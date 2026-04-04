@@ -469,7 +469,12 @@ export default function Students() {
                    </div>
                  </div>
                </div>
-               <button onClick={() => setViewStudentModal(null)} className="text-white opacity-70 hover:opacity-100 text-3xl">&times;</button>
+               <div className="flex items-center gap-3">
+                 <button onClick={() => window.print()} className="btn bg-white/20 hover:bg-white/30 text-white flex items-center gap-2 border-0">
+                    <Download className="w-4 h-4" /> Print Profile
+                 </button>
+                 <button onClick={() => setViewStudentModal(null)} className="text-white opacity-70 hover:opacity-100 text-3xl ml-2">&times;</button>
+               </div>
             </div>
             
             <div className="p-6 space-y-8">
