@@ -58,3 +58,33 @@ exports.getSchools = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.resetAdminPassword = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+    
+    if(!newPassword) {
+      return res.status(400).json({ success: false, message: 'New password is required' });
+    }
+
+    // Find the first ADMIN of this school
+    const adminUser = await prisma.user.findFirst({
+      where: { schoolId: id, role: 'ADMIN' }
+    });
+
+    if (!adminUser) {
+      return res.status(404).json({ success: false, message: 'Admin not found for this school' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    await prisma.user.update({
+      where: { id: adminUser.id },
+      data: { password: hashedPassword }
+    });
+
+    res.status(200).json({ success: true, message: 'Password reset successfully' });
+  } catch (error) {
+    next(error);
+  }
+};

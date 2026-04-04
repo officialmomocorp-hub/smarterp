@@ -11,10 +11,27 @@ export default function ManageSchools() {
     name: '', code: '', address: '', city: '', state: '', pincode: '', phone: '', email: '', udiseCode: '', adminEmail: '', adminPassword: ''
   });
 
+  const [resetModalSchool, setResetModalSchool] = useState(null);
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+
   useEffect(() => {
     fetchSchools();
   }, []);
 
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await api.put(`/schools/${resetModalSchool.id}/reset-password`, { newPassword: newAdminPassword });
+      toast.success('Admin password reset successfully!');
+      setResetModalSchool(null);
+      setNewAdminPassword('');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to reset password');
+    } finally {
+      setLoading(false);
+    }
+  };
   const fetchSchools = async () => {
     try {
       const res = await api.get(`/schools`);
@@ -56,7 +73,7 @@ export default function ManageSchools() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {schools.map(school => (
-          <div key={school.id} className="card hover:shadow-lg transition-shadow">
+          <div key={school.id} className="card hover:shadow-lg transition-shadow relative">
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 bg-primary-50 rounded-lg">
                 <Building2 className="w-6 h-6 text-primary-600" />
@@ -65,14 +82,41 @@ export default function ManageSchools() {
             </div>
             <h3 className="text-xl font-bold text-gray-900">{school.name}</h3>
             <p className="text-sm text-gray-500 mb-4 flex gap-1 items-center"><MapPin className="w-4 h-4"/> {school.city}, {school.state}</p>
-            <div className="space-y-2 text-sm text-gray-600">
+            <div className="space-y-2 text-sm text-gray-600 mb-4">
               <div className="flex justify-between"><span>Code:</span> <span className="font-medium text-gray-900">{school.code}</span></div>
               <div className="flex justify-between"><span>Admin:</span> <span className="font-medium text-gray-900">{school.users?.[0]?.email || 'N/A'}</span></div>
               <div className="flex justify-between"><span>Phone:</span> <span className="font-medium text-gray-900">{school.phone}</span></div>
             </div>
+            <button 
+                onClick={() => setResetModalSchool(school)}
+                className="w-full py-2 px-4 border border-rose-200 text-rose-600 rounded-lg text-sm font-medium hover:bg-rose-50 transition-colors"
+            >
+              Reset Admin Password
+            </button>
           </div>
         ))}
       </div>
+
+      {resetModalSchool && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Reset Admin Password</h3>
+            <p className="text-sm text-gray-500 mb-6">Enter a new admin password for <strong>{resetModalSchool.name}</strong>.</p>
+            <form onSubmit={handleResetPassword}>
+              <div className="space-y-4">
+                <div>
+                  <label className="label">New Password</label>
+                  <input type="text" className="input" required value={newAdminPassword} onChange={e => setNewAdminPassword(e.target.value)} />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button type="button" onClick={() => setResetModalSchool(null)} className="btn btn-outline">Cancel</button>
+                <button type="submit" disabled={loading} className="btn bg-rose-600 text-white hover:bg-rose-700">{loading ? 'Saving...' : 'Reset Password'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
