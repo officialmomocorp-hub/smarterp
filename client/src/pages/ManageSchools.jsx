@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { Building2, Plus, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -17,7 +17,7 @@ export default function ManageSchools() {
 
   const fetchSchools = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/schools`, { withCredentials: true });
+      const res = await api.get(`/schools`);
       setSchools(res.data.data);
     } catch (err) {
       toast.error('Failed to load schools');
@@ -28,7 +28,7 @@ export default function ManageSchools() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/schools`, formData, { withCredentials: true });
+      await api.post(`/schools`, formData);
       toast.success('School created successfully!');
       setShowModal(false);
       fetchSchools();
