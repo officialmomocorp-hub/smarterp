@@ -68,10 +68,36 @@ router.get('/receipts/student/:studentId', async (req, res, next) => {
  *     responses:
  *       200: { description: PDF file }
  */
-router.get('/reportcard/:studentId/:examId', async (req, res, next) => {
+router.get(['/reportcard/:studentId/:examId', '/report-card/:studentId/:examId'], async (req, res, next) => {
   try {
     await pdfService.generateReportCard(req.params.studentId, req.params.examId, req.schoolId, res);
   } catch (error) { next(error); }
+});
+
+// Demo Report Card for testing
+router.get(['/reportcard/demo', '/report-card/demo'], async (req, res, next) => {
+  try {
+    const student = await prisma.student.findFirst({
+        where: { schoolId: req.schoolId },
+        include: { id: true }
+    });
+    const exam = await prisma.exam.findFirst({
+        where: { schoolId: req.schoolId }
+    });
+
+    if (!student) {
+        // Fallback for very new schools - create a dummy PDF or throw
+        return res.status(404).send('Please add at least one student and exam first to see a report card demo.');
+    }
+    
+    // If no exam yet, we can't really show marks, but let's try to find any exam
+    const examId = exam?.id || 'demo-exam';
+    
+    await pdfService.generateReportCard(student.id, examId, req.schoolId, res);
+  } catch (error) { 
+    // If it fails because of missing marks, let's at least show the student profile in PDF
+    next(error);
+  }
 });
 
 // Bulk generate report cards for a class

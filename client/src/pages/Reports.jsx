@@ -244,8 +244,29 @@ export default function Reports() {
                 <FileText className="w-8 h-8 text-green-600 mb-3" />
                 <h4 className="font-medium text-green-900 mb-2">Report Card</h4>
                 <p className="text-sm text-green-700 mb-4">CBSE-format report card with marks, grades, co-scholastic areas</p>
-                <button onClick={() => {toast.success('Fetching Report Card...'); setTimeout(() => window.open('/api/v1/pdf/report-card/demo', '_blank'), 1000);}} data-testid="generate-report-card" className="btn btn-success text-sm flex items-center gap-2">
-                  <Download className="w-4 h-4" /> Generate Report Card
+                <button 
+                  onClick={async () => {
+                    toast.success('Generating Report Card...');
+                    try {
+                      const response = await axios.get(`${API_BASE}/pdf/report-card/demo`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                        responseType: 'blob',
+                      });
+                      const url = window.URL.createObjectURL(new Blob([response.data]));
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.setAttribute('download', 'Report-Card-Demo.pdf');
+                      document.body.appendChild(link);
+                      link.click();
+                      link.remove();
+                    } catch (e) {
+                      toast.error('Failed to generate PDF. Make sure you have students and exams set up.');
+                    }
+                  }} 
+                  data-testid="generate-report-card" 
+                  className="btn btn-success text-sm flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" /> Download Demo Report Card
                 </button>
               </div>
               <div className="p-6 bg-amber-50 rounded-lg border border-amber-200">
