@@ -47,6 +47,7 @@ export default function App() {
         <Route path="/hostel" element={<ProtectedRoute><Placeholder title="Hostel Management" /></ProtectedRoute>} />
         <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
         <Route path="/academic" element={<ProtectedRoute><Placeholder title="Academic Management" /></ProtectedRoute>} />
+        <Route path="/billing" element={<ProtectedRoute><Placeholder title="Subscription & Billing" /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Placeholder title="Settings" /></ProtectedRoute>} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
