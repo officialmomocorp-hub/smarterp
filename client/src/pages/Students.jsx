@@ -28,6 +28,8 @@ export default function Students() {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({});
   const [showForm, setShowForm] = useState(false);
+  const [viewStudentModal, setViewStudentModal] = useState(null);
+  const [editStudentId, setEditStudentId] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [formData, setFormData] = useState({
     profile: {
@@ -76,9 +78,15 @@ export default function Students() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await studentAPI.create(formData);
-      toast.success('Student created successfully');
+      if (editStudentId) {
+        await studentAPI.update(editStudentId, formData);
+        toast.success('Student updated successfully');
+      } else {
+        await studentAPI.create(formData);
+        toast.success('Student created successfully');
+      }
       setShowForm(false);
+      setEditStudentId(null);
       setFormData({
         profile: { firstName: '', middleName: '', lastName: '', dateOfBirth: '', gender: 'MALE', casteCategory: 'GENERAL', religion: 'HINDU', motherTongue: 'HINDI', aadharNumber: '', bloodGroup: '' },
         parentData: { fatherName: '', fatherOccupation: '', fatherPhone: '', fatherEmail: '', motherName: '', motherOccupation: '', motherPhone: '', motherEmail: '', address: '', city: '', state: 'DELHI', pincode: '', annualIncome: '' },
@@ -86,8 +94,28 @@ export default function Students() {
       });
       fetchStudents();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create student');
+      toast.error(error.response?.data?.message || 'Failed to save student');
     }
+  };
+
+  const handleEditClick = (student) => {
+    setEditStudentId(student.id);
+    setFormData({
+      profile: {
+        firstName: student.profile?.firstName || '', middleName: student.profile?.middleName || '', lastName: student.profile?.lastName || '', 
+        dateOfBirth: student.profile?.dateOfBirth ? new Date(student.profile.dateOfBirth).toISOString().split('T')[0] : '', 
+        gender: student.profile?.gender || 'MALE', casteCategory: student.profile?.casteCategory || 'GENERAL', religion: student.profile?.religion || 'HINDU', 
+        motherTongue: student.profile?.motherTongue || 'HINDI', aadharNumber: student.profile?.aadharNumber || '', bloodGroup: student.profile?.bloodGroup || ''
+      },
+      parentData: {
+        fatherName: student.parents?.[0]?.parent?.fatherName || '', fatherOccupation: student.parents?.[0]?.parent?.fatherOccupation || '', fatherPhone: student.parents?.[0]?.parent?.fatherPhone || '', fatherEmail: student.parents?.[0]?.parent?.fatherEmail || '',
+        motherName: student.parents?.[0]?.parent?.motherName || '', motherOccupation: student.parents?.[0]?.parent?.motherOccupation || '', motherPhone: student.parents?.[0]?.parent?.motherPhone || '', motherEmail: student.parents?.[0]?.parent?.motherEmail || '',
+        address: student.parents?.[0]?.parent?.address || '', city: student.parents?.[0]?.parent?.city || '', state: student.parents?.[0]?.parent?.state || 'DELHI', pincode: student.parents?.[0]?.parent?.pincode || '', annualIncome: student.parents?.[0]?.parent?.annualIncome || ''
+      },
+      class: student.class?.name || 'Class 1', section: student.section?.name || 'A', house: student.house || 'RED',
+      bplStatus: student.bplStatus || false, rteSeat: student.rteSeat || false, midDayMealOpted: student.midDayMealOpted || false, transportOpted: student.transportOpted || false, hostelOpted: student.hostelOpted || false
+    });
+    setShowForm(true);
   };
 
   const handleDelete = async (id) => {
@@ -108,7 +136,7 @@ export default function Students() {
           <h2 className="text-2xl font-bold text-gray-900">Student Management</h2>
           <p className="text-gray-500 mt-1">{pagination.total || 0} students enrolled</p>
         </div>
-        <button id="add-student-btn" data-testid="add-student" onClick={() => setShowForm(true)} className="btn btn-primary flex items-center gap-2">
+        <button id="add-student-btn" data-testid="add-student" onClick={() => { setEditStudentId(null); setShowForm(true); }} className="btn btn-primary flex items-center gap-2">
           <Plus className="w-4 h-4" /> Add Student
         </button>
       </div>
@@ -196,10 +224,10 @@ export default function Students() {
                     <td className="px-4 py-3 text-sm">{student.parents?.[0]?.parent?.fatherName || '-'}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <button className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600" title="View">
+                        <button onClick={() => setViewStudentModal(student)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600" title="View">
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600" title="Edit">
+                        <button onClick={() => handleEditClick(student)} className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600" title="Edit">
                           <Edit className="w-4 h-4" />
                         </button>
                         <button onClick={() => handleDelete(student.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-600" title="Delete">
@@ -240,13 +268,13 @@ export default function Students() {
         )}
       </div>
 
-      {/* Add Student Modal */}
+      {/* Add/Edit Student Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-              <h3 className="text-lg font-semibold text-gray-900">Add New Student</h3>
-              <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600">&times;</button>
+          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+              <h3 className="text-xl font-bold text-gray-900">{editStudentId ? 'Edit Student' : 'Add New Student'}</h3>
+              <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -412,11 +440,94 @@ export default function Students() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t">
+              <div className="flex justify-end gap-3 pt-4 border-t sticky bottom-0 bg-white pb-4 px-6 rounded-b-2xl">
                 <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary">Cancel</button>
-                <button type="submit" className="btn btn-primary">Create Student</button>
+                <button type="submit" className="btn btn-primary">{editStudentId ? 'Save Changes' : 'Create Student'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* View Student Profile Modal */}
+      {viewStudentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-gradient-to-r from-primary-600 to-primary-800 px-6 py-6 border-b border-gray-200 flex justify-between items-start rounded-t-2xl text-white">
+               <div className="flex gap-4 items-center">
+                 <div className="w-16 h-16 rounded-full bg-white text-primary-700 flex items-center justify-center text-2xl font-bold shadow-md">
+                   {viewStudentModal.profile?.firstName?.charAt(0)}{viewStudentModal.profile?.lastName?.charAt(0)}
+                 </div>
+                 <div>
+                   <h3 className="text-2xl font-bold">
+                     {viewStudentModal.profile?.firstName} {viewStudentModal.profile?.middleName} {viewStudentModal.profile?.lastName}
+                   </h3>
+                   <div className="flex gap-3 text-sm mt-1 opacity-90">
+                     <span>ID: <strong className="font-mono">{viewStudentModal.studentId}</strong></span>
+                     <span>•</span>
+                     <span>Roll: <strong>{viewStudentModal.rollNumber}</strong></span>
+                   </div>
+                 </div>
+               </div>
+               <button onClick={() => setViewStudentModal(null)} className="text-white opacity-70 hover:opacity-100 text-3xl">&times;</button>
+            </div>
+            
+            <div className="p-6 space-y-8">
+              {/* Academic Profile */}
+              <div>
+                <h4 className="text-lg font-bold text-gray-800 border-b pb-2 mb-4">Academic Information</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-2 text-sm">
+                  <div><p className="text-gray-500">Class</p><p className="font-semibold text-gray-900">{viewStudentModal.class?.name}</p></div>
+                  <div><p className="text-gray-500">Section</p><p className="font-semibold text-gray-900">{viewStudentModal.section?.name}</p></div>
+                  <div><p className="text-gray-500">House</p><p className="font-semibold text-gray-900">{viewStudentModal.house || 'N/A'}</p></div>
+                  <div><p className="text-gray-500">Status</p><span className="badge badge-success mt-1 inline-block">Active</span></div>
+                </div>
+              </div>
+
+              {/* Personal Details */}
+              <div>
+                <h4 className="text-lg font-bold text-gray-800 border-b pb-2 mb-4">Personal Details</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-2 text-sm">
+                  <div><p className="text-gray-500">Date of Birth</p><p className="font-semibold text-gray-900">{new Date(viewStudentModal.profile?.dateOfBirth).toLocaleDateString()}</p></div>
+                  <div><p className="text-gray-500">Gender</p><p className="font-semibold text-gray-900">{viewStudentModal.profile?.gender}</p></div>
+                  <div><p className="text-gray-500">Blood Group</p><p className="font-semibold text-gray-900">{viewStudentModal.profile?.bloodGroup?.replace('_', ' ') || 'N/A'}</p></div>
+                  <div><p className="text-gray-500">Mother Tongue</p><p className="font-semibold text-gray-900">{viewStudentModal.profile?.motherTongue}</p></div>
+                  <div><p className="text-gray-500">Category</p><p className="font-semibold text-gray-900">{viewStudentModal.profile?.casteCategory?.replace('_', ' ')}</p></div>
+                  <div><p className="text-gray-500">Religion</p><p className="font-semibold text-gray-900">{viewStudentModal.profile?.religion}</p></div>
+                  <div><p className="text-gray-500">Aadhar No.</p><p className="font-semibold text-gray-900">{viewStudentModal.profile?.aadharNumber}</p></div>
+                </div>
+              </div>
+
+              {/* Parents Details */}
+              <div>
+                <h4 className="text-lg font-bold text-gray-800 border-b pb-2 mb-4">Family Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                  <div>
+                    <p className="font-bold text-gray-900 mb-2 flex items-center gap-2">Father's Details</p>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex"><span className="text-gray-500 w-24">Name:</span> <span className="font-medium">{viewStudentModal.parents?.[0]?.parent?.fatherName || 'N/A'}</span></div>
+                      <div className="flex"><span className="text-gray-500 w-24">Phone:</span> <span className="font-medium">{viewStudentModal.parents?.[0]?.parent?.fatherPhone || 'N/A'}</span></div>
+                      <div className="flex"><span className="text-gray-500 w-24">Occupation:</span> <span className="font-medium">{viewStudentModal.parents?.[0]?.parent?.fatherOccupation || 'N/A'}</span></div>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900 mb-2 flex items-center gap-2">Mother's Details</p>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex"><span className="text-gray-500 w-24">Name:</span> <span className="font-medium">{viewStudentModal.parents?.[0]?.parent?.motherName || 'N/A'}</span></div>
+                      <div className="flex"><span className="text-gray-500 w-24">Phone:</span> <span className="font-medium">{viewStudentModal.parents?.[0]?.parent?.motherPhone || 'N/A'}</span></div>
+                      <div className="flex"><span className="text-gray-500 w-24">Occupation:</span> <span className="font-medium">{viewStudentModal.parents?.[0]?.parent?.motherOccupation || 'N/A'}</span></div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-4 text-sm">
+                  <p className="text-gray-500 mb-1">Residential Address</p>
+                  <p className="font-medium text-gray-900">
+                    {viewStudentModal.parents?.[0]?.parent?.address}, {viewStudentModal.parents?.[0]?.parent?.city}, {viewStudentModal.parents?.[0]?.parent?.state} - {viewStudentModal.parents?.[0]?.parent?.pincode}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
