@@ -27,11 +27,18 @@ class StudentService {
       throw new AppError('No active academic year found', 400);
     }
 
-    const studentCount = await prisma.student.count({
-      where: { classId: classRecord.id, sectionId: sectionRecord.id, academicYearId: currentAcademicYear.id },
+    const lastStudent = await prisma.student.findFirst({
+      where: { 
+        classId: classRecord.id, 
+        sectionId: sectionRecord.id, 
+        academicYearId: currentAcademicYear.id,
+        schoolId 
+      },
+      orderBy: { rollNumber: 'desc' },
+      select: { rollNumber: true }
     });
 
-    const rollNumber = studentCount + 1;
+    const rollNumber = lastStudent ? lastStudent.rollNumber + 1 : 1;
     const studentId = this.generateStudentId(schoolId, classRecord.name, section, rollNumber);
 
     const student = await prisma.$transaction(async (tx) => {
