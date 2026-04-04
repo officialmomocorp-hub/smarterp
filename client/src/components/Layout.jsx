@@ -6,7 +6,7 @@ import {
   Bus, BedDouble, FileText, MessageSquare, GraduationCap,
   Library, UserCheck, ClipboardList, Settings, LogOut,
   Menu, ChevronDown, ChevronRight, Receipt, BarChart3,
-  School, Award, FileSpreadsheet, Bell
+  School, Award, FileSpreadsheet, Bell, Building2
 } from 'lucide-react';
 
 const menuItems = [
@@ -15,6 +15,12 @@ const menuItems = [
     icon: LayoutDashboard,
     path: '/dashboard',
     roles: ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'PARENT', 'STUDENT'],
+  },
+  {
+    title: 'Manage Schools',
+    icon: Building2,
+    path: '/manage-schools',
+    roles: ['SUPER_ADMIN'],
   },
   {
     title: 'Admissions',
@@ -135,7 +141,7 @@ export default function Layout({ children }) {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div 

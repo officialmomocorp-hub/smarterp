@@ -53,7 +53,10 @@ export default function FeeManagement() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Fee Management</h2>
+        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <IndianRupee className="w-6 h-6 text-gray-900" />
+          Fee Management
+        </h2>
         <p className="text-gray-500 mt-1">Manage fee collection, concessions, and reports</p>
       </div>
 
