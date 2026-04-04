@@ -18,6 +18,7 @@ import Library from './pages/Library';
 import Reports from './pages/Reports';
 import Placeholder from './pages/Placeholder';
 import ManageSchools from './pages/ManageSchools';
+import Subscriptions from './pages/Subscriptions';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuthStore();
@@ -47,7 +48,7 @@ export default function App() {
         <Route path="/hostel" element={<ProtectedRoute><Placeholder title="Hostel Management" /></ProtectedRoute>} />
         <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
         <Route path="/academic" element={<ProtectedRoute><Placeholder title="Academic Management" /></ProtectedRoute>} />
-        <Route path="/billing" element={<ProtectedRoute><Placeholder title="Subscription & Billing" /></ProtectedRoute>} />
+        <Route path="/billing" element={<ProtectedRoute><Subscriptions /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Placeholder title="Settings" /></ProtectedRoute>} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
