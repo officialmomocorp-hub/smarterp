@@ -3,7 +3,7 @@ import { Calendar, Clock, User, BookOpen, Plus, Trash2, AlertCircle } from 'luci
 import toast from 'react-hot-toast';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const PERIODS = [
+const DEFAULT_PERIODS = [
   { period: 1, time: '08:00 - 08:45' },
   { period: 2, time: '08:45 - 09:30' },
   { period: 3, time: '09:30 - 10:15' },
@@ -18,6 +18,8 @@ const SUBJECTS = ['Mathematics', 'English', 'Hindi', 'Science', 'Social Studies'
 const TEACHERS = ['Sunita Sharma', 'Rajesh Kumar', 'Priya Singh', 'Amit Patel', 'Meera Joshi', 'Vikram Yadav'];
 
 export default function Timetable() {
+  const [periods, setPeriods] = useState(DEFAULT_PERIODS);
+  const [showTimeModal, setShowTimeModal] = useState(false);
   const [selectedClass, setSelectedClass] = useState('Class 5');
   const [selectedSection, setSelectedSection] = useState('A');
   const [timetable, setTimetable] = useState({});
@@ -119,6 +121,9 @@ export default function Timetable() {
           <p className="text-gray-500 mt-1">Create and manage class timetables</p>
         </div>
         <div className="flex gap-3">
+          <button onClick={() => setShowTimeModal(true)} className="btn btn-secondary flex items-center gap-2">
+            <Clock className="w-4 h-4" /> Edit Bell Timings
+          </button>
           <select className="input w-40" value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
             {['Nursery', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map(c => (
               <option key={c}>{c}</option>
@@ -148,7 +153,7 @@ export default function Timetable() {
             </tr>
           </thead>
           <tbody>
-            {PERIODS.map((p, periodIndex) => (
+            {periods.map((p, periodIndex) => (
               <tr key={p.period}>
                 <td className="px-3 py-2 border-r border-b bg-gray-50">
                   <div className="text-xs font-medium text-gray-700">Period {p.period}</div>
@@ -246,6 +251,42 @@ export default function Timetable() {
                 <button onClick={() => setShowAddModal(false)} className="btn btn-secondary">Cancel</button>
                 <button onClick={handleSaveEntry} className="btn btn-primary">Save</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Timings Modal */}
+      {showTimeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-primary-600" /> Edit Bell Timings
+              </h3>
+              <button onClick={() => setShowTimeModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <div className="p-6 space-y-4 overflow-y-auto flex-1">
+              <p className="text-sm text-gray-500 mb-2">Adjust the time duration for each period globally.</p>
+              {periods.map((p, idx) => (
+                <div key={p.period} className="flex gap-4 items-center">
+                  <span className="font-medium text-sm text-gray-700 w-20">Period {p.period}</span>
+                  <input
+                    type="text"
+                    className="input flex-1 font-mono text-sm"
+                    value={p.time}
+                    onChange={(e) => {
+                      const newPeriods = [...periods];
+                      newPeriods[idx].time = e.target.value;
+                      setPeriods(newPeriods);
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="px-6 py-4 border-t flex justify-end gap-3 sticky bottom-0 bg-gray-50">
+                <button onClick={() => setShowTimeModal(false)} className="btn btn-secondary">Cancel</button>
+                <button onClick={() => {toast.success('Timings updated successfully!'); setShowTimeModal(false);}} className="btn btn-primary">Save Changes</button>
             </div>
           </div>
         </div>
