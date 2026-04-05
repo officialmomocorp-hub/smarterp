@@ -32,9 +32,12 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+const { xssSanitizer } = require('./middleware/sanitize');
+
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(xssSanitizer);
 
 // Static files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
