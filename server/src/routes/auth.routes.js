@@ -27,6 +27,7 @@ const { authenticate } = require('../middleware/auth');
  *         description: User registered successfully
  */
 const { loginLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
+const { validatePasswordReset, validateResults } = require('../middleware/passwordValidator');
 
 router.post('/register', authController.register);
 
@@ -52,9 +53,19 @@ router.post('/register', authController.register);
  */
 router.post('/login', loginLimiter, authController.login);
 router.post('/refresh-token', authenticate, authController.refreshToken);
-router.post('/change-password', authenticate, authController.changePassword);
+router.post('/change-password', 
+  authenticate, 
+  validatePasswordReset, 
+  validateResults, 
+  authController.changePassword
+);
 router.post('/forgot-password', passwordResetLimiter, authController.forgotPassword);
-router.post('/reset-password', passwordResetLimiter, authController.resetPassword);
+router.post('/reset-password', 
+  passwordResetLimiter, 
+  validatePasswordReset, 
+  validateResults, 
+  authController.resetPassword
+);
 router.get('/profile', authenticate, authController.getProfile);
 
 module.exports = router;

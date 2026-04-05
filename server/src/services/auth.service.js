@@ -163,13 +163,22 @@ class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 12);
-    await prisma.user.update({
-      where: { id: userId },
-      data: { 
-        password: hashedPassword,
-        tokenVersion: { increment: 1 }
-      },
-    });
+    
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: userId },
+        data: { 
+          password: hashedPassword,
+          tokenVersion: { increment: 1 }
+        },
+      }),
+      prisma.passwordHistory.create({
+        data: {
+          userId,
+          hashedPassword
+        }
+      })
+    ]);
 
     return { message: 'Password changed successfully' };
   }
@@ -202,13 +211,22 @@ class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 12);
-    await prisma.user.update({
-      where: { id: decoded.userId },
-      data: { 
-        password: hashedPassword,
-        tokenVersion: { increment: 1 }
-      },
-    });
+    
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: decoded.userId },
+        data: { 
+          password: hashedPassword,
+          tokenVersion: { increment: 1 }
+        },
+      }),
+      prisma.passwordHistory.create({
+        data: {
+          userId: decoded.userId,
+          hashedPassword
+        }
+      })
+    ]);
 
     return { message: 'Password reset successfully' };
   }

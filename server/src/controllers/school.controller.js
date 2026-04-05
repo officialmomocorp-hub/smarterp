@@ -78,13 +78,21 @@ exports.resetAdminPassword = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 12);
-    await prisma.user.update({
-      where: { id: adminUser.id },
-      data: { 
-        password: hashedPassword,
-        tokenVersion: { increment: 1 }
-      }
-    });
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: adminUser.id },
+        data: { 
+          password: hashedPassword,
+          tokenVersion: { increment: 1 }
+        }
+      }),
+      prisma.passwordHistory.create({
+        data: {
+          userId: adminUser.id,
+          hashedPassword
+        }
+      })
+    ]);
 
     res.status(200).json({ success: true, message: 'Password reset successfully' });
   } catch (error) {

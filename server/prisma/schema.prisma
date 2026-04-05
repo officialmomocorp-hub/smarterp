@@ -168,6 +168,7 @@ model User {
   salaries          Salary[]
   auditLogs         AuditLog[]
   sentCommunications Communication[] @relation("CommSender")
+  passwordHistory   PasswordHistory[]
 
   @@index([schoolId, role])
   @@index([email])
@@ -1486,6 +1487,17 @@ model TokenBlacklist {
   userId    String
   expiry    DateTime
   createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PasswordHistory {
+  id             String   @id @default(uuid())
+  userId         String
+  hashedPassword String
+  createdAt      DateTime @default(now())
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
