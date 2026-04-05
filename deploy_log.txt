@@ -1,0 +1,56 @@
+Connecting to 103.179.97.107...
+Connected!
+
+>>> cd /var/www/smarterp && git log --oneline -3
+OUT:
+81a962c fix: resolve P0 bugs - Staff Add, Attendance Save, Fee Lookup, Notices, Settings
+ad46ba6 fix: enforced unique roll numbers per class/section/year
+b84512b fix: report-card demo route and client side pdf download
+
+
+>>> cd /var/www/smarterp && git status
+OUT:
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	server/seed_live.js
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+
+>>> cd /var/www/smarterp && git fetch origin && git reset --hard origin/main 2>&1
+OUT:
+HEAD is now at 81a962c fix: resolve P0 bugs - Staff Add, Attendance Save, Fee Lookup, Notices, Settings
+
+
+>>> cd /var/www/smarterp && pm2 restart smarterp-backend --no-color 2>&1 || echo PM2_RESTART_DONE
+OUT:
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [smarterp-backend](ids: [ 1 ])
+[PM2] [smarterp-backend](1) ✓
+┌────┬─────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼─────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 194261   │ 11h    │ 1    │ online    │ 0%       │ 61.5mb   │ root     │ disabled │
+│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 209769   │ 0s     │ 9    │ online    │ 0%       │ 17.0mb   │ root     │ disabled │
+└────┴─────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+
+
+>>> cd /var/www/smarterp && pm2 status --no-color 2>&1 || echo PM2_STATUS_DONE
+OUT:
+┌────┬─────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼─────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 194261   │ 11h    │ 1    │ online    │ 0%       │ 61.5mb   │ root     │ disabled │
+│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 209769   │ 0s     │ 9    │ online    │ 0%       │ 60.7mb   │ root     │ disabled │
+└────┴─────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+
+
+>>> echo DEPLOY_SUCCESS
+OUT:
+DEPLOY_SUCCESS
+
+
+=== DEPLOYMENT COMPLETE ===

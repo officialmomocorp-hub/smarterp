@@ -7,10 +7,11 @@ export default function Academics() {
   const [activeTab, setActiveTab] = useState('years');
   const [academicYears, setAcademicYears] = useState([]);
   const [classes, setClasses] = useState([]);
+  const [sectionForm, setSectionForm] = useState({ classId: '', name: '', capacity: 40 });
+  const [subjectForm, setSubjectForm] = useState({ classId: '', name: '', code: '', type: 'Theory', maxMarks: 100, passMarks: 33 });
   
   const [yearForm, setYearForm] = useState({ name: '', startDate: '', endDate: '', isCurrent: false });
   const [classForm, setClassForm] = useState({ name: '', displayName: '', sortOrder: 1 });
-  const [subjectForm, setSubjectForm] = useState({ classId: '', name: '', code: '', description: '' });
 
   useEffect(() => {
     fetchAcademicYears();
@@ -63,13 +64,25 @@ export default function Academics() {
     }
   };
 
+  const handleCreateSection = async (e) => {
+    e.preventDefault();
+    try {
+      await academicAPI.createSection(sectionForm);
+      toast.success('Section added successfully');
+      setSectionForm({ ...sectionForm, name: '' });
+      fetchClasses();
+    } catch (error) {
+      toast.error('Failed to create section');
+    }
+  };
+
   const handleCreateSubject = async (e) => {
     e.preventDefault();
     try {
-      const { description, ...payload } = subjectForm;
-      await academicAPI.createSubject(payload);
+      await academicAPI.createSubject(subjectForm);
       toast.success('Subject assigned successfully');
-      setSubjectForm({ classId: '', name: '', code: '', description: '' });
+      setSubjectForm({ ...subjectForm, name: '', code: '' });
+      fetchClasses(); 
     } catch (error) {
       toast.error('Failed to create subject');
     }
@@ -160,7 +173,7 @@ export default function Academics() {
 
       {activeTab === 'classes' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-6">
             <div className="card">
               <h3 className="text-lg font-semibold mb-4">Add New Class</h3>
               <form onSubmit={handleCreateClass} className="space-y-4">
@@ -177,23 +190,62 @@ export default function Academics() {
                 </button>
               </form>
             </div>
+
+            <div className="card">
+              <h3 className="text-lg font-semibold mb-4">Add Section to Class</h3>
+              <form onSubmit={handleCreateSection} className="space-y-4">
+                <div>
+                  <label className="label">Select Class</label>
+                  <select 
+                    className="input" 
+                    required 
+                    value={sectionForm.classId} 
+                    onChange={e => setSectionForm({...sectionForm, classId: e.target.value})}
+                  >
+                    <option value="">Choose Class</option>
+                    {classes.map(c => <option key={c.id} value={c.id}>{c.displayName}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="label">Section Name</label>
+                  <input className="input" required placeholder="e.g. A" value={sectionForm.name} onChange={e => setSectionForm({...sectionForm, name: e.target.value.toUpperCase()})} />
+                </div>
+                <button type="submit" className="w-full btn btn-secondary flex justify-center items-center gap-2">
+                  <Plus className="w-4 h-4"/> Add Section
+                </button>
+              </form>
+            </div>
           </div>
+
           <div className="lg:col-span-2">
             <div className="card">
-              <h3 className="text-lg font-semibold mb-4">Class List</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <h3 className="text-lg font-semibold mb-4">Structure View</h3>
+              <div className="space-y-4">
                 {classes.map(cls => (
                   <div key={cls.id} className="p-4 border rounded-lg bg-gray-50">
-                    <p className="font-bold text-gray-900 mb-2">{cls.displayName}</p>
+                    <div className="flex justify-between items-center mb-3">
+                      <p className="font-bold text-gray-900 text-lg">{cls.displayName}</p>
+                      <button 
+                        onClick={() => setSectionForm({...sectionForm, classId: cls.id})}
+                        className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                      >
+                        + Add Section
+                      </button>
+                    </div>
                     <div className="flex gap-2 flex-wrap">
-                      {(cls.sections || []).map(sec => (
-                        <span key={sec.id} className="badge bg-white shadow-sm border border-gray-200">
-                          Sec {sec.name}
-                        </span>
-                      ))}
+                      {(cls.sections || []).length > 0 ? (
+                        cls.sections.map(sec => (
+                          <span key={sec.id} className="badge bg-white shadow-sm border border-gray-200 py-2 px-4 text-base">
+                            Section {sec.name}
+                          </span>
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-400 italic">No sections added yet</p>
+                      )}
                     </div>
                   </div>
                 ))}
+                {classes.length === 0 && <p className="text-gray-500 text-center py-8">No classes defined. Create your first class to start.</p>}
               </div>
             </div>
           </div>
@@ -204,7 +256,7 @@ export default function Academics() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
             <div className="card">
-              <h3 className="text-lg font-semibold mb-4">Assign Subject</h3>
+              <h3 className="text-lg font-semibold mb-4">Assign New Subject</h3>
               <form onSubmit={handleCreateSubject} className="space-y-4">
                 <div>
                   <label className="label">Select Class</label>
@@ -219,9 +271,19 @@ export default function Academics() {
                   <label className="label">Subject Name</label>
                   <input className="input" required placeholder="e.g. Mathematics" value={subjectForm.name} onChange={e => setSubjectForm({...subjectForm, name: e.target.value})} />
                 </div>
-                <div>
-                  <label className="label">Subject Code</label>
-                  <input className="input" placeholder="e.g. MATH-101" value={subjectForm.code} onChange={e => setSubjectForm({...subjectForm, code: e.target.value})} />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">Code</label>
+                    <input className="input" placeholder="MATH-101" value={subjectForm.code} onChange={e => setSubjectForm({...subjectForm, code: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="label">Type</label>
+                    <select className="input" value={subjectForm.type} onChange={e => setSubjectForm({...subjectForm, type: e.target.value})}>
+                      <option value="Theory">Theory</option>
+                      <option value="Practical">Practical</option>
+                      <option value="Combo">Combo</option>
+                    </select>
+                  </div>
                 </div>
                 <button type="submit" className="w-full btn btn-primary flex justify-center items-center gap-2">
                   <Plus className="w-4 h-4"/> Assign Subject
@@ -231,9 +293,27 @@ export default function Academics() {
           </div>
           <div className="lg:col-span-2">
             <div className="card">
-              <div className="text-center py-12 text-gray-500 border-2 border-dashed rounded-lg">
-                <BookOpen className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p>Select a class from the list to view its subjects.</p>
+              <h3 className="text-lg font-semibold mb-4">Subjects Repository</h3>
+              <div className="space-y-4">
+                {classes.map(cls => (
+                  <div key={cls.id} className="border rounded-lg overflow-hidden">
+                    <div className="bg-gray-100 px-4 py-2 font-bold border-b">
+                      {cls.displayName}
+                    </div>
+                    <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {(cls.subjects || []).length > 0 ? (
+                        cls.subjects.map(sub => (
+                          <div key={sub.id} className="p-3 bg-white border rounded shadow-sm">
+                            <p className="font-semibold text-sm">{sub.name}</p>
+                            <p className="text-xs text-gray-500">{sub.code || 'No Code'}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="col-span-full text-center text-sm text-gray-400 py-4">No subjects assigned</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

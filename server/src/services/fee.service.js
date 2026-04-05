@@ -88,10 +88,17 @@ class FeeService {
   async processPayment(data, schoolId) {
     const { studentId, feeStructureId, installmentNumber, paymentMode, transactionId, amount, concessionId, remarks } = data;
 
-    const student = await prisma.student.findFirst({
+    let student = await prisma.student.findFirst({
       where: { id: studentId, schoolId },
       include: { class: true, feePayments: true },
     });
+
+    if (!student) {
+      student = await prisma.student.findFirst({
+        where: { studentId, schoolId },
+        include: { class: true, feePayments: true },
+      });
+    }
 
     if (!student) {
       throw new AppError('Student not found', 404);
@@ -159,7 +166,7 @@ class FeeService {
       data: {
         schoolId,
         academicYearId: student.academicYearId,
-        studentId,
+        studentId: student.id,
         feeStructureId,
         concessionId,
         receiptNumber,
