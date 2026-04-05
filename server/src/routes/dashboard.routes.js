@@ -3,7 +3,37 @@ const router = express.Router();
 const { authenticate, schoolScoped } = require('../middleware/auth');
 const prisma = require('../config/database');
 
+router.get('/super-admin', authenticate, async (req, res, next) => {
+  try {
+    if (req.userRole !== 'SUPER_ADMIN') {
+      return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
+
+    const [totalSchools, totalStudents, totalStaff, recentSchools] = await Promise.all([
+      prisma.school.count(),
+      prisma.student.count(),
+      prisma.staff.count(),
+      prisma.school.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: { id: true, name: true, city: true, createdAt: true }
+      })
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        totalSchools,
+        totalStudentsAcross: totalStudents,
+        totalStaffAcross: totalStaff,
+        recentSchools
+      }
+    });
+  } catch (error) { next(error); }
+});
+
 router.use(authenticate, schoolScoped);
+
 
 router.get('/admin', async (req, res, next) => {
   try {

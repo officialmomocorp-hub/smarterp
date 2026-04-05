@@ -2,17 +2,17 @@ Connected!
 
 >>> cd /var/www/smarterp && git fetch origin && git reset --hard origin/main 2>&1
 OUT:
-HEAD is now at 5dd7285 fix: fee payment structure and subjects visibility
+HEAD is now at de5bc9a fix: fee payment JSON parsing and academic subject visibility
 
 ERR:
 From https://github.com/officialmomocorp-hub/smarterp
-   495b578..5dd7285  main       -> origin/main
+   5dd7285..de5bc9a  main       -> origin/main
 
 
 >>> cd /var/www/smarterp/server && npm install --no-color 2>&1
 OUT:
 
-up to date, audited 438 packages in 764ms
+up to date, audited 438 packages in 735ms
 
 90 packages are looking for funding
   run `npm fund` for details
@@ -30,18 +30,18 @@ OUT:
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 446ms
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 384ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to react to database changes in your app as they happen? Discover how with Pulse: https://pris.ly/tip-1-pulse
+Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
 
 
 
 >>> cd /var/www/smarterp/client && npm install --no-color 2>&1
 OUT:
 
-up to date, audited 256 packages in 659ms
+up to date, audited 256 packages in 625ms
 
 54 packages are looking for funding
   run `npm fund` for details
@@ -68,7 +68,7 @@ dist/assets/index-BFwd5uvw.js   613.35 kB │ gzip: 177.97 kB
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 2.69s
+✓ built in 2.64s
 
 
 >>> pm2 restart smarterp-backend --no-color 2>&1
@@ -79,8 +79,8 @@ Use --update-env to update environment variables
 ┌────┬─────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
 │ id │ name                │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
 ├────┼─────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
-│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 194261   │ 11h    │ 1    │ online    │ 0%       │ 62.1mb   │ root     │ disabled │
-│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 211155   │ 0s     │ 11   │ online    │ 0%       │ 16.9mb   │ root     │ disabled │
+│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 194261   │ 12h    │ 1    │ online    │ 0%       │ 61.8mb   │ root     │ disabled │
+│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 211853   │ 0s     │ 12   │ online    │ 0%       │ 16.9mb   │ root     │ disabled │
 └────┴─────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
 
 

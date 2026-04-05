@@ -9,7 +9,7 @@ import {
   School, Award, FileSpreadsheet, Bell, Building2
 } from 'lucide-react';
 
-const menuItems = [
+const commonMenu = [
   {
     title: 'Dashboard',
     icon: LayoutDashboard,
@@ -17,11 +17,35 @@ const menuItems = [
     roles: ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'PARENT', 'STUDENT'],
   },
   {
+    title: 'Settings',
+    icon: Settings,
+    path: '/settings',
+    roles: ['SUPER_ADMIN', 'ADMIN'],
+  },
+];
+
+const superAdminMenu = [
+  {
     title: 'Manage Schools',
     icon: Building2,
     path: '/manage-schools',
     roles: ['SUPER_ADMIN'],
   },
+  {
+    title: 'Subscriptions',
+    icon: Receipt,
+    path: '/billing',
+    roles: ['SUPER_ADMIN'],
+  },
+  {
+    title: 'Platform Reports',
+    icon: BarChart3,
+    path: '/platform-reports',
+    roles: ['SUPER_ADMIN'],
+  },
+];
+
+const schoolAdminMenu = [
   {
     title: 'Admissions',
     icon: FileText,
@@ -83,28 +107,16 @@ const menuItems = [
     roles: ['ADMIN', 'TEACHER'],
   },
   {
-    title: 'Transport',
-    icon: Bus,
-    path: '/transport',
-    roles: ['ADMIN'],
-  },
-  {
-    title: 'Hostel',
-    icon: BedDouble,
-    path: '/hostel',
-    roles: ['ADMIN'],
-  },
-  {
     title: 'Notices',
     icon: Bell,
     path: '/notices',
     roles: ['ADMIN', 'TEACHER', 'PARENT', 'STUDENT'],
   },
   {
-    title: 'Reports',
+    title: 'School Reports',
     icon: FileSpreadsheet,
     path: '/reports',
-    roles: ['SUPER_ADMIN', 'ADMIN'],
+    roles: ['ADMIN'],
   },
   {
     title: 'Academic',
@@ -112,19 +124,15 @@ const menuItems = [
     path: '/academic',
     roles: ['ADMIN', 'TEACHER'],
   },
-  {
-    title: 'Subscriptions',
-    icon: Receipt,
-    path: '/billing',
-    roles: ['SUPER_ADMIN'],
-  },
-  {
-    title: 'Settings',
-    icon: Settings,
-    path: '/settings',
-    roles: ['SUPER_ADMIN', 'ADMIN'],
-  },
 ];
+
+const getMenuItems = (role) => {
+  if (role === 'SUPER_ADMIN') {
+    return [...commonMenu.filter(i => i.roles.includes(role)), ...superAdminMenu];
+  }
+  return [...commonMenu.filter(i => i.roles.includes(role)), ...schoolAdminMenu.filter(i => i.roles.includes(role))];
+};
+
 
 export default function Layout({ children }) {
   const { user, logout } = useAuthStore();
@@ -142,9 +150,7 @@ export default function Layout({ children }) {
     setExpandedMenus(prev => ({ ...prev, [title]: !prev[title] }));
   };
 
-  const filteredMenu = menuItems.filter(item =>
-    item.roles.includes(user?.role)
-  );
+  const filteredMenu = getMenuItems(user?.role);
 
   return (
     <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
@@ -256,7 +262,7 @@ export default function Layout({ children }) {
         <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-40">
           <div>
             <h1 className="text-lg font-semibold text-gray-900">
-              {menuItems.find(item => location.pathname === item.path)?.title || 'Dashboard'}
+              {filteredMenu.find(item => location.pathname === item.path)?.title || 'Smarterp'}
             </h1>
           </div>
           <div className="flex items-center gap-4">
