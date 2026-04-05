@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 const dotenv = require('dotenv');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
@@ -13,12 +14,21 @@ dotenv.config();
 
 const app = express();
 
+// Global performance
+app.use(compression());
+
 // Security middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 app.use(cors({
-  origin: ['http://localhost:8000', 'http://localhost:5173', 'http://localhost:3000'],
+  origin: [
+    'http://localhost:8000', 
+    'http://localhost:5173', 
+    'http://localhost:3000',
+    'https://smarterpsolution.duckdns.org',
+    'http://103.179.97.107'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -79,6 +89,11 @@ app.use('/api/v1/schools', require('./routes/school.routes'));
 
 // Cron jobs
 require('./config/cron');
+
+// 404 Handler for API
+app.use((req, res, next) => {
+  next(new AppError(`Endpoint ${req.originalUrl} not found on this server.`, 404));
+});
 
 // Error handling
 app.use(errorHandler);

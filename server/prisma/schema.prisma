@@ -1,4 +1,4 @@
-// Indian School ERP - Prisma Schema (SQLite for local development)
+// Indian School ERP - Prisma Schema (PostgreSQL Production)
 // Supports CBSE, ICSE, State Boards - Indian Education System
 
 generator client {
