@@ -117,7 +117,9 @@ class FeeService {
       throw new AppError('Fee structure not found', 404);
     }
 
-    const installmentData = feeStructure.dueDates[installmentNumber - 1];
+    const dates = typeof feeStructure.dueDates === 'string' ? JSON.parse(feeStructure.dueDates) : feeStructure.dueDates;
+    const installmentData = dates[installmentNumber - 1];
+
     if (!installmentData) {
       throw new AppError('Invalid installment number', 400);
     }

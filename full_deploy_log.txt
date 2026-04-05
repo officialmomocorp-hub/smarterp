@@ -2,17 +2,17 @@ Connected!
 
 >>> cd /var/www/smarterp && git fetch origin && git reset --hard origin/main 2>&1
 OUT:
-HEAD is now at 495b578 fix: academics and fees enhanced
+HEAD is now at 5dd7285 fix: fee payment structure and subjects visibility
 
 ERR:
 From https://github.com/officialmomocorp-hub/smarterp
-   81a962c..495b578  main       -> origin/main
+   495b578..5dd7285  main       -> origin/main
 
 
 >>> cd /var/www/smarterp/server && npm install --no-color 2>&1
 OUT:
 
-added 80 packages, and audited 438 packages in 18s
+up to date, audited 438 packages in 764ms
 
 90 packages are looking for funding
   run `npm fund` for details
@@ -30,22 +30,12 @@ OUT:
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 408ms
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 446ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+Tip: Want to react to database changes in your app as they happen? Discover how with Pulse: https://pris.ly/tip-1-pulse
 
-┌─────────────────────────────────────────────────────────┐
-│  Update available 5.22.0 -> 7.6.0                       │
-│                                                         │
-│  This is a major update - please follow the guide at    │
-│  https://pris.ly/d/major-version-upgrade                │
-│                                                         │
-│  Run the following to update                            │
-│    npm i --save-dev prisma@latest                       │
-│    npm i @prisma/client@latest                          │
-└─────────────────────────────────────────────────────────┘
 
 
 >>> cd /var/www/smarterp/client && npm install --no-color 2>&1
@@ -72,13 +62,13 @@ rendering chunks...
 computing gzip size...
 dist/index.html                   0.73 kB │ gzip:   0.42 kB
 dist/assets/index-Z4a2VF38.css   35.12 kB │ gzip:   6.08 kB
-dist/assets/index-P-pnQB5r.js   613.34 kB │ gzip: 177.97 kB
+dist/assets/index-BFwd5uvw.js   613.35 kB │ gzip: 177.97 kB
 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 2.79s
+✓ built in 2.69s
 
 
 >>> pm2 restart smarterp-backend --no-color 2>&1
@@ -89,8 +79,8 @@ Use --update-env to update environment variables
 ┌────┬─────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
 │ id │ name                │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
 ├────┼─────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
-│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 194261   │ 11h    │ 1    │ online    │ 0%       │ 62.2mb   │ root     │ disabled │
-│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 210763   │ 0s     │ 10   │ online    │ 0%       │ 16.7mb   │ root     │ disabled │
+│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 194261   │ 11h    │ 1    │ online    │ 0%       │ 62.1mb   │ root     │ disabled │
+│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 211155   │ 0s     │ 11   │ online    │ 0%       │ 16.9mb   │ root     │ disabled │
 └────┴─────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
 
 
