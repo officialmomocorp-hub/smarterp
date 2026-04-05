@@ -99,7 +99,7 @@ export default function FeeManagement() {
     try {
       await feeAPI.processPayment({
         studentId: searchQuery,
-        feeStructureId: feeStatus?.payments?.[0]?.feeStructureId,
+        feeStructureId: feeStatus?.student?.activeFeeStructure?.id,
         ...paymentForm,
       });
       toast.success('Payment recorded successfully');

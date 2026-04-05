@@ -11,7 +11,7 @@ router.get('/classes', async (req, res, next) => {
     const where = { schoolId: req.schoolId };
     if (academicYearId) where.academicYearId = academicYearId;
     const classes = await prisma.class.findMany({
-      where, include: { sections: true }, orderBy: { sortOrder: 'asc' },
+      where, include: { sections: true, subjects: true }, orderBy: { sortOrder: 'asc' },
     });
     res.json({ success: true, data: classes });
   } catch (error) { next(error); }

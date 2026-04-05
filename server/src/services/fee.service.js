@@ -104,6 +104,10 @@ class FeeService {
       throw new AppError('Student not found', 404);
     }
 
+    if (!feeStructureId) {
+      throw new AppError('Fee structure ID is required', 400);
+    }
+
     const feeStructure = await prisma.feeStructure.findUnique({
       where: { id: feeStructureId },
       include: { concessions: true },
@@ -258,7 +262,11 @@ class FeeService {
       if (feeStructure) {
         totalDue = feeStructure.totalAmount;
         totalBalance = feeStructure.totalAmount;
+        student.activeFeeStructure = feeStructure;
       }
+    } else {
+      // If there are payments, the first payment's structure is the active one
+      student.activeFeeStructure = { id: feePayments[0].feeStructureId };
     }
 
     return {
