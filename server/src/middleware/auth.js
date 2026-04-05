@@ -48,14 +48,18 @@ const authorize = (...roles) => {
 };
 
 const schoolScoped = async (req, res, next) => {
+  // CRITICAL SECURITY RULE: Super Admin is for platform management ONLY.
+  // They should NEVER access individual school data or student records.
   if (req.userRole === 'SUPER_ADMIN') {
-    return next();
+    return next(new AppError('Forbidden: Super Admins are restricted to the platform management panel and cannot access school-level data.', 403));
   }
 
+  // IDOR PROTECTION: Ensure the schoolId requested matches the user's assigned schoolId.
   if (req.params.schoolId && req.params.schoolId !== req.schoolId) {
-    throw new AppError('Access denied to this school', 403);
+    return next(new AppError('Access Denied: You do not have permission to view or modify data for another school.', 403));
   }
 
+  // TENANT ISOLATION: Force inject the user's schoolId into the query to ensure Prisma filtering.
   req.query.schoolId = req.schoolId;
   next();
 };
