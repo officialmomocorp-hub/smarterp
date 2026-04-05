@@ -296,7 +296,7 @@ model Student {
   meritCertificates MeritCertificate[]
   recheckApplications RecheckApplication[]
 
-  @@unique([schoolId, academicYearId, classId, sectionId, rollNumber])
+  // @@unique([schoolId, academicYearId, classId, sectionId, rollNumber])
   @@index([schoolId, classId, sectionId])
   @@index([studentId])
   @@index([academicYearId])
