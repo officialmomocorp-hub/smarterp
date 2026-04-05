@@ -148,6 +148,7 @@ model User {
   phone             String
   password          String
   role              String
+  tokenVersion      Int       @default(0)
   isActive          Boolean   @default(true)
   lastLogin         DateTime?
   failedLoginAttempts Int     @default(0)
@@ -1479,3 +1480,12 @@ model SiblingLink {
   @@index([schoolId])
 }
 
+model TokenBlacklist {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiry    DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

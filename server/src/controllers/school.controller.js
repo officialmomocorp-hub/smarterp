@@ -80,7 +80,10 @@ exports.resetAdminPassword = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     await prisma.user.update({
       where: { id: adminUser.id },
-      data: { password: hashedPassword }
+      data: { 
+        password: hashedPassword,
+        tokenVersion: { increment: 1 }
+      }
     });
 
     res.status(200).json({ success: true, message: 'Password reset successfully' });

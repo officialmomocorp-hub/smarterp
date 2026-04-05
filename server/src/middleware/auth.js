@@ -10,6 +10,14 @@ const authenticate = async (req, res, next) => {
       throw new AppError('Authentication required', 401);
     }
 
+    // 1. Check if token is blacklisted (individual logouts)
+    const blacklisted = await prisma.tokenBlacklist.findUnique({
+      where: { token }
+    });
+    if (blacklisted) {
+      throw new AppError('This session has been revoked. Please log in again.', 401);
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await prisma.user.findUnique({
@@ -19,6 +27,11 @@ const authenticate = async (req, res, next) => {
 
     if (!user || !user.isActive) {
       throw new AppError('User not found or inactive', 401);
+    }
+
+    // 2. CRITICAL: Invalidate tokens if the password was changed (tokenVersion mismatch)
+    if (decoded.version !== undefined && user.tokenVersion !== decoded.version) {
+       throw new AppError('Session expired due to security update (password change). Please log in again.', 401);
     }
 
     req.user = user;
