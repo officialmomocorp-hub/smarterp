@@ -33,7 +33,8 @@ router.post('/sections', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, nex
 
 router.post('/subjects', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, res, next) => {
   try {
-    const subject = await prisma.subject.create({ data: { ...req.body } });
+    const { description, ...subjectData } = req.body;
+    const subject = await prisma.subject.create({ data: { ...subjectData } });
     res.status(201).json({ success: true, data: subject });
   } catch (error) { next(error); }
 });
@@ -45,6 +46,20 @@ router.get('/academic-years', async (req, res, next) => {
       orderBy: { startDate: 'desc' },
     });
     res.json({ success: true, data: years });
+  } catch (error) { next(error); }
+});
+
+router.post('/academic-years', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+  try {
+    const year = await prisma.academicYear.create({
+      data: {
+        schoolId: req.schoolId,
+        ...req.body,
+        startDate: new Date(req.body.startDate),
+        endDate: new Date(req.body.endDate),
+      }
+    });
+    res.status(201).json({ success: true, data: year });
   } catch (error) { next(error); }
 });
 

@@ -3,19 +3,25 @@ const { AppError } = require('../utils/appError');
 
 class FeeService {
   async createFeeStructure(data, schoolId) {
-    const { class: className, academicYear, feeHeads, installmentType, dueDates, lateFinePerDay, gstPercentage } = data;
+    const { class: className, academicYear, feeHeads, installmentType, dueDates, lateFinePerDay, gstPercentage, classId, academicYearId } = data;
 
-    const classRecord = await prisma.class.findFirst({
-      where: { schoolId, name: className },
-    });
+    let classRecord;
+    if (classId) {
+      classRecord = await prisma.class.findFirst({ where: { id: classId, schoolId } });
+    } else if (className) {
+      classRecord = await prisma.class.findFirst({ where: { schoolId, name: className } });
+    }
 
     if (!classRecord) {
       throw new AppError('Class not found', 404);
     }
 
-    const year = await prisma.academicYear.findFirst({
-      where: { schoolId, name: academicYear },
-    });
+    let year;
+    if (academicYearId) {
+      year = await prisma.academicYear.findFirst({ where: { id: academicYearId, schoolId } });
+    } else if (academicYear) {
+      year = await prisma.academicYear.findFirst({ where: { schoolId, name: academicYear } });
+    }
 
     if (!year) {
       throw new AppError('Academic year not found', 404);
@@ -34,10 +40,10 @@ class FeeService {
         academicYearId: year.id,
         classId: classRecord.id,
         name: data.name || `${className} Fee Structure`,
-        feeHeads: heads,
+        feeHeads: typeof heads === 'string' ? heads : JSON.stringify(heads),
         totalAmount,
         installmentType: installmentType || 'QUARTERLY',
-        dueDates: typeof dueDates === 'string' ? JSON.parse(dueDates) : dueDates,
+        dueDates: typeof dueDates === 'string' ? dueDates : JSON.stringify(dueDates),
         lateFinePerDay: lateFinePerDay || 0,
         gstPercentage: gstPercentage || 0,
       },
@@ -181,22 +187,75 @@ class FeeService {
     return feePayment;
   }
 
-  async getStudentFeeStatus(studentId, schoolId, academicYearId) {
+  async getStudentFeeStatus(studentIdOrCode, schoolId, academicYearId) {
+    // First resolve the student - could be UUID or display ID like STU2025001
+    let student = await prisma.student.findFirst({
+      where: { id: studentIdOrCode, schoolId },
+      include: { profile: true, class: true, section: true },
+    });
+
+    if (!student) {
+      // Try by display studentId field
+      student = await prisma.student.findFirst({
+        where: { studentId: studentIdOrCode, schoolId },
+        include: { profile: true, class: true, section: true },
+      });
+    }
+
+    if (!student) {
+      // Try by aadhar or partial match
+      student = await prisma.student.findFirst({
+        where: {
+          schoolId,
+          OR: [
+            { studentId: { contains: studentIdOrCode } },
+            { profile: { aadharNumber: studentIdOrCode } },
+          ],
+        },
+        include: { profile: true, class: true, section: true },
+      });
+    }
+
+    if (!student) {
+      return {
+        student: null,
+        payments: [],
+        summary: { totalDue: 0, totalPaid: 0, totalBalance: 0, totalLateFine: 0, paymentPercentage: 0 },
+      };
+    }
+
+    const wherePayments = {
+      studentId: student.id,
+      schoolId,
+    };
+    if (academicYearId && academicYearId !== 'demo-academic-year') {
+      wherePayments.academicYearId = academicYearId;
+    }
+
     const feePayments = await prisma.feePayment.findMany({
-      where: {
-        studentId,
-        schoolId,
-        academicYearId,
-      },
+      where: wherePayments,
       orderBy: { installmentNumber: 'asc' },
     });
 
-    const totalDue = feePayments.reduce((sum, p) => sum + parseFloat(p.totalAmount), 0);
+    // If no payments exist, try to calculate from fee structure
+    let totalDue = feePayments.reduce((sum, p) => sum + parseFloat(p.totalAmount), 0);
     const totalPaid = feePayments.reduce((sum, p) => sum + parseFloat(p.paidAmount), 0);
-    const totalBalance = feePayments.reduce((sum, p) => sum + parseFloat(p.balanceAmount), 0);
+    let totalBalance = feePayments.reduce((sum, p) => sum + parseFloat(p.balanceAmount), 0);
     const totalLateFine = feePayments.reduce((sum, p) => sum + parseFloat(p.lateFine), 0);
 
+    // If no payments, look up fee structure for this class
+    if (feePayments.length === 0) {
+      const feeStructure = await prisma.feeStructure.findFirst({
+        where: { classId: student.classId, schoolId, isActive: true },
+      });
+      if (feeStructure) {
+        totalDue = feeStructure.totalAmount;
+        totalBalance = feeStructure.totalAmount;
+      }
+    }
+
     return {
+      student,
       payments: feePayments,
       summary: {
         totalDue,

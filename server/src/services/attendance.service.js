@@ -5,35 +5,46 @@ class AttendanceService {
   async markAttendance(data, schoolId, markedBy) {
     const { date, attendanceRecords } = data;
     const attendanceDate = new Date(date);
+    // Normalize to start of day
+    attendanceDate.setHours(0, 0, 0, 0);
 
     const results = await prisma.$transaction(async (tx) => {
       const results = [];
 
       for (const record of attendanceRecords) {
-        const attendance = await tx.attendance.upsert({
+        // Check if attendance already exists for this student+date
+        const existing = await tx.attendance.findFirst({
           where: {
-            studentId_date_period: {
-              studentId: record.studentId,
-              date: attendanceDate,
-              period: record.period || null,
-            },
-          },
-          update: {
-            status: record.status,
-            remarks: record.remarks,
-            markedBy,
-            markedAt: new Date(),
-          },
-          create: {
-            schoolId,
             studentId: record.studentId,
             date: attendanceDate,
-            period: record.period || null,
-            status: record.status,
-            remarks: record.remarks,
-            markedBy,
           },
         });
+
+        let attendance;
+        if (existing) {
+          // Update existing record
+          attendance = await tx.attendance.update({
+            where: { id: existing.id },
+            data: {
+              status: record.status,
+              remarks: record.remarks || null,
+              markedBy: markedBy || 'admin',
+              markedAt: new Date(),
+            },
+          });
+        } else {
+          // Create new record
+          attendance = await tx.attendance.create({
+            data: {
+              schoolId,
+              studentId: record.studentId,
+              date: attendanceDate,
+              status: record.status,
+              remarks: record.remarks || null,
+              markedBy: markedBy || 'admin',
+            },
+          });
+        }
 
         results.push(attendance);
       }
@@ -47,28 +58,34 @@ class AttendanceService {
   async markStaffAttendance(data, schoolId) {
     const { staffId, date, checkInTime, checkOutTime } = data;
     const attendanceDate = new Date(date);
+    attendanceDate.setHours(0, 0, 0, 0);
 
-    const attendance = await prisma.attendance.upsert({
-      where: {
-        staffId_date: {
+    const existing = await prisma.attendance.findFirst({
+      where: { staffId, date: attendanceDate },
+    });
+
+    let attendance;
+    if (existing) {
+      attendance = await prisma.attendance.update({
+        where: { id: existing.id },
+        data: {
+          status: 'PRESENT',
+          checkInTime: checkInTime ? new Date(checkInTime) : undefined,
+          checkOutTime: checkOutTime ? new Date(checkOutTime) : undefined,
+        },
+      });
+    } else {
+      attendance = await prisma.attendance.create({
+        data: {
+          schoolId,
           staffId,
           date: attendanceDate,
+          status: 'PRESENT',
+          checkInTime: checkInTime ? new Date(checkInTime) : new Date(),
+          markedBy: 'system',
         },
-      },
-      update: {
-        status: checkOutTime ? 'PRESENT' : 'PRESENT',
-        checkInTime: checkInTime ? new Date(checkInTime) : undefined,
-        checkOutTime: checkOutTime ? new Date(checkOutTime) : undefined,
-      },
-      create: {
-        schoolId,
-        staffId,
-        date: attendanceDate,
-        status: 'PRESENT',
-        checkInTime: checkInTime ? new Date(checkInTime) : new Date(),
-        markedBy: 'system',
-      },
-    });
+      });
+    }
 
     return attendance;
   }
@@ -189,12 +206,14 @@ class AttendanceService {
   }
 
   async getAttendanceAlerts(schoolId, academicYearId) {
+    const where = {
+      schoolId,
+      status: 'ACTIVE',
+    };
+    if (academicYearId) where.academicYearId = academicYearId;
+
     const students = await prisma.student.findMany({
-      where: {
-        schoolId,
-        academicYearId,
-        status: 'ACTIVE',
-      },
+      where,
       include: {
         profile: true,
         class: true,

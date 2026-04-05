@@ -8,12 +8,39 @@ router.use(authenticate, schoolScoped);
 
 router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
+    let yearId = req.body.academicYearId;
+    if (!yearId) {
+      const activeYear = await prisma.academicYear.findFirst({
+        where: { schoolId: req.schoolId, isCurrent: true }
+      });
+      yearId = activeYear?.id;
+    }
+    if (!yearId) throw new AppError('No active academic year found', 400);
+
+    const admissionNumber = `ADM${Date.now().toString().slice(-6)}`;
+
+    const {
+      fatherName, fatherOccupation, fatherPhone,
+      motherName, motherOccupation, motherPhone,
+      address, city, state, pincode, annualIncome,
+      ...admissionData
+    } = req.body;
+
+    const parentAndAddressInfo = JSON.stringify({
+      fatherName, fatherOccupation, fatherPhone,
+      motherName, motherOccupation, motherPhone,
+      address, city, state, pincode, annualIncome,
+    });
+
     const admission = await prisma.admission.create({
       data: {
         schoolId: req.schoolId,
-        ...req.body,
-        dateOfBirth: new Date(req.body.dateOfBirth),
-        tcDate: req.body.tcDate ? new Date(req.body.tcDate) : null,
+        academicYearId: yearId,
+        admissionNumber,
+        ...admissionData,
+        dateOfBirth: new Date(admissionData.dateOfBirth),
+        tcDate: admissionData.tcDate ? new Date(admissionData.tcDate) : null,
+        documents: parentAndAddressInfo,
       },
     });
     res.status(201).json({ success: true, data: admission });
@@ -27,8 +54,8 @@ router.get('/', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, res, n
     if (status) where.status = status;
     if (search) {
       where.OR = [
-        { applicantName: { contains: search, mode: 'insensitive' } },
-        { admissionNumber: { contains: search, mode: 'insensitive' } },
+        { applicantName: { contains: search } },
+        { admissionNumber: { contains: search } },
       ];
     }
     const skip = (parseInt(page) - 1) * parseInt(limit);

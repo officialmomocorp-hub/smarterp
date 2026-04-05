@@ -8,20 +8,36 @@ router.use(authenticate, schoolScoped);
 
 router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
+    const { firstName, lastName, phone, email, designation, department, qualification,
+            dateOfJoining, basicPay, specialization, experience, employmentType } = req.body;
+
     const staffCount = await prisma.staff.count({ where: { schoolId: req.schoolId } });
     const staffId = `STF${new Date().getFullYear().toString().slice(-2)}${(staffCount + 1).toString().padStart(4, '0')}`;
     const employeeCode = `EMP${Date.now().toString().slice(-6)}`;
 
-    const user = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
           schoolId: req.schoolId,
-          phone: req.body.phone,
-          email: req.body.email || null,
+          phone: phone || '0000000000',
+          email: email || null,
           password: '',
           role: 'TEACHER',
         },
       });
+
+      // Create profile for the user
+      if (firstName) {
+        await tx.profile.create({
+          data: {
+            userId: newUser.id,
+            firstName: firstName || 'Staff',
+            lastName: lastName || '',
+            dateOfBirth: new Date('1990-01-01'),
+            gender: 'Other',
+          },
+        });
+      }
 
       const staff = await tx.staff.create({
         data: {
@@ -29,18 +45,24 @@ router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
           schoolId: req.schoolId,
           staffId,
           employeeCode,
-          ...req.body,
-          dateOfJoining: new Date(req.body.dateOfJoining),
+          designation: designation || 'Teacher',
+          department: department || 'General',
+          qualification: qualification || 'B.Ed',
+          dateOfJoining: dateOfJoining ? new Date(dateOfJoining) : new Date(),
+          basicPay: parseFloat(basicPay) || 0,
+          specialization: specialization || null,
+          experience: parseInt(experience) || 0,
+          employmentType: employmentType || 'Permanent',
         },
       });
 
       return tx.staff.findUnique({
         where: { id: staff.id },
-        include: { user: true },
+        include: { user: { include: { profile: true } } },
       });
     });
 
-    res.status(201).json({ success: true, data: user });
+    res.status(201).json({ success: true, data: result });
   } catch (error) { next(error); }
 });
 

@@ -40,6 +40,14 @@ export const studentAPI = {
   delete: (id) => api.delete(`/students/${id}`),
   getStatistics: (params) => api.get('/students/statistics', { params }),
   getDefaulters: (params) => api.get('/students/defaulters', { params }),
+  issueTC: (id, data) => api.post(`/pdf/tc/${id}`, data, { responseType: 'blob' }),
+};
+
+export const admissionAPI = {
+  getAll: (params) => api.get('/admissions', { params }),
+  getById: (id) => api.get(`/admissions/${id}`),
+  create: (data) => api.post('/admissions', data),
+  updateStatus: (id, data) => api.put(`/admissions/${id}/status`, data),
 };
 
 export const feeAPI = {
@@ -94,7 +102,11 @@ export const noticeAPI = {
 
 export const academicAPI = {
   getClasses: (params) => api.get('/academic/classes', { params }),
+  createClass: (data) => api.post('/academic/classes', data),
+  createSection: (data) => api.post('/academic/sections', data),
+  createSubject: (data) => api.post('/academic/subjects', data),
   getAcademicYears: () => api.get('/academic/academic-years'),
+  createAcademicYear: (data) => api.post('/academic/academic-years', data),
   createHomework: (data) => api.post('/academic/homework', data),
   submitHomework: (id, data) => api.post(`/academic/homework/${id}/submit`, data),
   getStudyMaterial: (params) => api.get('/academic/study-material', { params }),

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { studentAPI } from '../services/api';
-import { Search, Plus, Edit, Trash2, Eye, Filter, Download } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, Filter, Download, FileOutput } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const INDIAN_STATES = [
@@ -119,13 +119,33 @@ export default function Students() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this student?')) return;
+    if (!window.confirm('Are you sure you want to delete this student (Mark as Dropped Out)?')) return;
     try {
       await studentAPI.delete(id);
       toast.success('Student deleted');
       fetchStudents();
     } catch (error) {
       toast.error('Failed to delete student');
+    }
+  };
+
+  const handleIssueTC = async (student) => {
+    if (!window.confirm(`Are you sure you want to issue Transfer Certificate for ${student.profile?.firstName}?`)) return;
+    try {
+      const response = await studentAPI.issueTC(student.id, { leavingReason: 'Parent Request' });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `TC-${student.studentId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success(`TC Issued for ${student.profile?.firstName}. Status updated to Transferred.`);
+      fetchStudents();
+    } catch (error) {
+      toast.error('Failed to issue TC');
     }
   };
 
@@ -226,6 +246,9 @@ export default function Students() {
                       <div className="flex items-center gap-2">
                         <button onClick={() => setViewStudentModal(student)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600" title="View">
                           <Eye className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => handleIssueTC(student)} className="p-1.5 rounded-lg hover:bg-purple-50 text-purple-600" title="Issue TC">
+                          <FileOutput className="w-4 h-4" />
                         </button>
                         <button onClick={() => handleEditClick(student)} className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600" title="Edit">
                           <Edit className="w-4 h-4" />

@@ -5,6 +5,10 @@ class StudentService {
   async create(data, schoolId) {
     const { profile, parentData, class: className, section, ...studentData } = data;
 
+    if (profile && profile.dateOfBirth) {
+      profile.dateOfBirth = new Date(profile.dateOfBirth);
+    }
+
     const classRecord = await prisma.class.findFirst({
       where: { schoolId, name: className },
       include: { sections: true },
@@ -129,9 +133,9 @@ class StudentService {
 
     if (search) {
       where.OR = [
-        { studentId: { contains: search, mode: 'insensitive' } },
-        { profile: { firstName: { contains: search, mode: 'insensitive' } } },
-        { profile: { lastName: { contains: search, mode: 'insensitive' } } },
+        { studentId: { contains: search } },
+        { profile: { firstName: { contains: search } } },
+        { profile: { lastName: { contains: search } } },
         { profile: { aadharNumber: { contains: search } } },
       ];
     }
@@ -197,7 +201,25 @@ class StudentService {
       throw new AppError('Student not found', 404);
     }
 
-    const { profile, parentData, ...studentData } = data;
+    const { profile, parentData, class: className, section, ...studentData } = data;
+
+    if (className && section) {
+      const classRecord = await prisma.class.findFirst({
+        where: { schoolId, name: className },
+        include: { sections: true },
+      });
+      if (classRecord) {
+        studentData.classId = classRecord.id;
+        const sectionRecord = classRecord.sections.find(s => s.name === section);
+        if (sectionRecord) {
+          studentData.sectionId = sectionRecord.id;
+        }
+      }
+    }
+
+    if (profile && profile.dateOfBirth) {
+      profile.dateOfBirth = new Date(profile.dateOfBirth);
+    }
 
     return prisma.$transaction(async (tx) => {
       const updatedStudent = await tx.student.update({

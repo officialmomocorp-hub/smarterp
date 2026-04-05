@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { attendanceAPI } from '../services/api';
+import { attendanceAPI, studentAPI } from '../services/api';
 import { Calendar, UserCheck, UserX, Clock, AlertTriangle, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -9,29 +9,62 @@ export default function Attendance() {
   const [students, setStudents] = useState([]);
   const [attendanceRecords, setAttendanceRecords] = useState({});
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [classId, setClassId] = useState('');
   const [sectionId, setSectionId] = useState('');
+  const [fetched, setFetched] = useState(false);
 
   const CLASSES = ['Nursery', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'];
 
-  const handleMarkAttendance = async () => {
+  // Fetch students from DB when class/section selected
+  const fetchStudents = async () => {
+    if (!classId) return;
     setLoading(true);
     try {
-      const records = Object.entries(attendanceRecords).map(([studentId, status]) => ({
+      const { data } = await studentAPI.getAll({ class: classId, section: sectionId, limit: 100 });
+      const list = data.data?.students || data.data || [];
+      setStudents(list);
+      setFetched(true);
+      // Reset attendance records
+      const init = {};
+      list.forEach(s => { init[s.id] = 'PRESENT'; });
+      setAttendanceRecords(init);
+    } catch (err) {
+      console.error('Failed to fetch students', err);
+      setStudents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (classId) fetchStudents();
+  }, [classId, sectionId]);
+
+  const handleMarkAttendance = async () => {
+    const records = Object.entries(attendanceRecords);
+    if (records.length === 0) {
+      return toast.error('No attendance to save');
+    }
+
+    setSaving(true);
+    try {
+      const attendanceData = records.map(([studentId, status]) => ({
         studentId,
         status,
       }));
 
       await attendanceAPI.mark({
         date: selectedDate,
-        attendanceRecords: records,
+        attendanceRecords: attendanceData,
       });
 
-      toast.success('Attendance marked successfully');
+      toast.success('Attendance saved successfully! ✅');
     } catch (error) {
-      toast.error('Failed to mark attendance');
+      console.error('Attendance save error:', error);
+      toast.error(error.response?.data?.message || 'Failed to save attendance');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -43,14 +76,17 @@ export default function Attendance() {
     setAttendanceRecords(newRecords);
   };
 
-  // Demo students for attendance
-  const demoStudents = [
-    { id: '1', rollNumber: 1, name: 'Aarav Verma', profile: { firstName: 'Aarav', lastName: 'Verma' } },
-    { id: '2', rollNumber: 2, name: 'Diya Sharma', profile: { firstName: 'Diya', lastName: 'Sharma' } },
-    { id: '3', rollNumber: 3, name: 'Arjun Patel', profile: { firstName: 'Arjun', lastName: 'Patel' } },
-    { id: '4', rollNumber: 4, name: 'Ananya Singh', profile: { firstName: 'Ananya', lastName: 'Singh' } },
-    { id: '5', rollNumber: 5, name: 'Rohan Gupta', profile: { firstName: 'Rohan', lastName: 'Gupta' } },
-  ];
+  const getStudentName = (student) => {
+    if (student.profile?.firstName) return `${student.profile.firstName} ${student.profile.lastName || ''}`.trim();
+    if (student.name) return student.name;
+    return student.studentId || 'Unknown';
+  };
+
+  const getInitials = (student) => {
+    const name = getStudentName(student);
+    const parts = name.split(' ');
+    return (parts[0]?.charAt(0) || '') + (parts[1]?.charAt(0) || '');
+  };
 
   return (
     <div className="space-y-6">
@@ -96,9 +132,10 @@ export default function Attendance() {
               <div>
                 <label className="label">Section</label>
                 <select className="input" value={sectionId} onChange={(e) => setSectionId(e.target.value)}>
-                  <option value="">Select Section</option>
+                  <option value="">All Sections</option>
                   <option value="A">A</option>
                   <option value="B">B</option>
+                  <option value="C">C</option>
                 </select>
               </div>
               <div className="flex gap-2">
@@ -113,80 +150,96 @@ export default function Attendance() {
           </div>
 
           <div className="card">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Roll</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {demoStudents.map((student) => (
-                    <tr key={student.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm">{student.rollNumber}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-medium">
-                            {student.profile.firstName.charAt(0)}{student.profile.lastName.charAt(0)}
-                          </div>
-                          <span className="text-sm font-medium">{student.profile.firstName} {student.profile.lastName}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex justify-center gap-2">
-                          <button
-                            onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: 'PRESENT' })}
-                            className={`p-2 rounded-lg transition-colors ${
-                              attendanceRecords[student.id] === 'PRESENT'
-                                ? 'bg-green-100 text-green-700 ring-2 ring-green-500'
-                                : 'bg-gray-100 text-gray-400 hover:bg-green-50'
-                            }`}
-                          >
-                            <UserCheck className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: 'ABSENT' })}
-                            className={`p-2 rounded-lg transition-colors ${
-                              attendanceRecords[student.id] === 'ABSENT'
-                                ? 'bg-red-100 text-red-700 ring-2 ring-red-500'
-                                : 'bg-gray-100 text-gray-400 hover:bg-red-50'
-                            }`}
-                          >
-                            <UserX className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: 'LATE' })}
-                            className={`p-2 rounded-lg transition-colors ${
-                              attendanceRecords[student.id] === 'LATE'
-                                ? 'bg-amber-100 text-amber-700 ring-2 ring-amber-500'
-                                : 'bg-gray-100 text-gray-400 hover:bg-amber-50'
-                            }`}
-                          >
-                            <Clock className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <input className="input text-sm" placeholder="Optional" />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {!classId ? (
+              <div className="text-center py-12 text-gray-500">
+                <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>Select a class to load students for attendance</p>
+              </div>
+            ) : loading ? (
+              <div className="text-center py-12 text-gray-500">Loading students...</div>
+            ) : students.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <p>No students found for {classId}{sectionId ? ` - ${sectionId}` : ''}</p>
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Roll</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Remarks</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {students.map((student, index) => (
+                        <tr key={student.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 text-sm">{student.rollNumber || index + 1}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-medium">
+                                {getInitials(student)}
+                              </div>
+                              <span className="text-sm font-medium">{getStudentName(student)}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex justify-center gap-2">
+                              <button
+                                onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: 'PRESENT' })}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  attendanceRecords[student.id] === 'PRESENT'
+                                    ? 'bg-green-100 text-green-700 ring-2 ring-green-500'
+                                    : 'bg-gray-100 text-gray-400 hover:bg-green-50'
+                                }`}
+                              >
+                                <UserCheck className="w-5 h-5" />
+                              </button>
+                              <button
+                                onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: 'ABSENT' })}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  attendanceRecords[student.id] === 'ABSENT'
+                                    ? 'bg-red-100 text-red-700 ring-2 ring-red-500'
+                                    : 'bg-gray-100 text-gray-400 hover:bg-red-50'
+                                }`}
+                              >
+                                <UserX className="w-5 h-5" />
+                              </button>
+                              <button
+                                onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: 'LATE' })}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  attendanceRecords[student.id] === 'LATE'
+                                    ? 'bg-amber-100 text-amber-700 ring-2 ring-amber-500'
+                                    : 'bg-gray-100 text-gray-400 hover:bg-amber-50'
+                                }`}
+                              >
+                                <Clock className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <input className="input text-sm" placeholder="Optional" />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
-            <div className="flex justify-end mt-4 pt-4 border-t">
-              <button
-                onClick={handleMarkAttendance}
-                disabled={loading}
-                className="btn btn-primary"
-              >
-                {loading ? 'Saving...' : 'Save Attendance'}
-              </button>
-            </div>
+                <div className="flex justify-between items-center mt-4 pt-4 border-t">
+                  <p className="text-sm text-gray-500">{students.length} students loaded</p>
+                  <button
+                    onClick={handleMarkAttendance}
+                    disabled={saving}
+                    className="btn btn-primary"
+                  >
+                    {saving ? 'Saving...' : 'Save Attendance'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

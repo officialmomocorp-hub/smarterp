@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { feeAPI } from '../services/api';
-import { IndianRupee, Plus, Search, Download, AlertTriangle, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { feeAPI, academicAPI } from '../services/api';
+import { IndianRupee, Plus, Search, Download, AlertTriangle, CheckCircle, Clock, XCircle, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 function formatINR(amount) {
@@ -8,12 +9,70 @@ function formatINR(amount) {
 }
 
 export default function FeeManagement() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('collect');
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [feeStatus, setFeeStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [classes, setClasses] = useState([]);
+  const [academicYears, setAcademicYears] = useState([]);
+  const [structureForm, setStructureForm] = useState({
+    name: '', classId: '', academicYearId: '', totalAmount: '',
+  });
+
+  useEffect(() => {
+    const path = location.pathname.split('/').pop();
+    if (['collect', 'structure', 'defaulters', 'reports'].includes(path)) {
+      setActiveTab(path);
+    }
+  }, [location.pathname]);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    navigate(`/fees/${tab}`);
+  };
+
+  const loadDependencies = async () => {
+    try {
+      const [clsRes, ayRes] = await Promise.all([
+        academicAPI.getClasses(),
+        academicAPI.getAcademicYears()
+      ]);
+      setClasses(clsRes.data.data || []);
+      setAcademicYears(ayRes.data.data || []);
+    } catch (e) {
+      toast.error('Failed to load classes or academic years');
+    }
+  };
+
+  const openCreateModal = () => {
+    loadDependencies();
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCreateStructure = async (e) => {
+    e.preventDefault();
+    try {
+      await feeAPI.createStructure({
+        ...structureForm,
+        totalAmount: parseFloat(structureForm.totalAmount),
+        feeHeads: JSON.stringify([{ name: 'General Fee', amount: parseFloat(structureForm.totalAmount) }]),
+        installmentType: 'YEARLY',
+        dueDates: JSON.stringify([{ installment: 1, amount: parseFloat(structureForm.totalAmount), date: new Date().toISOString() }]),
+        lateFinePerDay: 0,
+        gstPercentage: 0
+      });
+      toast.success('Fee structure created specifically required');
+      setIsCreateModalOpen(false);
+    } catch (err) {
+      toast.error('Failed to create fee structure');
+    }
+  };
   const [paymentForm, setPaymentForm] = useState({
     installmentNumber: 1,
     paymentMode: 'CASH',
@@ -65,12 +124,12 @@ export default function FeeManagement() {
         {['collect', 'structure', 'defaulters', 'reports'].map(tab => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => handleTabChange(tab)}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors capitalize ${
               activeTab === tab ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            {tab}
+            {tab === 'collect' ? 'Collect Fee' : tab}
           </button>
         ))}
       </div>
@@ -270,7 +329,7 @@ export default function FeeManagement() {
         <div className="card">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Fee Structure</h3>
-            <button className="btn btn-primary flex items-center gap-2">
+            <button onClick={openCreateModal} className="btn btn-primary flex items-center gap-2">
               <Plus className="w-4 h-4" /> Create Structure
             </button>
           </div>
@@ -340,6 +399,73 @@ export default function FeeManagement() {
           </div>
         </div>
       )}
+
+      {/* Create Structure Modal */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">Create Fee Structure</h3>
+              <button onClick={() => setIsCreateModalOpen(false)} className="text-gray-400 hover:text-gray-500">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateStructure} className="p-6 space-y-4">
+              <div>
+                <label className="label">Structure Name</label>
+                <input 
+                  className="input" 
+                  required 
+                  placeholder="e.g. Class 1 Annual Fee"
+                  value={structureForm.name} 
+                  onChange={e => setStructureForm({...structureForm, name: e.target.value})} 
+                />
+              </div>
+              <div>
+                <label className="label">Select Class</label>
+                <select 
+                  className="input" 
+                  required 
+                  value={structureForm.classId} 
+                  onChange={e => setStructureForm({...structureForm, classId: e.target.value})}
+                >
+                  <option value="">Select a class</option>
+                  {classes.map(c => <option key={c.id} value={c.id}>{c.displayName}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="label">Academic Year</label>
+                <select 
+                  className="input" 
+                  required 
+                  value={structureForm.academicYearId} 
+                  onChange={e => setStructureForm({...structureForm, academicYearId: e.target.value})}
+                >
+                  <option value="">Select an academic year</option>
+                  {academicYears.map(ay => <option key={ay.id} value={ay.id}>{ay.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="label">Total Amount (₹)</label>
+                <input 
+                  type="number" 
+                  className="input" 
+                  required 
+                  placeholder="e.g. 50000"
+                  value={structureForm.totalAmount} 
+                  onChange={e => setStructureForm({...structureForm, totalAmount: e.target.value})} 
+                />
+              </div>
+              <div className="pt-4">
+                <button type="submit" className="w-full btn btn-primary flex justify-center items-center gap-2">
+                  <Plus className="w-4 h-4"/> Save Structure
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

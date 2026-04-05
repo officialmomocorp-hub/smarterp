@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Plus, Search, CheckCircle, XCircle, Clock, Eye, Upload, AlertTriangle } from 'lucide-react';
+import { admissionAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
 const CLASSES = ['Nursery', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'];
@@ -27,34 +28,60 @@ export default function Admissions() {
     annualIncome: '',
   });
 
-  const demoAdmissions = [
-    { id: 'ADM001', name: 'Aryan Kumar', class: 'Class 5', dob: '2014-06-15', gender: 'MALE', caste: 'OBC', phone: '9876543210', status: 'PENDING', date: '2025-03-15' },
-    { id: 'ADM002', name: 'Sara Ali', class: 'Class 3', dob: '2016-02-20', gender: 'FEMALE', caste: 'GENERAL', phone: '9876543211', status: 'APPROVED', date: '2025-03-14' },
-    { id: 'ADM003', name: 'Ravi Sharma', class: 'Class 8', dob: '2011-09-10', gender: 'MALE', caste: 'SC', phone: '9876543212', status: 'PENDING', date: '2025-03-13' },
-    { id: 'ADM004', name: 'Priya Singh', class: 'Nursery', dob: '2021-01-05', gender: 'FEMALE', caste: 'GENERAL', phone: '9876543213', status: 'WAITLISTED', date: '2025-03-12' },
-    { id: 'ADM005', name: 'Mohammad Faiz', class: 'Class 10', dob: '2009-11-25', gender: 'MALE', caste: 'OBC_NCL', phone: '9876543214', status: 'REJECTED', date: '2025-03-10' },
-  ];
+  const [admissions, setAdmissions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    toast.success('Admission application submitted successfully');
-    setShowForm(false);
-    setFormData({
-      applicantName: '', applicantPhone: '', applicantEmail: '',
-      classApplied: 'Class 1', sectionPreferred: 'A',
-      dateOfBirth: '', gender: 'MALE',
-      casteCategory: 'GENERAL', religion: 'HINDU', motherTongue: 'HINDI',
-      aadharNumber: '', previousSchool: '', previousClass: '',
-      tcNumber: '', reasonForLeaving: '',
-      fatherName: '', fatherOccupation: '', fatherPhone: '',
-      motherName: '', motherOccupation: '', motherPhone: '',
-      address: '', city: '', state: 'DELHI', pincode: '',
-      annualIncome: '',
-    });
+  const fetchAdmissions = async () => {
+    setLoading(true);
+    try {
+      const { data } = await admissionAPI.getAll({ search: searchQuery, status: filterStatus });
+      setAdmissions(data.data.admissions);
+    } catch (e) {
+      toast.error('Failed to load admissions');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleStatusChange = (id, status) => {
-    toast.success(`Admission ${status.toLowerCase()}`);
+  useEffect(() => {
+    fetchAdmissions();
+  }, [searchQuery, filterStatus]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (formData.annualIncome) {
+        formData.annualIncome = parseFloat(formData.annualIncome);
+      }
+      await admissionAPI.create({...formData, status: 'PENDING'});
+      toast.success('Admission application submitted successfully');
+      setShowForm(false);
+      setFormData({
+        applicantName: '', applicantPhone: '', applicantEmail: '',
+        classApplied: 'Class 1', sectionPreferred: 'A',
+        dateOfBirth: '', gender: 'MALE',
+        casteCategory: 'GENERAL', religion: 'HINDU', motherTongue: 'HINDI',
+        aadharNumber: '', previousSchool: '', previousClass: '',
+        tcNumber: '', reasonForLeaving: '',
+        fatherName: '', fatherOccupation: '', fatherPhone: '',
+        motherName: '', motherOccupation: '', motherPhone: '',
+        address: '', city: '', state: 'DELHI', pincode: '',
+        annualIncome: '',
+      });
+      fetchAdmissions();
+    } catch (e) {
+      toast.error('Failed to submit application');
+    }
+  };
+
+  const handleStatusChange = async (id, status) => {
+    try {
+      await admissionAPI.updateStatus(id, { status });
+      toast.success(`Admission ${status.toLowerCase()}`);
+      fetchAdmissions();
+    } catch (e) {
+      toast.error('Failed to update status');
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -156,17 +183,17 @@ export default function Admissions() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {demoAdmissions.map((adm) => (
+              {admissions.map((adm) => (
                 <tr key={adm.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm font-mono text-primary-600">{adm.id}</td>
+                  <td className="px-4 py-3 text-sm font-mono text-primary-600">{adm.admissionNumber}</td>
                   <td className="px-4 py-3">
-                    <p className="text-sm font-medium">{adm.name}</p>
+                    <p className="text-sm font-medium">{adm.applicantName}</p>
                     <p className="text-xs text-gray-500">{adm.gender}</p>
                   </td>
-                  <td className="px-4 py-3 text-sm">{adm.class}</td>
-                  <td className="px-4 py-3 text-sm">{new Date(adm.dob).toLocaleDateString('en-IN')}</td>
-                  <td className="px-4 py-3"><span className="badge badge-blue">{adm.caste}</span></td>
-                  <td className="px-4 py-3 text-sm">{adm.phone}</td>
+                  <td className="px-4 py-3 text-sm">{adm.classApplied}</td>
+                  <td className="px-4 py-3 text-sm">{new Date(adm.dateOfBirth).toLocaleDateString('en-IN')}</td>
+                  <td className="px-4 py-3"><span className="badge badge-blue">{adm.casteCategory}</span></td>
+                  <td className="px-4 py-3 text-sm">{adm.applicantPhone}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center gap-1 badge ${getStatusBadge(adm.status)}`}>
                       {getStatusIcon(adm.status)} {adm.status}
