@@ -231,12 +231,15 @@ export default function Students() {
                               const blob = new Blob([response.data], { type: 'application/pdf' });
                               const url = window.URL.createObjectURL(blob);
                               const link = document.createElement('a');
+                              link.style.display = 'none';
                               link.href = url;
                               link.setAttribute('download', `ID-${student.studentId}.pdf`);
                               document.body.appendChild(link);
                               link.click();
-                              document.body.removeChild(link);
-                              setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                              setTimeout(() => {
+                                document.body.removeChild(link);
+                                window.URL.revokeObjectURL(url);
+                              }, 60000);
                             } catch (e) { toast.error('Failed to generate ID card'); }
                           }} 
                           className="p-1.5 rounded-lg hover:bg-green-50 text-green-600" 

@@ -244,12 +244,15 @@ export default function Reports() {
                       });
                       const url = window.URL.createObjectURL(new Blob([response.data]));
                       const link = document.createElement('a');
+                      link.style.display = 'none';
                       link.href = url;
                       link.setAttribute('download', 'Report-Card-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
-                      document.body.removeChild(link);
-                      window.URL.revokeObjectURL(url);
+                      setTimeout(() => {
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                      }, 60000);
                     } catch (e) {
                       toast.error('Failed to generate PDF. Make sure you have students and exams set up.');
                     }
@@ -274,12 +277,15 @@ export default function Reports() {
                       const blob = new Blob([response.data], { type: 'application/pdf' });
                       const url = window.URL.createObjectURL(blob);
                       const link = document.createElement('a');
+                      link.style.display = 'none';
                       link.href = url;
                       link.setAttribute('download', 'TC-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
-                      document.body.removeChild(link);
-                      setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                      setTimeout(() => {
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                      }, 60000);
                     } catch (e) { toast.error('Failed to generate TC demo'); }
                   }} 
                   className="btn btn-secondary text-sm flex items-center gap-2"
@@ -301,12 +307,15 @@ export default function Reports() {
                       const blob = new Blob([response.data], { type: 'application/pdf' });
                       const url = window.URL.createObjectURL(blob);
                       const link = document.createElement('a');
+                      link.style.display = 'none';
                       link.href = url;
                       link.setAttribute('download', 'Salary-Slip-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
-                      document.body.removeChild(link);
-                      setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                      setTimeout(() => {
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                      }, 60000);
                     } catch (e) { toast.error('No salary records found for demo'); }
                   }} 
                   className="btn btn-secondary text-sm flex items-center gap-2"
@@ -328,12 +337,15 @@ export default function Reports() {
                       const blob = new Blob([response.data], { type: 'application/pdf' });
                       const url = window.URL.createObjectURL(blob);
                       const link = document.createElement('a');
+                      link.style.display = 'none';
                       link.href = url;
                       link.setAttribute('download', 'ID-Card-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
-                      document.body.removeChild(link);
-                      setTimeout(() => window.URL.revokeObjectURL(url), 100);
+                      setTimeout(() => {
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                      }, 60000);
                     } catch (e) { toast.error('No students found for ID card demo'); }
                   }} 
                   className="btn btn-secondary text-sm flex items-center gap-2"
