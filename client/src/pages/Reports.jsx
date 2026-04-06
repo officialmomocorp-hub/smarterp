@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Download, Printer, Users, AlertTriangle, TrendingDown, Send, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
-import axios from 'axios';
+import api, { API_BASE } from '../services/api';
 import toast from 'react-hot-toast';
-
-const API_BASE = '/api/v1';
 
 function formatINR(amount) {
   return `₹${parseFloat(amount).toLocaleString('en-IN')}`;
@@ -277,8 +275,7 @@ export default function Reports() {
                   onClick={async () => {
                     toast.success('Generating TC...');
                     try {
-                      const response = await axios.get(`${API_BASE}/pdf/tc/demo`, {
-                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                      const response = await api.get('/pdf/tc/demo', {
                         responseType: 'blob',
                       });
                       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -287,7 +284,8 @@ export default function Reports() {
                       link.setAttribute('download', 'TC-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
-                      link.remove();
+                      document.body.removeChild(link);
+                      window.URL.revokeObjectURL(url);
                     } catch (e) { toast.error('Failed to generate TC demo'); }
                   }} 
                   className="btn btn-secondary text-sm flex items-center gap-2"
@@ -303,8 +301,7 @@ export default function Reports() {
                   onClick={async () => {
                     toast.success('Generating Salary Slip...');
                     try {
-                      const response = await axios.get(`${API_BASE}/pdf/salary/demo`, {
-                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                      const response = await api.get('/pdf/salary/demo', {
                         responseType: 'blob',
                       });
                       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -313,7 +310,8 @@ export default function Reports() {
                       link.setAttribute('download', 'Salary-Slip-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
-                      link.remove();
+                      document.body.removeChild(link);
+                      window.URL.revokeObjectURL(url);
                     } catch (e) { toast.error('No salary records found for demo'); }
                   }} 
                   className="btn btn-secondary text-sm flex items-center gap-2"
@@ -329,8 +327,7 @@ export default function Reports() {
                   onClick={async () => {
                     toast.success('Generating ID Card...');
                     try {
-                      const response = await axios.get(`${API_BASE}/pdf/idcard/demo`, {
-                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                      const response = await api.get('/pdf/idcard/demo', {
                         responseType: 'blob',
                       });
                       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -339,7 +336,8 @@ export default function Reports() {
                       link.setAttribute('download', 'ID-Card-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
-                      link.remove();
+                      document.body.removeChild(link);
+                      window.URL.revokeObjectURL(url);
                     } catch (e) { toast.error('No students found for ID card demo'); }
                   }} 
                   className="btn btn-secondary text-sm flex items-center gap-2"

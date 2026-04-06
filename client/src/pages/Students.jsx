@@ -225,6 +225,7 @@ export default function Students() {
                         <button onClick={() => setViewStudentModal(student)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600" title="View"><Eye className="w-4 h-4" /></button>
                         <button 
                           onClick={async () => {
+                            toast.success('Generating ID Card...');
                             try {
                               const response = await studentAPI.generateIDCard(student.id);
                               const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -233,6 +234,8 @@ export default function Students() {
                               link.setAttribute('download', `ID-${student.studentId}.pdf`);
                               document.body.appendChild(link);
                               link.click();
+                              document.body.removeChild(link);
+                              window.URL.revokeObjectURL(url);
                             } catch (e) { toast.error('Failed to generate ID card'); }
                           }} 
                           className="p-1.5 rounded-lg hover:bg-green-50 text-green-600" 
