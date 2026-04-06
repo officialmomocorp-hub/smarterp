@@ -1,4 +1,6 @@
 import React from 'react';
+import api from '../services/api';
+import toast from 'react-hot-toast';
 import { BarChart3, Download, FileSpreadsheet, Building2, TrendingUp } from 'lucide-react';
 
 export default function PlatformReports() {
@@ -8,6 +10,29 @@ export default function PlatformReports() {
     { title: 'Usage Analytics', description: 'Most active schools, student enrollment trends, and module usage.', icon: BarChart3 },
     { title: 'Subscription Expiry', description: 'Schools whose plans are expiring within the next 30 days.', icon: FileSpreadsheet },
   ];
+
+  const [downloading, setDownloading] = React.useState(null);
+
+  const handleDownload = async (title) => {
+    setDownloading(title);
+    try {
+      const endpoint = title.includes('School') ? '/platform/reports/school-list' :
+                      title.includes('Revenue') ? '/platform/reports/revenue' :
+                      title.includes('Usage') ? '/platform/reports/usage' : '/platform/reports/school-list';
+      const { data } = await api.get(endpoint);
+      const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      toast.success(`${title} downloaded successfully! 📊`);
+    } catch (err) {
+      toast.error(`Failed to download ${title}`);
+    } finally {
+      setDownloading(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -26,8 +51,13 @@ export default function PlatformReports() {
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-gray-900 mb-1">{report.title}</h3>
                 <p className="text-sm text-gray-500 mb-4">{report.description}</p>
-                <button className="flex items-center gap-2 text-sm font-bold text-primary-600 hover:text-primary-700 transition-colors">
-                   <Download className="w-4 h-4" /> Download Excel Report
+                <button 
+                  disabled={!!downloading}
+                  onClick={() => handleDownload(report.title)}
+                  className="flex items-center gap-2 text-sm font-bold text-primary-600 hover:text-primary-700 transition-colors disabled:opacity-50"
+                >
+                   <Download className="w-4 h-4" /> 
+                   {downloading === report.title ? 'Generating Excel...' : 'Download Report'}
                 </button>
               </div>
             </div>

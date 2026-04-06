@@ -86,6 +86,7 @@ app.use('/api/v1/parent', require('./routes/parent.routes'));
 app.use('/api/v1/homework', require('./routes/homework.routes'));
 app.use('/api/v1/phase3', require('./routes/phase3.routes'));
 app.use('/api/v1/schools', require('./routes/school.routes'));
+app.use('/api/v1/platform', require('./routes/platform.routes'));
 
 // Cron jobs
 require('./config/cron');
