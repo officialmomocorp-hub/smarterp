@@ -20,9 +20,7 @@ export default function Reports() {
 
   const fetchClasses = async () => {
     try {
-      const { data } = await axios.get(`${API_BASE}/academic/classes`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      const { data } = await api.get('/academic/classes');
       setClasses(data.data || []);
     } catch (error) {
       console.error('Failed to fetch classes');
@@ -32,8 +30,7 @@ export default function Reports() {
   const handleUDISEExport = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_BASE}/reports-enhanced/udise?year=2025-26`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      const response = await api.get('/reports-enhanced/udise?year=2025-26', {
         responseType: 'blob',
       });
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -55,9 +52,7 @@ export default function Reports() {
     if (!selectedClass) { toast.error('Please select a class'); return; }
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_BASE}/reports-enhanced/below75/${selectedClass}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      const { data } = await api.get(`/reports-enhanced/below75/${selectedClass}`);
       setBelow75Students(data.data || []);
       toast.success(`Found ${data.data.length} students below 75% attendance`);
     } catch (error) {
@@ -69,9 +64,7 @@ export default function Reports() {
 
   const handleSMSAlert = async (studentId) => {
     try {
-      await axios.post(`${API_BASE}/reports-enhanced/sms-alert/${studentId}`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      await api.post(`/reports-enhanced/sms-alert/${studentId}`, {});
       toast.success('SMS alert ready for parent');
     } catch (error) {
       toast.error('Failed to send SMS alert');
@@ -246,8 +239,7 @@ export default function Reports() {
                   onClick={async () => {
                     toast.success('Generating Report Card...');
                     try {
-                      const response = await axios.get(`${API_BASE}/pdf/report-card/demo`, {
-                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                      const response = await api.get('/pdf/report-card/demo', {
                         responseType: 'blob',
                       });
                       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -256,7 +248,8 @@ export default function Reports() {
                       link.setAttribute('download', 'Report-Card-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
-                      link.remove();
+                      document.body.removeChild(link);
+                      window.URL.revokeObjectURL(url);
                     } catch (e) {
                       toast.error('Failed to generate PDF. Make sure you have students and exams set up.');
                     }
