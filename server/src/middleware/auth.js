@@ -63,8 +63,8 @@ const authorize = (...roles) => {
 const schoolScoped = async (req, res, next) => {
   // CRITICAL SECURITY RULE: Super Admin is for platform management ONLY.
   // They should NEVER access individual school data or student records.
-  if (req.userRole === 'SUPER_ADMIN') {
-    return next(new AppError('Forbidden: Super Admins are restricted to the platform management panel and cannot access school-level data.', 403));
+  if (req.userRole === 'SUPER_ADMIN' && !req.schoolId) {
+    return next(new AppError('Forbidden: Super Admins without an assigned school are restricted to the platform management panel.', 403));
   }
 
   // IDOR PROTECTION: Ensure the schoolId requested matches the user's assigned schoolId.

@@ -85,8 +85,8 @@ export default function FeeManagement() {
     if (!searchQuery.trim()) return;
     setLoading(true);
     try {
-      // Search through students API
-      const { data } = await feeAPI.getStudentFeeStatus(searchQuery, { academicYearId: 'demo-academic-year' });
+      const currentYear = academicYears.find(y => y.isCurrent) || academicYears[0];
+      const { data } = await feeAPI.getStudentFeeStatus(searchQuery, { academicYearId: currentYear?.id });
       setFeeStatus(data.data);
     } catch (error) {
       toast.error('Student not found');
@@ -434,7 +434,7 @@ export default function FeeManagement() {
                   onChange={e => setStructureForm({...structureForm, classId: e.target.value})}
                 >
                   <option value="">Select a class</option>
-                  {classes.map(c => <option key={c.id} value={c.id}>{c.displayName}</option>)}
+                  {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               <div>

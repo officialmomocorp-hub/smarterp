@@ -223,6 +223,17 @@ model Admission {
   tcNumber          String?
   tcDate            DateTime?
   reasonForLeaving  String?
+  fatherName        String?
+  fatherOccupation  String?
+  fatherPhone       String?
+  motherName        String?
+  motherOccupation  String?
+  motherPhone       String?
+  annualIncome      Float?
+  address           String?
+  city              String?
+  state             String?
+  pincode           String?
   status            String          @default("PENDING")
   remarks           String?
   documents         String?

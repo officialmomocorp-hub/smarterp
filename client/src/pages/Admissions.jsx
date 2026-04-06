@@ -173,9 +173,9 @@ export default function Admissions() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">App ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student Name</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Parent Name</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">DOB</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
@@ -188,10 +188,13 @@ export default function Admissions() {
                   <td className="px-4 py-3 text-sm font-mono text-primary-600">{adm.admissionNumber}</td>
                   <td className="px-4 py-3">
                     <p className="text-sm font-medium">{adm.applicantName}</p>
-                    <p className="text-xs text-gray-500">{adm.gender}</p>
+                    <p className="text-xs text-gray-500">{new Date(adm.dateOfBirth).toLocaleDateString('en-IN')}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="text-sm font-medium">{adm.fatherName}</p>
+                    <p className="text-xs text-gray-500">{adm.fatherPhone}</p>
                   </td>
                   <td className="px-4 py-3 text-sm">{adm.classApplied}</td>
-                  <td className="px-4 py-3 text-sm">{new Date(adm.dateOfBirth).toLocaleDateString('en-IN')}</td>
                   <td className="px-4 py-3"><span className="badge badge-blue">{adm.casteCategory}</span></td>
                   <td className="px-4 py-3 text-sm">{adm.applicantPhone}</td>
                   <td className="px-4 py-3">

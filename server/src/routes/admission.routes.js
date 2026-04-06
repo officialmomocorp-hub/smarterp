@@ -19,28 +19,15 @@ router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
 
     const admissionNumber = `ADM${Date.now().toString().slice(-6)}`;
 
-    const {
-      fatherName, fatherOccupation, fatherPhone,
-      motherName, motherOccupation, motherPhone,
-      address, city, state, pincode, annualIncome,
-      ...admissionData
-    } = req.body;
-
-    const parentAndAddressInfo = JSON.stringify({
-      fatherName, fatherOccupation, fatherPhone,
-      motherName, motherOccupation, motherPhone,
-      address, city, state, pincode, annualIncome,
-    });
-
     const admission = await prisma.admission.create({
       data: {
         schoolId: req.schoolId,
         academicYearId: yearId,
         admissionNumber,
-        ...admissionData,
-        dateOfBirth: new Date(admissionData.dateOfBirth),
-        tcDate: admissionData.tcDate ? new Date(admissionData.tcDate) : null,
-        documents: parentAndAddressInfo,
+        ...req.body,
+        dateOfBirth: new Date(req.body.dateOfBirth),
+        tcDate: req.body.tcDate ? new Date(req.body.tcDate) : null,
+        annualIncome: req.body.annualIncome ? parseFloat(req.body.annualIncome) : null,
       },
     });
     res.status(201).json({ success: true, data: admission });
