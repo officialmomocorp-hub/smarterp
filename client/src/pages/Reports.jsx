@@ -273,24 +273,78 @@ export default function Reports() {
                 <FileText className="w-8 h-8 text-amber-600 mb-3" />
                 <h4 className="font-medium text-amber-900 mb-2">Transfer Certificate</h4>
                 <p className="text-sm text-amber-700 mb-4">Standard TC format with all required fields and signatures</p>
-                <button onClick={() => toast.success('Transfer Certificate PDF generated')} data-testid="issue-tc-btn" className="btn btn-secondary text-sm flex items-center gap-2">
-                  <FileText className="w-4 h-4" /> Issue TC
+                <button 
+                  onClick={async () => {
+                    toast.success('Generating TC...');
+                    try {
+                      const response = await axios.get(`${API_BASE}/pdf/tc/demo`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                        responseType: 'blob',
+                      });
+                      const url = window.URL.createObjectURL(new Blob([response.data]));
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.setAttribute('download', 'TC-Demo.pdf');
+                      document.body.appendChild(link);
+                      link.click();
+                      link.remove();
+                    } catch (e) { toast.error('Failed to generate TC demo'); }
+                  }} 
+                  className="btn btn-secondary text-sm flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4" /> Download Demo TC
                 </button>
               </div>
               <div className="p-6 bg-purple-50 rounded-lg border border-purple-200">
                 <FileText className="w-8 h-8 text-purple-600 mb-3" />
                 <h4 className="font-medium text-purple-900 mb-2">Salary Slip</h4>
                 <p className="text-sm text-purple-700 mb-4">Monthly salary slip with earnings, deductions, net salary</p>
-                <button onClick={() => toast.success('Salary Slip PDF downloaded')} className="btn btn-secondary text-sm flex items-center gap-2">
-                  <Download className="w-4 h-4" /> Generate Salary Slip
+                <button 
+                  onClick={async () => {
+                    toast.success('Generating Salary Slip...');
+                    try {
+                      const response = await axios.get(`${API_BASE}/pdf/salary/demo`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                        responseType: 'blob',
+                      });
+                      const url = window.URL.createObjectURL(new Blob([response.data]));
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.setAttribute('download', 'Salary-Slip-Demo.pdf');
+                      document.body.appendChild(link);
+                      link.click();
+                      link.remove();
+                    } catch (e) { toast.error('No salary records found for demo'); }
+                  }} 
+                  className="btn btn-secondary text-sm flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" /> Generate Demo Slip
                 </button>
               </div>
               <div className="p-6 bg-cyan-50 rounded-lg border border-cyan-200">
                 <FileText className="w-8 h-8 text-cyan-600 mb-3" />
                 <h4 className="font-medium text-cyan-900 mb-2">Student ID Card</h4>
                 <p className="text-sm text-cyan-700 mb-4">Credit card size ID with photo, details, and school info</p>
-                <button onClick={() => toast.success('ID Card layout generated')} className="btn btn-secondary text-sm flex items-center gap-2">
-                  <Printer className="w-4 h-4" /> Generate ID Card
+                <button 
+                  onClick={async () => {
+                    toast.success('Generating ID Card...');
+                    try {
+                      const response = await axios.get(`${API_BASE}/pdf/idcard/demo`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                        responseType: 'blob',
+                      });
+                      const url = window.URL.createObjectURL(new Blob([response.data]));
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.setAttribute('download', 'ID-Card-Demo.pdf');
+                      document.body.appendChild(link);
+                      link.click();
+                      link.remove();
+                    } catch (e) { toast.error('No students found for ID card demo'); }
+                  }} 
+                  className="btn btn-secondary text-sm flex items-center gap-2"
+                >
+                  <Printer className="w-4 h-4" /> Download Demo ID
                 </button>
               </div>
               <div className="p-6 bg-pink-50 rounded-lg border border-pink-200">

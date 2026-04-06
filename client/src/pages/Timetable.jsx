@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Calendar, Clock, User, BookOpen, Plus, Trash2, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, Clock, User as UserIcon, BookOpen, Plus, Trash2, AlertCircle } from 'lucide-react';
+import { timetableAPI, academicAPI, staffAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -14,72 +15,63 @@ const DEFAULT_PERIODS = [
   { period: 8, time: '01:30 - 02:15' },
 ];
 
-const SUBJECTS = ['Mathematics', 'English', 'Hindi', 'Science', 'Social Studies', 'Computer', 'Physical Education', 'Art', 'Sanskrit', 'General Knowledge'];
-const TEACHERS = ['Sunita Sharma', 'Rajesh Kumar', 'Priya Singh', 'Amit Patel', 'Meera Joshi', 'Vikram Yadav'];
-
 export default function Timetable() {
   const [periods, setPeriods] = useState(DEFAULT_PERIODS);
   const [showTimeModal, setShowTimeModal] = useState(false);
-  const [selectedClass, setSelectedClass] = useState('Class 5');
-  const [selectedSection, setSelectedSection] = useState('A');
+  const [selectedClass, setSelectedClass] = useState('');
+  const [selectedSection, setSelectedSection] = useState('');
   const [timetable, setTimetable] = useState({});
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [newEntry, setNewEntry] = useState({ subject: '', teacher: '' });
+  const [newEntry, setNewEntry] = useState({ subjectId: '', teacherId: '' });
+  const [classes, setClasses] = useState([]);
+  const [staff, setStaff] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const demoTimetable = {
-    '0-Monday': { subject: 'Mathematics', teacher: 'Sunita Sharma' },
-    '1-Monday': { subject: 'English', teacher: 'Rajesh Kumar' },
-    '2-Monday': { subject: 'Hindi', teacher: 'Priya Singh' },
-    '3-Monday': { subject: 'Science', teacher: 'Amit Patel' },
-    '4-Monday': { subject: 'Mathematics', teacher: 'Sunita Sharma' },
-    '5-Monday': { subject: 'Social Studies', teacher: 'Meera Joshi' },
-    '6-Monday': { subject: 'Computer', teacher: 'Vikram Yadav' },
-    '7-Monday': { subject: 'Physical Education', teacher: 'Rajesh Kumar' },
-    '0-Tuesday': { subject: 'Science', teacher: 'Amit Patel' },
-    '1-Tuesday': { subject: 'Mathematics', teacher: 'Sunita Sharma' },
-    '2-Tuesday': { subject: 'English', teacher: 'Rajesh Kumar' },
-    '3-Tuesday': { subject: 'Sanskrit', teacher: 'Priya Singh' },
-    '4-Tuesday': { subject: 'Hindi', teacher: 'Priya Singh' },
-    '5-Tuesday': { subject: 'Art', teacher: 'Meera Joshi' },
-    '6-Tuesday': { subject: 'General Knowledge', teacher: 'Vikram Yadav' },
-    '7-Tuesday': { subject: 'Mathematics', teacher: 'Sunita Sharma' },
-    '0-Wednesday': { subject: 'English', teacher: 'Rajesh Kumar' },
-    '1-Wednesday': { subject: 'Science', teacher: 'Amit Patel' },
-    '2-Wednesday': { subject: 'Mathematics', teacher: 'Sunita Sharma' },
-    '3-Wednesday': { subject: 'Hindi', teacher: 'Priya Singh' },
-    '4-Wednesday': { subject: 'Computer', teacher: 'Vikram Yadav' },
-    '5-Wednesday': { subject: 'Social Studies', teacher: 'Meera Joshi' },
-    '6-Wednesday': { subject: 'Physical Education', teacher: 'Rajesh Kumar' },
-    '7-Wednesday': { subject: 'English', teacher: 'Rajesh Kumar' },
-    '0-Thursday': { subject: 'Hindi', teacher: 'Priya Singh' },
-    '1-Thursday': { subject: 'Mathematics', teacher: 'Sunita Sharma' },
-    '2-Thursday': { subject: 'Science', teacher: 'Amit Patel' },
-    '3-Thursday': { subject: 'Sanskrit', teacher: 'Priya Singh' },
-    '4-Thursday': { subject: 'English', teacher: 'Rajesh Kumar' },
-    '5-Thursday': { subject: 'Computer', teacher: 'Vikram Yadav' },
-    '6-Thursday': { subject: 'Art', teacher: 'Meera Joshi' },
-    '7-Thursday': { subject: 'General Knowledge', teacher: 'Vikram Yadav' },
-    '0-Friday': { subject: 'Mathematics', teacher: 'Sunita Sharma' },
-    '1-Friday': { subject: 'Science', teacher: 'Amit Patel' },
-    '2-Friday': { subject: 'English', teacher: 'Rajesh Kumar' },
-    '3-Friday': { subject: 'Hindi', teacher: 'Priya Singh' },
-    '4-Friday': { subject: 'Social Studies', teacher: 'Meera Joshi' },
-    '5-Friday': { subject: 'Computer', teacher: 'Vikram Yadav' },
-    '6-Friday': { subject: 'Physical Education', teacher: 'Rajesh Kumar' },
-    '7-Friday': { subject: 'Art', teacher: 'Meera Joshi' },
-    '0-Saturday': { subject: 'General Knowledge', teacher: 'Vikram Yadav' },
-    '1-Saturday': { subject: 'Mathematics', teacher: 'Sunita Sharma' },
-    '2-Saturday': { subject: 'Science', teacher: 'Amit Patel' },
-    '3-Saturday': { subject: 'English', teacher: 'Rajesh Kumar' },
-    '4-Saturday': { subject: 'Hindi', teacher: 'Priya Singh' },
-    '5-Saturday': { subject: 'Social Studies', teacher: 'Meera Joshi' },
+  const fetchDependencies = async () => {
+    try {
+      const [clsRes, staffRes, subRes] = await Promise.all([
+        academicAPI.getClasses(),
+        staffAPI.getAll(),
+        academicAPI.getSubjects()
+      ]);
+      setClasses(clsRes.data.data || []);
+      setStaff(staffRes.data.data.staff || []);
+      setSubjects(subRes.data.data || []);
+    } catch (e) { toast.error('Failed to load classes or staff'); }
   };
+
+  const fetchTimetable = async () => {
+    if (!selectedClass) return;
+    setLoading(true);
+    try {
+      const { data } = await timetableAPI.getAll({ classId: selectedClass, sectionId: selectedSection });
+      const ttMap = {};
+      data.data.forEach(entry => {
+        ttMap[`${entry.period - 1}-${entry.dayOfWeek}`] = {
+           id: entry.id,
+           subject: entry.subject?.name,
+           teacher: entry.teacher?.profile?.firstName || 'Staff',
+           subjectId: entry.subjectId,
+           teacherId: entry.teacherId
+        };
+      });
+      setTimetable(ttMap);
+    } catch (e) { toast.error('Failed to load timetable'); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { fetchDependencies(); }, []);
+  useEffect(() => { if (selectedClass) fetchTimetable(); }, [selectedClass, selectedSection]);
+
+
+
 
   const handleSlotClick = (dayIndex, dayName, periodIndex) => {
     const key = `${periodIndex}-${dayName}`;
     setSelectedSlot({ key, dayIndex, dayName, periodIndex });
-    const existing = demoTimetable[key];
+    const existing = timetable[key];
     setNewEntry({
       subject: existing?.subject || '',
       teacher: existing?.teacher || '',
@@ -87,13 +79,24 @@ export default function Timetable() {
     setShowAddModal(true);
   };
 
-  const handleSaveEntry = () => {
-    if (!newEntry.subject || !newEntry.teacher) {
+  const handleSaveEntry = async () => {
+    if (!newEntry.subjectId || !newEntry.teacherId) {
       toast.error('Please fill all fields');
       return;
     }
-    toast.success('Timetable entry saved');
-    setShowAddModal(false);
+    try {
+      await timetableAPI.create({
+        dayOfWeek: selectedSlot.dayIndex,
+        period: selectedSlot.periodIndex + 1,
+        subjectId: newEntry.subjectId,
+        staffId: newEntry.teacherId,
+        classId: selectedClass,
+        sectionId: selectedSection || undefined
+      });
+      toast.success('Timetable entry saved');
+      setShowAddModal(false);
+      fetchTimetable();
+    } catch (e) { toast.error('Failed to save entry'); }
   };
 
   const handleDeleteEntry = (key) => {
@@ -125,12 +128,16 @@ export default function Timetable() {
             <Clock className="w-4 h-4" /> Edit Bell Timings
           </button>
           <select className="input w-40" value={selectedClass} onChange={(e) => setSelectedClass(e.target.value)}>
-            {['Nursery', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map(c => (
-              <option key={c}>{c}</option>
+            <option value="">Select Class</option>
+            {classes.map(c => (
+              <option key={c.id} value={c.id}>{c.displayName}</option>
             ))}
           </select>
           <select className="input w-24" value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
-            <option>A</option><option>B</option><option>C</option><option>D</option>
+            <option value="">All Sec</option>
+            {classes.find(c => c.id === selectedClass)?.sections?.map(s => (
+               <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -161,7 +168,7 @@ export default function Timetable() {
                 </td>
                 {DAYS.map((day, dayIndex) => {
                   const key = `${periodIndex}-${day}`;
-                  const entry = demoTimetable[key];
+                  const entry = timetable[key];
                   return (
                     <td
                       key={day}
@@ -193,15 +200,16 @@ export default function Timetable() {
       <div className="card">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Teacher Workload Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {TEACHERS.map(teacher => {
-            const count = Object.values(demoTimetable).filter(e => e.teacher === teacher).length;
+          {staff.slice(0, 8).map(teacher => {
+            const teacherName = `${teacher.profile.firstName} ${teacher.profile.lastName}`;
+            const count = Object.values(timetable).flat().filter(e => e.teacherId === teacher.id).length;
             return (
-              <div key={teacher} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div key={teacher.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                 <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-                  <User className="w-5 h-5 text-primary-600" />
+                  <UserIcon className="w-5 h-5 text-primary-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{teacher}</p>
+                  <p className="text-sm font-medium text-gray-900">{teacherName}</p>
                   <p className="text-xs text-gray-500">{count} periods/week</p>
                 </div>
               </div>
@@ -216,7 +224,7 @@ export default function Timetable() {
           <div className="bg-white rounded-2xl w-full max-w-md">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">
-                {demoTimetable[selectedSlot?.key] ? 'Edit' : 'Add'} Entry
+                {timetable[selectedSlot?.key] ? 'Edit' : 'Add'} Entry
               </h3>
               <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
@@ -231,18 +239,18 @@ export default function Timetable() {
                 <label className="label">Subject</label>
                 <select className="input" value={newEntry.subject} onChange={(e) => setNewEntry({...newEntry, subject: e.target.value})}>
                   <option value="">Select Subject</option>
-                  {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
+                  {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="label">Teacher</label>
                 <select className="input" value={newEntry.teacher} onChange={(e) => setNewEntry({...newEntry, teacher: e.target.value})}>
                   <option value="">Select Teacher</option>
-                  {TEACHERS.map(t => <option key={t} value={t}>{t}</option>)}
+                  {staff.map(t => <option key={t.id} value={t.id}>{t.profile.firstName} {t.profile.lastName}</option>)}
                 </select>
               </div>
               <div className="flex gap-3 pt-4">
-                {demoTimetable[selectedSlot?.key] && (
+                {timetable[selectedSlot?.key] && (
                   <button onClick={() => handleDeleteEntry(selectedSlot.key)} className="btn btn-danger flex items-center gap-2">
                     <Trash2 className="w-4 h-4" /> Delete
                   </button>

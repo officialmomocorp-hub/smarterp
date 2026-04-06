@@ -83,9 +83,9 @@ const schoolAdminMenu = [
     roles: ['ADMIN', 'TEACHER', 'PARENT', 'STUDENT'],
     children: [
       { title: 'Exam Schedule', path: '/exams' },
-      { title: 'Marks Entry', path: '/exams-enhanced' },
-      { title: 'Hall Tickets', path: '/exams-enhanced' },
-      { title: 'Results & Analytics', path: '/exams-enhanced' },
+      { title: 'Marks Verification', path: '/exams-enhanced?tab=verification' },
+      { title: 'Hall Tickets', path: '/exams-enhanced?tab=hall-tickets' },
+      { title: 'Results & Analytics', path: '/exams-enhanced?tab=analytics' },
     ],
   },
   {

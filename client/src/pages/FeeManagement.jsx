@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { feeAPI, academicAPI } from '../services/api';
+import { useAuthStore } from '../store';
 import { IndianRupee, Plus, Search, Download, AlertTriangle, CheckCircle, Clock, XCircle, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -308,7 +309,10 @@ export default function FeeManagement() {
                         <td className="px-4 py-3">
                           <button
                             data-testid="print-receipt"
-                            onClick={() => window.open(`/api/v1/pdf/receipt/${payment.id}`, '_blank')}
+                            onClick={() => {
+                              const token = useAuthStore.getState().token;
+                              window.open(`/api/v1/pdf/receipt/${payment.id}?token=${token}`, '_blank');
+                            }}
                             className="btn btn-secondary text-xs py-1 px-2"
                           >
                             Print

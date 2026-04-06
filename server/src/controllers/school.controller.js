@@ -99,3 +99,34 @@ exports.resetAdminPassword = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getSchoolSettings = async (req, res, next) => {
+  try {
+    const school = await prisma.school.findUnique({ where: { id: req.schoolId } });
+    res.json({ success: true, data: school });
+  } catch (error) { next(error); }
+};
+
+exports.updateSchoolSettings = async (req, res, next) => {
+  try {
+    const { name, address, city, state, pincode, phone, email, udiseCode, affiliationNumber, principalName } = req.body;
+    
+    let updateData = {
+      name, address, city, state, pincode, phone, email, udiseCode, affiliationNumber, principalName
+    };
+
+    if (req.files?.logo) {
+      updateData.logoUrl = `/uploads/${req.schoolId}/${req.files.logo[0].filename}`;
+    }
+    if (req.files?.letterhead) {
+      updateData.letterheadUrl = `/uploads/${req.schoolId}/${req.files.letterhead[0].filename}`;
+    }
+
+    const updated = await prisma.school.update({
+      where: { id: req.schoolId },
+      data: updateData
+    });
+
+    res.json({ success: true, data: updated });
+  } catch (error) { next(error); }
+};

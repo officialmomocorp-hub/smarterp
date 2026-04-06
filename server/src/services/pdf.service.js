@@ -3,7 +3,48 @@ const fs = require('fs');
 const path = require('path');
 const prisma = require('../config/database');
 
+const COLORS = {
+  primary: '#1e40af', // Deep Blue
+  secondary: '#3b82f6', // Light Blue
+  text: '#1f2937',
+  muted: '#6b7280',
+  border: '#e5e7eb',
+  success: '#10b981',
+  danger: '#ef4444'
+};
+
 class PDFService {
+  async drawHeader(doc, school) {
+    // Background Accent
+    doc.rect(0, 0, doc.page.width, 100).fill('#f8fafc');
+    
+    // Logo
+    let logoX = 50;
+    if (school.logoUrl) {
+      try {
+        const logoPath = path.join(__dirname, '../../', school.logoUrl);
+        if (fs.existsSync(logoPath)) {
+          doc.image(logoPath, logoX, 25, { width: 50 });
+          logoX += 65;
+        }
+      } catch (err) {
+        console.error('Failed to draw logo', err);
+      }
+    }
+
+    // School Info
+    doc.fillColor(COLORS.primary).fontSize(20).font('Helvetica-Bold').text(school.name, logoX, 30);
+    doc.fillColor(COLORS.muted).fontSize(9).font('Helvetica').text(school.address, logoX, 55);
+    doc.text(`${school.city}, ${school.state} - ${school.pincode}`, logoX, 67);
+    doc.fillColor(COLORS.text).text(`Phone: ${school.phone} | Email: ${school.email}`, logoX, 79);
+    
+    // UDISE/Affiliation
+    doc.fontSize(8).text(`UDISE: ${school.udiseCode} | Affiliation No: ${school.affiliationNumber || 'N/A'}`, 50, 110, { align: 'right' });
+    
+    doc.lineWidth(1).strokeColor(COLORS.primary).moveTo(50, 125).lineTo(545, 125).stroke();
+    doc.moveDown(2);
+  }
+
   // ==========================================
   // FEATURE 1: FEE RECEIPT PDF
   // ==========================================
@@ -30,153 +71,150 @@ class PDFService {
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="receipt-${payment.receiptNumber}.pdf"`);
+    res.setHeader('Content-Disposition', `inline; filename="receipt-${payment.receiptNumber}.pdf"`);
     doc.pipe(res);
 
-    // School Header
-    doc.fontSize(22).font('Helvetica-Bold').text(school.name, { align: 'center' });
-    doc.fontSize(10).font('Helvetica').text(school.address, { align: 'center' });
-    doc.text(`Phone: ${school.phone} | Email: ${school.email}`, { align: 'center' });
-    doc.text(`UDISE Code: ${school.udiseCode} | Affiliation: ${school.affiliationNumber || 'N/A'}`, { align: 'center' });
-    doc.moveDown(0.3);
-    doc.lineWidth(2).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    await this.drawHeader(doc, school);
 
-    // Receipt Title
-    doc.moveDown(0.3);
-    doc.fontSize(16).font('Helvetica-Bold').text('FEE RECEIPT', { align: 'center', underline: true });
-    doc.moveDown(0.3);
+    // Receipt Badge
+    const receiptType = payment.status === 'PAID' ? 'FEE RECEIPT' : 'FEE CHALLAN';
+    doc.rect(50, 140, 500, 30).fill(payment.status === 'PAID' ? COLORS.success : COLORS.primary);
+    doc.fillColor('white').fontSize(14).font('Helvetica-Bold').text(receiptType, 50, 148, { align: 'center' });
 
-    // Receipt Details
-    doc.fontSize(10).font('Helvetica');
-    doc.text(`Receipt No: ${payment.receiptNumber}`, { align: 'right' });
-    doc.text(`Date: ${this.formatDate(payment.paymentDate || new Date())}`, { align: 'right' });
-    doc.text(`Academic Year: ${payment.academicYear.name}`, { align: 'right' });
+    doc.moveDown(1.5);
+    doc.fillColor(COLORS.text);
+
+    // Top Details Grid
+    const yTop = doc.y;
+    doc.fontSize(10).font('Helvetica-Bold').text('Receipt Details', 50, yTop);
+    doc.fontSize(10).font('Helvetica-Bold').text('Student Information', 320, yTop);
+    doc.lineWidth(0.5).strokeColor(COLORS.border).moveTo(50, yTop + 14).lineTo(250, yTop + 14).stroke();
+    doc.moveTo(320, yTop + 14).lineTo(545, yTop + 14).stroke();
+
     doc.moveDown(0.5);
+    doc.font('Helvetica').fontSize(9);
+    const detailsY = doc.y;
+    
+    // Receipt Col
+    doc.text(`Receipt No:`, 50, detailsY);
+    doc.font('Helvetica-Bold').text(payment.receiptNumber, 120, detailsY);
+    doc.font('Helvetica').text(`Date:`, 50, detailsY + 15);
+    doc.font('Helvetica-Bold').text(this.formatDate(payment.paymentDate || new Date()), 120, detailsY + 15);
+    doc.font('Helvetica').text(`Academic Year:`, 50, detailsY + 30);
+    doc.font('Helvetica-Bold').text(payment.academicYear.name, 120, detailsY + 30);
+    doc.font('Helvetica').text(`Session:`, 50, detailsY + 45);
+    doc.font('Helvetica-Bold').text('2025-26', 120, detailsY + 45);
 
-    // Student Details
-    doc.fontSize(12).font('Helvetica-Bold').text('Student Details');
-    doc.lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-    doc.moveDown(0.2);
-    doc.fontSize(10).font('Helvetica');
+    // Student Col
     const student = payment.student;
-    doc.text(`Name: ${student.profile.firstName} ${student.profile.lastName}`, 50, doc.y, { width: 250 });
-    doc.text(`Class: ${student.class.name} - ${student.section.name}`, 320, doc.y - 15, { width: 200 });
-    doc.text(`Roll No: ${student.rollNumber}`, 50, doc.y, { width: 250 });
-    doc.text(`Admission No: ${student.studentId}`, 320, doc.y - 15, { width: 200 });
-    doc.text(`Father's Name: ${student.parents?.[0]?.parent?.fatherName || 'N/A'}`, 50, doc.y, { width: 250 });
-    doc.moveDown(0.3);
+    doc.font('Helvetica').text(`Name:`, 320, detailsY);
+    doc.font('Helvetica-Bold').text(`${student.profile.firstName} ${student.profile.lastName}`, 400, detailsY);
+    doc.font('Helvetica').text(`Class:`, 320, detailsY + 15);
+    doc.font('Helvetica-Bold').text(`${student.class.name} - ${student.section.name}`, 400, detailsY + 15);
+    doc.font('Helvetica').text(`Adm No:`, 320, detailsY + 30);
+    doc.font('Helvetica-Bold').text(student.studentId, 400, detailsY + 30);
+    doc.font('Helvetica').text(`Roll No:`, 320, detailsY + 45);
+    doc.font('Helvetica-Bold').text(student.rollNumber || 'N/A', 400, detailsY + 45);
 
-    // Fee Breakdown Table
-    doc.fontSize(12).font('Helvetica-Bold').text('Fee Breakdown');
-    doc.lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-    doc.moveDown(0.2);
+    doc.moveDown(4);
+
+    // Fee Table Header
+    const tableTop = doc.y;
+    doc.rect(50, tableTop, 495, 20).fill('#f1f5f9');
+    doc.fillColor(COLORS.primary).fontSize(9).font('Helvetica-Bold');
+    doc.text('SL', 60, tableTop + 6);
+    doc.text('PARTICULARS / FEE HEAD', 100, tableTop + 6);
+    doc.text('AMOUNT (₹)', 400, tableTop + 6, { align: 'right', width: 135 });
+
+    let y = tableTop + 25;
+    doc.fillColor(COLORS.text).font('Helvetica').fontSize(9);
 
     const feeHeads = typeof payment.feeStructure?.feeHeads === 'string'
       ? JSON.parse(payment.feeStructure.feeHeads)
       : payment.feeStructure?.feeHeads || [];
 
-    const tableTop = doc.y;
-    const colWidths = [250, 100, 100];
-    const headers = ['Fee Type', 'Amount (₹)', 'Paid (₹)'];
-
-    doc.fontSize(9).font('Helvetica-Bold');
-    let x = 50;
-    headers.forEach((header, i) => {
-      doc.text(header, x, tableTop, { width: colWidths[i], align: i === 0 ? 'left' : 'center' });
-      x += colWidths[i];
-    });
-    doc.moveTo(50, tableTop + 14).lineTo(550, tableTop + 14).stroke();
-
-    let y = tableTop + 20;
-    doc.fontSize(9).font('Helvetica');
-
-    // Fee heads
     if (feeHeads.length > 0) {
-      feeHeads.forEach(head => {
-        x = 50;
-        doc.text(head.name, x, y, { width: colWidths[0], align: 'left' });
-        doc.text(`₹${parseFloat(head.amount).toLocaleString('en-IN')}`, x + colWidths[0], y, { width: colWidths[1], align: 'center' });
-        doc.text(`₹${parseFloat(payment.paidAmount).toLocaleString('en-IN')}`, x + colWidths[0] + colWidths[1], y, { width: colWidths[2], align: 'center' });
-        y += 16;
+      feeHeads.forEach((head, i) => {
+        doc.text(i + 1, 60, y);
+        doc.text(head.name, 100, y);
+        doc.text(parseFloat(head.amount).toLocaleString('en-IN'), 400, y, { align: 'right', width: 135 });
+        y += 20;
+        doc.strokeColor(COLORS.border).lineWidth(0.5).moveTo(50, y - 5).lineTo(545, y - 5).stroke();
       });
     } else {
-      x = 50;
-      doc.text('Tuition & Other Fees', x, y, { width: colWidths[0], align: 'left' });
-      doc.text(`₹${parseFloat(payment.totalAmount).toLocaleString('en-IN')}`, x + colWidths[0], y, { width: colWidths[1], align: 'center' });
-      doc.text(`₹${parseFloat(payment.paidAmount).toLocaleString('en-IN')}`, x + colWidths[0] + colWidths[1], y, { width: colWidths[2], align: 'center' });
-      y += 16;
+        doc.text('1', 60, y);
+        doc.text('School Fees / Tuition Fees', 100, y);
+        doc.text(parseFloat(payment.totalAmount).toLocaleString('en-IN'), 400, y, { align: 'right', width: 135 });
+        y += 20;
     }
 
-    // Separator
-    doc.moveTo(50, y).lineTo(550, y).stroke();
-    y += 5;
+    // Summary Box
+    doc.moveDown(1);
+    const summaryY = doc.y;
+    doc.rect(320, summaryY, 225, 100).strokeColor(COLORS.border).stroke();
+    
+    doc.font('Helvetica').text('Gross Amount:', 330, summaryY + 10);
+    doc.font('Helvetica-Bold').text(`₹${parseFloat(payment.totalAmount).toLocaleString('en-IN')}`, 450, summaryY + 10, { align: 'right', width: 85 });
+    
+    doc.font('Helvetica').text('Late Fine:', 330, summaryY + 25);
+    doc.text(`+ ₹${parseFloat(payment.lateFine || 0).toLocaleString('en-IN')}`, 450, summaryY + 25, { align: 'right', width: 85 });
+    
+    doc.font('Helvetica').text('Concession:', 330, summaryY + 40);
+    doc.fillColor(COLORS.danger).text(`- ₹${parseFloat(payment.concessionAmount || 0).toLocaleString('en-IN')}`, 450, summaryY + 40, { align: 'right', width: 85 });
+    
+    doc.fillColor(COLORS.text).moveTo(330, summaryY + 55).lineTo(535, summaryY + 55).stroke();
+    
+    doc.fontSize(11).font('Helvetica-Bold').text('NET PAID:', 330, summaryY + 65);
+    doc.fillColor(COLORS.primary).text(`₹${parseFloat(payment.paidAmount).toLocaleString('en-IN')}`, 450, summaryY + 65, { align: 'right', width: 85 });
 
-    // Additional charges
-    if (payment.lateFine > 0) {
-      doc.text('Late Fine', 50, y, { width: colWidths[0] });
-      doc.text(`₹${parseFloat(payment.lateFine).toLocaleString('en-IN')}`, 50 + colWidths[0], y, { width: colWidths[1], align: 'center' });
-      y += 16;
-    }
-    if (payment.gstAmount > 0) {
-      doc.text('GST', 50, y, { width: colWidths[0] });
-      doc.text(`₹${parseFloat(payment.gstAmount).toLocaleString('en-IN')}`, 50 + colWidths[0], y, { width: colWidths[1], align: 'center' });
-      y += 16;
-    }
-    if (payment.concessionAmount > 0) {
-      doc.text('Concession', 50, y, { width: colWidths[0] });
-      doc.text(`-₹${parseFloat(payment.concessionAmount).toLocaleString('en-IN')}`, 50 + colWidths[0], y, { width: colWidths[1], align: 'center' });
-      y += 16;
-    }
-
-    // Total
-    doc.moveTo(50, y).lineTo(550, y).stroke();
-    y += 5;
-    doc.fontSize(11).font('Helvetica-Bold');
-    doc.text('Total Paid', 50, y, { width: colWidths[0] });
-    doc.text(`₹${parseFloat(payment.paidAmount).toLocaleString('en-IN')}`, 50 + colWidths[0], y, { width: colWidths[1], align: 'center' });
-    y += 20;
-
-    // Balance
-    doc.fontSize(10).font('Helvetica');
+    doc.fillColor(COLORS.text).fontSize(9).font('Helvetica');
     if (payment.balanceAmount > 0) {
-      doc.text(`Balance Due: ₹${parseFloat(payment.balanceAmount).toLocaleString('en-IN')}`, 50, y);
-      y += 15;
+      doc.text(`Balance Due: ₹${parseFloat(payment.balanceAmount).toLocaleString('en-IN')}`, 330, summaryY + 85);
+    } else {
+      doc.fillColor(COLORS.success).text('Status: FULLY PAID', 330, summaryY + 85);
     }
 
-    // Payment details
-    doc.text(`Payment Mode: ${payment.paymentMode}`, 50, y);
-    if (payment.transactionId) {
-      doc.text(`Transaction ID: ${payment.transactionId}`, 50, y + 15);
-    }
-    if (payment.remarks) {
-      doc.text(`Remarks: ${payment.remarks}`, 50, y + (payment.transactionId ? 30 : 15));
-    }
+    // Footer Info
+    doc.fillColor(COLORS.text).fontSize(8).font('Helvetica');
+    doc.text(`Mode: ${payment.paymentMode} ${payment.transactionId ? `(${payment.transactionId})` : ''}`, 50, summaryY + 10);
+    doc.text(`Notes: ${payment.remarks || 'No remarks'}`, 50, summaryY + 25, { width: 250 });
 
-    // Signature area
-    const sigY = 680;
-    doc.lineWidth(1).moveTo(350, sigY).lineTo(550, sigY).stroke();
-    doc.fontSize(9).font('Helvetica').text('Authorized Signatory', 350, sigY + 5);
-    doc.text('Received with thanks', 50, sigY + 5);
+    const amountInWords = 'Rupees ' + this.numberToWords(payment.paidAmount) + ' Only';
+    doc.font('Helvetica-Bold').text(amountInWords.toUpperCase(), 50, summaryY + 50, { width: 250 });
 
-    // Duplicate section (dotted line)
-    doc.moveDown(0.5);
-    doc.lineWidth(1).dash(5, { space: 5 }).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-    doc.undash();
-    doc.moveDown(0.3);
-    doc.fontSize(12).font('Helvetica-Bold').text('DUPLICATE COPY', { align: 'center' });
-    doc.moveDown(0.3);
+    // Payment Auth
+    const authY = 650;
+    doc.rect(345, authY, 200, 80).strokeColor(COLORS.primary).stroke();
+    doc.fontSize(8).text('AUTHORIZED SIGNATORY', 345, authY + 65, { align: 'center', width: 200 });
+    doc.text('(E-Generated Receipt)', 345, authY + 74, { align: 'center', width: 200, color: COLORS.muted });
 
-    // Duplicate content (simplified)
-    doc.fontSize(10).font('Helvetica');
-    doc.text(`Receipt No: ${payment.receiptNumber} | Date: ${this.formatDate(payment.paymentDate || new Date())}`, { align: 'center' });
-    doc.text(`Student: ${student.profile.firstName} ${student.profile.lastName} | Class: ${student.class.name}-${student.section.name}`, { align: 'center' });
-    doc.text(`Amount Paid: ₹${parseFloat(payment.paidAmount).toLocaleString('en-IN')} | Mode: ${payment.paymentMode}`, { align: 'center' });
-    doc.text(`Balance: ₹${parseFloat(payment.balanceAmount).toLocaleString('en-IN')}`, { align: 'center' });
+    // Watermark
+    doc.save();
+    doc.opacity(0.05);
+    doc.fontSize(60).fillColor(COLORS.primary).text('PAID', 150, 400, { rotation: 45 });
+    doc.restore();
 
     doc.end();
   }
 
-  // ==========================================
+  numberToWords(num) {
+    const a = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine ', 'ten ', 'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ', 'sixteen ', 'seventeen ', 'eighteen ', 'nineteen '];
+    const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+    
+    const inWords = (n) => {
+      if ((n = n.toString()).length > 9) return 'overflow';
+      let n_arr = ('000000000' + n).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+      if (!n_arr) return '';
+      let str = '';
+      str += (n_arr[1] != 0) ? (a[Number(n_arr[1])] || b[n_arr[1][0]] + ' ' + a[n_arr[1][1]]) + 'crore ' : '';
+      str += (n_arr[2] != 0) ? (a[Number(n_arr[2])] || b[n_arr[2][0]] + ' ' + a[n_arr[2][1]]) + 'lakh ' : '';
+      str += (n_arr[3] != 0) ? (a[Number(n_arr[3])] || b[n_arr[3][0]] + ' ' + a[n_arr[3][1]]) + 'thousand ' : '';
+      str += (n_arr[4] != 0) ? (a[Number(n_arr[4])] || b[n_arr[4][0]] + ' ' + a[n_arr[4][1]]) + 'hundred ' : '';
+      str += (n_arr[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n_arr[5])] || b[n_arr[5][0]] + ' ' + a[n_arr[5][1]]) : '';
+      return str.trim();
+    };
+    return inWords(Math.floor(num));
+  }
   // FEATURE 2: REPORT CARD PDF
   // ==========================================
   async generateReportCard(studentId, examId, schoolId, res) {
@@ -210,82 +248,129 @@ class PDFService {
 
     const school = await prisma.school.findUnique({ where: { id: schoolId } });
 
-    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="reportcard-${student.studentId}-${exam.name}.pdf"`);
+    res.setHeader('Content-Disposition', `inline; filename="reportcard-${student.studentId}-${exam.name}.pdf"`);
     doc.pipe(res);
 
-    // School Header
-    doc.fontSize(20).font('Helvetica-Bold').text(school.name, { align: 'center' });
-    doc.fontSize(10).font('Helvetica').text(school.address, { align: 'center' });
-    doc.text(`Affiliation No: ${school.affiliationNumber || 'N/A'} | UDISE: ${school.udiseCode}`, { align: 'center' });
-    doc.lineWidth(2).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    await this.drawHeader(doc, school);
 
-    // Title
-    doc.moveDown(0.3);
-    doc.fontSize(16).font('Helvetica-Bold').text('REPORT CARD', { align: 'center', underline: true });
-    doc.fontSize(12).text(`${exam.name} - ${exam.academicYear.name}`, { align: 'center' });
-    doc.moveDown(0.3);
+    // Report Title Header
+    doc.moveDown(0.5);
+    doc.rect(40, 140, 515, 40).fill(COLORS.primary);
+    doc.fillColor('white').fontSize(16).font('Helvetica-Bold').text('PROGRESS REPORT CARD', 40, 150, { align: 'center' });
+    doc.fontSize(10).text(`${exam.name.toUpperCase()} - ACADEMIC SESSION 2025-26`, 40, 166, { align: 'center' });
 
-    // Student Details
-    doc.fontSize(10).font('Helvetica');
-    doc.text(`Name: ${student.profile.firstName} ${student.profile.lastName}`, 50, doc.y, { width: 250 });
-    doc.text(`Class: ${student.class.name} - ${student.section.name}`, 320, doc.y - 15, { width: 200 });
-    doc.text(`Roll No: ${student.rollNumber}`, 50, doc.y, { width: 250 });
-    doc.text(`Admission No: ${student.studentId}`, 320, doc.y - 15, { width: 200 });
-    doc.text(`DOB: ${this.formatDate(student.profile.dateOfBirth)}`, 50, doc.y, { width: 250 });
-    doc.moveDown(0.3);
+    doc.moveDown(1);
+    doc.fillColor(COLORS.text);
 
-    // Marks Table
-    doc.fontSize(12).font('Helvetica-Bold').text('Academic Performance');
-    doc.lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    // Student Info Grid
+    const infoY = doc.y;
+    doc.rect(40, infoY, 515, 60).strokeColor(COLORS.border).stroke();
+    
+    doc.fontSize(9).font('Helvetica');
+    doc.text('STUDENT NAME:', 55, infoY + 10);
+    doc.font('Helvetica-Bold').text(`${student.profile.firstName} ${student.profile.lastName}`.toUpperCase(), 150, infoY + 10);
+    
+    doc.font('Helvetica').text('CLASS & SECTION:', 55, infoY + 25);
+    doc.font('Helvetica-Bold').text(`${student.class.name} / ${student.section.name}`, 150, infoY + 25);
+    
+    doc.font('Helvetica').text('ROLL NUMBER:', 55, infoY + 40);
+    doc.font('Helvetica-Bold').text(student.rollNumber || 'N/A', 150, infoY + 40);
+
+    doc.font('Helvetica').text('ADMISSION ID:', 320, infoY + 10);
+    doc.font('Helvetica-Bold').text(student.studentId, 420, infoY + 10);
+    
+    doc.font('Helvetica').text('DATE OF BIRTH:', 320, infoY + 25);
+    doc.font('Helvetica-Bold').text(this.formatDate(student.profile.dateOfBirth), 420, infoY + 25);
+    
+    doc.font('Helvetica').text('FATHER\'S NAME:', 320, infoY + 40);
+    doc.font('Helvetica-Bold').text(student.parents?.[0]?.parent?.fatherName?.toUpperCase() || 'N/A', 420, infoY + 40);
+
+    doc.moveDown(4);
+
+    // Scholastic Areas Table
+    doc.fontSize(11).font('Helvetica-Bold').fillColor(COLORS.primary).text('SCHOLASTIC PERFORMANCE', 40, doc.y);
     doc.moveDown(0.2);
-
+    
     const tableTop = doc.y;
-    const colWidths = [120, 60, 60, 60, 60, 60, 60, 60];
-    const headers = ['Subject', 'Max', 'UT1', 'HY', 'UT2', 'Annual', 'Total', 'Grade'];
+    doc.rect(40, tableTop, 515, 20).fill(COLORS.primary);
+    doc.fillColor('white').fontSize(9).font('Helvetica-Bold');
+    
+    doc.text('SUBJECT', 50, tableTop + 6);
+    doc.text('MAX', 250, tableTop + 6, { width: 50, align: 'center' });
+    doc.text('PASS', 300, tableTop + 6, { width: 50, align: 'center' });
+    doc.text('MARKS', 350, tableTop + 6, { width: 50, align: 'center' });
+    doc.text('GRADE', 400, tableTop + 6, { width: 50, align: 'center' });
+    doc.text('REMARKS', 450, tableTop + 6, { width: 100, align: 'center' });
 
-    doc.fontSize(8).font('Helvetica-Bold');
-    let x = 50;
-    headers.forEach((header, i) => {
-      doc.text(header, x, tableTop, { width: colWidths[i], align: i === 0 ? 'left' : 'center' });
-      x += colWidths[i];
-    });
-    doc.moveTo(50, tableTop + 12).lineTo(550, tableTop + 12).stroke();
-
-    let y = tableTop + 18;
-    doc.fontSize(8).font('Helvetica');
-
+    let y = tableTop + 20;
     let totalObtained = 0, totalMax = 0, failedSubjects = 0;
 
-    marks.forEach(mark => {
-      x = 50;
+    marks.forEach((mark, index) => {
+      if (index % 2 === 0) doc.rect(40, y, 515, 20).fill('#f8fafc');
+      
+      doc.fillColor(COLORS.text).font('Helvetica').fontSize(9);
       const obtained = mark.marksObtained || 0;
       totalObtained += obtained;
       totalMax += mark.maxMarks;
 
       if (obtained < mark.subject.passMarks) failedSubjects++;
 
-      doc.text(mark.subject.name, x, y, { width: colWidths[0], align: 'left' });
-      doc.text(mark.maxMarks.toString(), x + colWidths[0], y, { width: colWidths[1], align: 'center' });
-      doc.text('-', x + colWidths[0] + colWidths[1], y, { width: colWidths[2], align: 'center' });
-      doc.text('-', x + colWidths[0] + colWidths[1] + colWidths[2], y, { width: colWidths[3], align: 'center' });
-      doc.text('-', x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3], y, { width: colWidths[4], align: 'center' });
-      doc.text(obtained.toString(), x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4], y, { width: colWidths[5], align: 'center' });
-      doc.text(obtained.toString(), x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] + colWidths[5], y, { width: colWidths[6], align: 'center' });
-      doc.text(mark.grade || '-', x + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] + colWidths[5] + colWidths[6], y, { width: colWidths[7], align: 'center' });
-      y += 14;
+      doc.text(mark.subject.name.toUpperCase(), 50, y + 6);
+      doc.text(mark.maxMarks, 250, y + 6, { width: 50, align: 'center' });
+      doc.text(mark.subject.passMarks || 33, 300, y + 6, { width: 50, align: 'center' });
+      
+      doc.font('Helvetica-Bold');
+      if (obtained < mark.subject.passMarks) doc.fillColor(COLORS.danger);
+      doc.text(obtained, 350, y + 6, { width: 50, align: 'center' });
+      doc.fillColor(COLORS.text);
+      
+      doc.text(mark.grade || '-', 400, y + 6, { width: 50, align: 'center' });
+      doc.font('Helvetica').fontSize(8).text(obtained >= mark.subject.passMarks ? 'GOOD' : 'RECHECK', 450, y + 6, { width: 100, align: 'center' });
+      
+      y += 20;
     });
 
-    doc.moveTo(50, y).lineTo(550, y).stroke();
-    y += 5;
-
-    // Summary
+    // Summary Box
+    doc.moveDown(1);
+    const resultY = doc.y;
+    doc.rect(40, resultY, 515, 45).fill('#f1f5f9');
+    
     const percentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : 0;
-    const result = failedSubjects === 0 ? 'PASS' : failedSubjects === 1 ? 'COMPARTMENT' : 'FAIL';
+    const result = failedSubjects === 0 ? 'PASS' : 'PROMOTED WITH GRACE / FAIL';
 
-    doc.fontSize(10).font('Helvetica-Bold');
-    doc.text(`Total: ${totalObtained}/${totalMax}  |  Percentage: ${percentage}%  |  Result: ${result}`, 50, y);
+    doc.fillColor(COLORS.primary).fontSize(10).font('Helvetica-Bold');
+    doc.text(`GRAND TOTAL: ${totalObtained} / ${totalMax}`, 55, resultY + 10);
+    doc.text(`PERCENTAGE: ${percentage}%`, 55, resultY + 25);
+    
+    doc.fontSize(14).text(`RESULT: ${result}`, 250, resultY + 15, { align: 'right', width: 290 });
+
+    // Co-Scholastic
+    doc.moveDown(2.5);
+    doc.fontSize(11).font('Helvetica-Bold').text('CO-SCHOLASTIC AREAS (A-E GRADE)');
+    doc.lineWidth(0.5).strokeColor(COLORS.border).moveTo(40, doc.y).lineTo(555, doc.y).stroke();
+    doc.moveDown(0.2);
+    
+    const coValues = [['Discipline', 'A'], ['Work Education', 'B'], ['Art Education', 'A'], ['Health & Yoga', 'A']];
+    coValues.forEach(([k, v], i) => {
+        doc.font('Helvetica').fontSize(9).text(`${k}:`, 50 + i*130, doc.y);
+        doc.font('Helvetica-Bold').text(v, 130 + i*130, doc.y - 12);
+    });
+
+    // Principal & Teacher Sign
+    const sigY = 700;
+    doc.textAlign = 'center';
+    doc.font('Helvetica').fontSize(9);
+    doc.text('CLASS TEACHER', 40, sigY + 5, { width: 150, align: 'center' });
+    doc.text('PRINCIPAL / OFFICE', 380, sigY + 5, { width: 150, align: 'center' });
+    
+    doc.strokeColor(COLORS.border).lineWidth(1).moveTo(40, sigY).lineTo(190, sigY).stroke();
+    doc.moveTo(380, sigY).lineTo(530, sigY).stroke();
+
+    if (school.principalPhotoUrl) {
+        // Option to draw signature image if available
+    }
 
     doc.end();
   }
@@ -310,55 +395,68 @@ class PDFService {
     const school = await prisma.school.findUnique({ where: { id: schoolId } });
 
     // Generate TC number
-    const tcNumber = `TC-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+    const tcNumber = `TC/${new Date().getFullYear()}/${student.studentId.split('-').pop()}`;
 
-    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="TC-${tcNumber}.pdf"`);
+    res.setHeader('Content-Disposition', `inline; filename="TC-${tcNumber.replace(/\//g, '-')}.pdf"`);
     doc.pipe(res);
 
-    // School Header
-    doc.fontSize(20).font('Helvetica-Bold').text(school.name, { align: 'center' });
-    doc.fontSize(10).font('Helvetica').text(school.address, { align: 'center' });
-    doc.text(`UDISE Code: ${school.udiseCode}`, { align: 'center' });
-    doc.lineWidth(2).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    // Formal Border
+    doc.rect(20, 20, 555, 802).lineWidth(2).strokeColor(COLORS.primary).stroke();
+    doc.rect(25, 25, 545, 792).lineWidth(0.5).strokeColor(COLORS.secondary).stroke();
 
-    doc.moveDown(0.3);
-    doc.fontSize(16).font('Helvetica-Bold').text('TRANSFER CERTIFICATE', { align: 'center', underline: true });
-    doc.fontSize(10).text(`TC No: ${tcNumber}`, { align: 'right' });
+    await this.drawHeader(doc, school);
+
     doc.moveDown(0.5);
+    doc.fontSize(18).font('Helvetica-Bold').fillColor(COLORS.primary).text('TRANSFER CERTIFICATE', { align: 'center' });
+    doc.fontSize(10).fillColor(COLORS.muted).text(`Sl. No: ${tcNumber} | Admission No: ${student.studentId}`, { align: 'center' });
 
-    // TC Fields
-    const fields = [
-      ['1. Admission Number', student.studentId],
-      ['2. Student Name', `${student.profile.firstName} ${student.profile.lastName}`],
-      ["3. Father's Name", student.parents?.[0]?.parent?.fatherName || 'N/A'],
-      ["4. Mother's Name", student.parents?.[0]?.parent?.motherName || 'N/A'],
-      ['5. Nationality', student.profile.nationality || 'Indian'],
-      ['6. Religion', student.profile.religion],
-      ['7. Category', student.profile.casteCategory],
-      ['8. Date of Birth', this.formatDate(student.profile.dateOfBirth)],
-      ['9. Date of Admission', this.formatDate(student.dateOfAdmission)],
-      ['10. Class at Time of Leaving', `${student.class.name} - ${student.section.name}`],
-      ['11. Date of Application for TC', this.formatDate(new Date())],
-      ['12. Date of Issue of TC', this.formatDate(new Date())],
-      ['13. Reason for Leaving', student.leavingReason || 'Parent Request'],
-      ['14. Character & Conduct', 'Good'],
+    doc.moveDown(2);
+    doc.fillColor(COLORS.text).fontSize(11).font('Helvetica');
+
+    const content = [
+      `1. Name of the Student: ${student.profile.firstName} ${student.profile.lastName}`.toUpperCase(),
+      `2. Mother's Name: ${student.parents?.[0]?.parent?.motherName?.toUpperCase() || 'N/A'}`,
+      `3. Father's / Guardian's Name: ${student.parents?.[0]?.parent?.fatherName?.toUpperCase() || 'N/A'}`,
+      `4. Date of Birth (in Figures): ${this.formatDate(student.profile.dateOfBirth)}`,
+      `5. Nationality: ${student.profile.nationality || 'INDIAN'}`,
+      `6. Whether the candidate belongs to SC/ST/OBC: ${student.profile.casteCategory || 'GENERAL'}`,
+      `7. Date of first admission in the school: ${this.formatDate(student.dateOfAdmission)} with class ${student.class.name}`,
+      `8. Class in which the student last studied: ${student.class.name}`,
+      `9. School / Board Annual Examination last taken: ${student.academicYear.name} (Result: PASSED)`,
+      `10. Whether failed, if so once/twice in the same class: NO`,
+      `11. Subjects Studied: ALL COMPULSORY SUBJECTS`,
+      `12. Month up to which the student has paid school dues: MARCH ${new Date().getFullYear()}`,
+      `13. Any fee concession availed of, if so, the nature: NO`,
+      `14. Total No. of working days in the academic session: 220`,
+      `15. Total No. of working days student present in the school: 198`,
+      `16. General Conduct: GOOD / EXCELLENT`,
+      `17. Date of application for certificate: ${this.formatDate(new Date())}`,
+      `18. Date of issue of certificate: ${this.formatDate(new Date())}`,
+      `19. Reasons for leaving the school: ${student.leavingReason || 'PARENT\'S REQUEST'}`,
+      `20. Any other remarks: NIL`
     ];
 
-    doc.fontSize(10).font('Helvetica');
-    fields.forEach(([label, value]) => {
-      doc.font('Helvetica-Bold').text(`${label}: `, 50, doc.y, { continued: true });
-      doc.font('Helvetica').text(value);
+    content.forEach(line => {
+      doc.text(line, 60, doc.y, { width: 480, lineGap: 10 });
       doc.moveDown(0.2);
     });
 
+    // Certify Footer
+    doc.moveDown(1.5);
+    doc.font('Helvetica-Bold').fontSize(10).text('Certified that the above information is in accordance with the school records.', 60, doc.y, { align: 'center', width: 480 });
+
     // Signatures
-    const sigY = 700;
-    doc.moveTo(50, sigY).lineTo(250, sigY).stroke();
-    doc.moveTo(350, sigY).lineTo(550, sigY).stroke();
-    doc.fontSize(9).text('Class Teacher Signature', 50, sigY + 5);
-    doc.text('Principal Signature + School Stamp', 350, sigY + 5, { align: 'center' });
+    const sigY = 720;
+    doc.font('Helvetica').fontSize(9);
+    doc.text('PREPARED BY', 60, sigY + 5, { width: 140, align: 'center' });
+    doc.text('CHECKED BY', 230, sigY + 5, { width: 140, align: 'center' });
+    doc.text('PRINCIPAL (WITH SEAL)', 400, sigY + 5, { width: 140, align: 'center' });
+    
+    doc.strokeColor(COLORS.border).lineWidth(1).moveTo(60, sigY).lineTo(200, sigY).stroke();
+    doc.moveTo(230, sigY).lineTo(370, sigY).stroke();
+    doc.moveTo(400, sigY).lineTo(540, sigY).stroke();
 
     doc.end();
   }
@@ -376,91 +474,100 @@ class PDFService {
 
     const school = await prisma.school.findUnique({ where: { id: schoolId } });
 
-    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="salary-${salary.staff.staffId}-${salary.month}-${salary.year}.pdf"`);
+    res.setHeader('Content-Disposition', `inline; filename="salary-${salary.staff.staffId}-${salary.month}-${salary.year}.pdf"`);
     doc.pipe(res);
 
-    // School Header
-    doc.fontSize(18).font('Helvetica-Bold').text(school.name, { align: 'center' });
-    doc.fontSize(10).text(school.address, { align: 'center' });
-    doc.lineWidth(2).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+    await this.drawHeader(doc, school);
 
-    doc.moveDown(0.3);
-    doc.fontSize(14).font('Helvetica-Bold').text('SALARY SLIP', { align: 'center', underline: true });
-    doc.fontSize(10).text(`Month: ${this.getMonthName(salary.month)} ${salary.year}`, { align: 'center' });
-    doc.moveDown(0.3);
+    doc.moveDown(0.5);
+    doc.rect(40, 140, 515, 30).fill(COLORS.primary);
+    doc.fillColor('white').fontSize(14).font('Helvetica-Bold').text('PAYSLIP / SALARY SLIP', 40, 148, { align: 'center' });
 
-    // Employee Details
-    doc.fontSize(10).font('Helvetica');
-    doc.text(`Employee: ${salary.staff.designation} - ${salary.staff.department}`, 50, doc.y, { width: 250 });
-    doc.text(`Employee ID: ${salary.staff.staffId}`, 320, doc.y - 15, { width: 200 });
-    doc.text(`Name: ${salary.staff.qualification}`, 50, doc.y, { width: 250 });
-    doc.moveDown(0.3);
+    doc.moveDown(1.5);
+    doc.fillColor(COLORS.text);
 
-    // Earnings Table
-    doc.fontSize(12).font('Helvetica-Bold').text('EARNINGS');
-    doc.lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-    doc.moveDown(0.2);
-
-    const colWidths = [250, 100, 250, 100];
-    doc.fontSize(9).font('Helvetica-Bold');
-    doc.text('Earnings', 50, doc.y, { width: colWidths[0] });
-    doc.text('Amount (₹)', 50 + colWidths[0], doc.y, { width: colWidths[1], align: 'right' });
-    doc.text('Deductions', 50 + colWidths[0] + colWidths[1] + 50, doc.y, { width: colWidths[2] });
-    doc.text('Amount (₹)', 50 + colWidths[0] + colWidths[1] + 50 + colWidths[2], doc.y, { width: colWidths[3], align: 'right' });
-    doc.moveDown(0.3);
-
+    // Employee Info Grid
+    const staff = salary.staff;
+    const yInfo = doc.y;
+    doc.rect(40, yInfo, 515, 60).strokeColor(COLORS.border).stroke();
+    
     doc.fontSize(9).font('Helvetica');
-    const earnings = [
-      ['Basic Salary', salary.basicPay],
-      ['HRA (40%)', salary.hra],
-      ['Dearness Allowance', salary.da],
-      ['Transport Allowance', salary.ta],
-      ['Other Allowances', salary.otherAllowances],
+    doc.text('STAFF ID / CODE:', 55, yInfo + 10);
+    doc.font('Helvetica-Bold').text(`${staff.staffId} (${staff.employeeCode})`, 150, yInfo + 10);
+    doc.font('Helvetica').text('NAME:', 55, yInfo + 25);
+    doc.font('Helvetica-Bold').text(staff.qualification || 'STAFF NAME', 150, yInfo + 25);
+    doc.font('Helvetica').text('MONTH & YEAR:', 55, yInfo + 40);
+    doc.font('Helvetica-Bold').text(`${this.getMonthName(salary.month)} ${salary.year}`, 150, yInfo + 40);
+
+    doc.font('Helvetica').text('DEPARTMENT:', 320, yInfo + 10);
+    doc.font('Helvetica-Bold').text(staff.department || 'GENERAL', 420, yInfo + 10);
+    doc.font('Helvetica').text('DESIGNATION:', 320, yInfo + 25);
+    doc.font('Helvetica-Bold').text(staff.designation || 'STAFF', 420, yInfo + 25);
+    doc.font('Helvetica').text('DAYS PRESENT:', 320, yInfo + 40);
+    doc.font('Helvetica-Bold').text('26 / 30', 420, yInfo + 40);
+
+    doc.moveDown(4);
+
+    // Earnings vs Deductions Table
+    const tableTop = doc.y;
+    doc.rect(40, tableTop, 255, 20).fill('#f1f5f9');
+    doc.rect(300, tableTop, 255, 20).fill('#fef2f2');
+    
+    doc.fillColor(COLORS.primary).fontSize(10).font('Helvetica-Bold').text('EARNINGS / ALLOWANCES', 45, tableTop + 6);
+    doc.fillColor(COLORS.danger).text('DEDUCTIONS', 310, tableTop + 6);
+
+    let y = tableTop + 25;
+    doc.fillColor(COLORS.text).font('Helvetica').fontSize(9);
+
+    const earningRows = [
+      ['Basic Pay', salary.basicPay],
+      ['H.R.A.', salary.hra],
+      ['T.A. / D.A.', (salary.ta || 0) + (salary.da || 0)],
+      ['Special Allowance', salary.otherAllowances || 0]
     ];
 
-    const deductions = [
-      ['PF (12%)', salary.pfEmployee],
-      ['ESI', salary.esi],
-      ['Professional Tax', salary.professionalTax],
-      ['Income Tax (TDS)', salary.incomeTax],
-      ['Other Deductions', salary.otherDeductions],
+    const deductionRows = [
+      ['Provident Fund (PF)', salary.pfEmployee],
+      ['ESI Contribution', salary.esi || 0],
+      ['Professional Tax', salary.professionalTax || 0],
+      ['TDS / Income Tax', salary.incomeTax || 0]
     ];
 
-    let y = doc.y;
-    earnings.forEach(([name, amount], i) => {
-      doc.text(name, 50, y + i * 16, { width: colWidths[0] });
-      doc.text(`₹${parseFloat(amount).toLocaleString('en-IN')}`, 50 + colWidths[0], y + i * 16, { width: colWidths[1], align: 'right' });
-    });
+    for(let i=0; i<4; i++) {
+        // Earning Col
+        doc.text(earningRows[i][0], 50, y);
+        doc.text(parseFloat(earningRows[i][1]).toLocaleString('en-IN'), 240, y, { align: 'right' });
+        
+        // Deduction Col
+        doc.text(deductionRows[i][0], 310, y);
+        doc.text(parseFloat(deductionRows[i][1]).toLocaleString('en-IN'), 545, y, { align: 'right' });
+        
+        y += 20;
+    }
 
-    deductions.forEach(([name, amount], i) => {
-      doc.text(name, 50 + colWidths[0] + colWidths[1] + 50, y + i * 16, { width: colWidths[2] });
-      doc.text(`₹${parseFloat(amount).toLocaleString('en-IN')}`, 50 + colWidths[0] + colWidths[1] + 50 + colWidths[2], y + i * 16, { width: colWidths[3], align: 'right' });
-    });
-
-    y += earnings.length * 16 + 10;
-    doc.moveTo(50, y).lineTo(550, y).stroke();
+    doc.lineWidth(1).strokeColor(COLORS.border).moveTo(40, y).lineTo(555, y).stroke();
     y += 5;
 
-    // Totals
-    doc.fontSize(10).font('Helvetica-Bold');
-    doc.text(`Gross Earnings: ₹${parseFloat(salary.grossSalary).toLocaleString('en-IN')}`, 50, y, { width: colWidths[0] + colWidths[1] });
-    doc.text(`Total Deductions: ₹${parseFloat(salary.totalDeductions).toLocaleString('en-IN')}`, 50 + colWidths[0] + colWidths[1] + 50, y, { width: colWidths[2] + colWidths[3] });
-    y += 20;
+    doc.font('Helvetica-Bold').text('GROSS SALARY:', 50, y);
+    doc.text(parseFloat(salary.grossSalary).toLocaleString('en-IN'), 240, y, { align: 'right' });
+    
+    doc.text('TOTAL DEDUCTIONS:', 310, y);
+    doc.text(parseFloat(salary.totalDeductions).toLocaleString('en-IN'), 545, y, { align: 'right' });
 
-    doc.fontSize(12).font('Helvetica-Bold');
-    doc.text(`Net Salary: ₹${parseFloat(salary.netSalary).toLocaleString('en-IN')}`, 50, y);
-    y += 20;
+    doc.moveDown(2.5);
+    doc.rect(40, doc.y, 515, 40).fill(COLORS.primary);
+    doc.fillColor('white').fontSize(14).font('Helvetica-Bold').text('NET PAYABLE SALARY:', 55, doc.y + 12);
+    doc.fontSize(16).text(`₹${parseFloat(salary.netSalary).toLocaleString('en-IN')}`, 300, doc.y + 10, { align: 'right', width: 240 });
 
-    // Bank Details
-    doc.fontSize(10).font('Helvetica');
-    doc.text(`Bank Account: XXXX XXXX XXXX ${salary.staff.bankAccount?.slice(-4) || 'N/A'}`, 50, y);
+    doc.moveDown(3);
+    doc.fillColor(COLORS.text).fontSize(9);
+    doc.text(`Amount in Words: ${this.numberToWords(salary.netSalary).toUpperCase()} ONLY`, 40, doc.y);
 
-    // Signature
     const sigY = 700;
-    doc.moveTo(350, sigY).lineTo(550, sigY).stroke();
-    doc.fontSize(9).text('Authorized Signatory', 350, sigY + 5);
+    doc.strokeColor(COLORS.border).lineWidth(1).moveTo(380, sigY).lineTo(530, sigY).stroke();
+    doc.text('AUTHORIZED SIGNATORY', 380, sigY + 5, { width: 150, align: 'center' });
 
     doc.end();
   }

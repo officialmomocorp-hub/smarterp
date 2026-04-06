@@ -26,7 +26,14 @@ router.post('/classes', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next
 
 router.post('/sections', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
-    const section = await prisma.section.create({ data: { ...req.body } });
+    const { classId, name } = req.body;
+    const existing = await prisma.section.findFirst({
+      where: { classId, name: name.trim().toUpperCase() }
+    });
+    if (existing) {
+      return res.status(400).json({ success: false, message: `Section ${name} already exists for this class.` });
+    }
+    const section = await prisma.section.create({ data: { ...req.body, name: name.trim().toUpperCase() } });
     res.status(201).json({ success: true, data: section });
   } catch (error) { next(error); }
 });

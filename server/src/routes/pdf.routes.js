@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate, authorize, schoolScoped } = require('../middleware/auth');
-const pdfService = require('../services/pdf.service');
+const pdfService = require('../services/htmlPdf.service');
 const prisma = require('../config/database');
 const { AppError } = require('../utils/appError');
 
@@ -151,6 +151,16 @@ router.post('/tc/:studentId', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res
   } catch (error) { next(error); }
 });
 
+router.get('/tc/demo', async (req, res, next) => {
+  try {
+    const student = await prisma.student.findFirst({
+        where: { schoolId: req.schoolId }
+    });
+    if (!student) return res.status(404).send('No student found to generate demo TC.');
+    await pdfService.generateTC(student.id, req.schoolId, res);
+  } catch (error) { next(error); }
+});
+
 // ==========================================
 // FEATURE 7: SALARY SLIP PDF
 // ==========================================
@@ -179,6 +189,16 @@ router.get('/salary/bulk/:month/:year', authorize('SUPER_ADMIN', 'ADMIN'), async
   } catch (error) { next(error); }
 });
 
+router.get('/salary/demo', async (req, res, next) => {
+  try {
+    const salary = await prisma.salary.findFirst({
+        where: { schoolId: req.schoolId }
+    });
+    if (!salary) return res.status(404).send('No salary record found for demo.');
+    await pdfService.generateSalarySlip(salary.id, req.schoolId, res);
+  } catch (error) { next(error); }
+});
+
 // ==========================================
 // FEATURE 9: STUDENT ID CARD
 // ==========================================
@@ -186,6 +206,16 @@ router.get('/salary/bulk/:month/:year', authorize('SUPER_ADMIN', 'ADMIN'), async
 router.get('/idcard/:studentId', async (req, res, next) => {
   try {
     await pdfService.generateIDCard(req.params.studentId, req.schoolId, res);
+  } catch (error) { next(error); }
+});
+
+router.get('/idcard/demo', async (req, res, next) => {
+  try {
+    const student = await prisma.student.findFirst({
+        where: { schoolId: req.schoolId }
+    });
+    if (!student) return res.status(404).send('No student found for ID card demo.');
+    await pdfService.generateIDCard(student.id, req.schoolId, res);
   } catch (error) { next(error); }
 });
 
@@ -201,6 +231,12 @@ router.get('/idcard/bulk/:classId', async (req, res, next) => {
 
     // Generate first ID card
     await pdfService.generateIDCard(students[0].id, req.schoolId, res);
+  } catch (error) { next(error); }
+});
+
+router.get('/hallticket/:studentId/:examId', async (req, res, next) => {
+  try {
+    await pdfService.generateAdmitCard(req.params.studentId, req.params.examId, req.schoolId, res);
   } catch (error) { next(error); }
 });
 

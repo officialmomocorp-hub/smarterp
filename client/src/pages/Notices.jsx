@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, AlertTriangle, Info, CheckCircle, Plus, X } from 'lucide-react';
 import { noticeAPI } from '../services/api';
 import toast from 'react-hot-toast';
@@ -16,10 +16,24 @@ const INITIAL_FORM = {
 };
 
 export default function Notices() {
-  const [notices, setNotices] = useState(INITIAL_NOTICES);
+  const [notices, setNotices] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const fetchNotices = async () => {
+    try {
+      const { data } = await noticeAPI.getAll();
+      setNotices(data.data || []);
+    } catch (e) {
+      console.error('Notice fetch failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchNotices(); }, []);
 
   const getPriorityBadge = (priority) => {
     const badges = {
@@ -47,22 +61,11 @@ export default function Notices() {
     }
     setSubmitting(true);
     try {
-      // Try backend first, fallback to local
-      try {
-        await noticeAPI.create(form);
-      } catch (apiErr) {
-        console.log('API not available, adding locally');
-      }
-      // Add locally for immediate UI feedback
-      const newNotice = {
-        id: Date.now(),
-        ...form,
-        date: new Date().toISOString().split('T')[0],
-      };
-      setNotices([newNotice, ...notices]);
+      await noticeAPI.create(form);
       toast.success('Notice published successfully! 📢');
       setShowModal(false);
       setForm(INITIAL_FORM);
+      fetchNotices();
     } catch (err) {
       toast.error('Failed to create notice');
     } finally {

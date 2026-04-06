@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { examAPI } from '../services/api';
 import axios from 'axios';
 import {
@@ -16,12 +17,23 @@ function formatINR(amount) {
 }
 
 export default function ExamEnhanced() {
-  const [activeTab, setActiveTab] = useState('verification');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'verification');
   const [exams, setExams] = useState([]);
   const [selectedExam, setSelectedExam] = useState(null);
   const [pendingMarks, setPendingMarks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [verificationData, setVerificationData] = useState(null);
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab) setActiveTab(tab);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (activeTab === 'verification') fetchPendingVerifications();
+    if (activeTab === 'analytics' && selectedExam) handleFetchAnalytics();
+  }, [activeTab]);
 
   useEffect(() => {
     fetchExams();
@@ -76,6 +88,18 @@ export default function ExamEnhanced() {
     }
   };
 
+  const handlePrintHallTicket = async (studentId) => {
+    if (!selectedExam) { toast.error('Please select an exam'); return; }
+    const url = `${API_BASE}/pdf/hallticket/${studentId}/${selectedExam.id}`;
+    window.open(`${axios.defaults.baseURL || ''}${url}`, '_blank');
+  };
+
+  const handlePrintReportCard = async (studentId) => {
+    if (!selectedExam) { toast.error('Please select an exam'); return; }
+    const url = `${API_BASE}/pdf/reportcard/${studentId}/${selectedExam.id}`;
+    window.open(`${axios.defaults.baseURL || ''}${url}`, '_blank');
+  };
+
   const handleGenerateHallTickets = async () => {
     if (!selectedExam) { toast.error('Please select an exam'); return; }
     setLoading(true);
@@ -83,7 +107,9 @@ export default function ExamEnhanced() {
       const { data } = await axios.get(`${API_BASE}/exams-enhanced/hall-tickets/bulk/${selectedExam.id}/${selectedExam.classId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-      toast.success(`${data.data.count} hall tickets generated`);
+      // For now, let's just fetch the list of students who have tickets
+      setVerificationData(prev => ({ ...prev, hallTicketStudents: data.data }));
+      toast.success(`${data.data.length} hall tickets ready for printing`);
     } catch (error) {
       toast.error('Failed to generate hall tickets');
     } finally {
@@ -131,7 +157,7 @@ export default function ExamEnhanced() {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setVerificationData(data.data);
-      setActiveTab('analytics');
+      if (activeTab !== 'analytics') setActiveTab('analytics');
     } catch (error) {
       toast.error('Failed to fetch analytics');
     } finally {
@@ -139,7 +165,65 @@ export default function ExamEnhanced() {
     }
   };
 
+  const handleTeacherSubmit = async (markId) => {
+    try {
+      await axios.put(`${API_BASE}/exams-enhanced/marks/${markId}/submit`, {}, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      toast.success('Marks submitted for verification');
+      fetchPendingVerifications();
+    } catch (error) { toast.error('Submission failed'); }
+  };
+
+  const [entryStudents, setEntryStudents] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const handleLoadStudentsForEntry = async () => {
+    if (!selectedExam || !selectedSubject) { toast.error('Select exam and subject'); return; }
+    setLoading(true);
+    try {
+       const { data } = await axios.get(`${API_BASE}/students?classId=${selectedExam.classId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+       });
+       setEntryStudents(data.data.map(s => ({ ...s, obtainedMarks: '', remarks: '' })));
+    } catch (error) { toast.error('Failed to load students'); } finally { setLoading(false); }
+  };
+
+  const handleBulkSaveMarks = async () => {
+     setLoading(true);
+     try {
+        const marks = entryStudents
+          .filter(s => s.obtainedMarks !== '')
+          .map(s => ({
+             studentId: s.id,
+             subjectId: selectedSubject.subjectId,
+             marksObtained: parseFloat(s.obtainedMarks),
+             maxMarks: selectedSubject.maxMarks
+          }));
+        await axios.post(`${API_BASE}/exams/marks/bulk`, { examId: selectedExam.id, marks }, {
+           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        toast.success('Marks saved as Draft'); setEntryStudents([]); setActiveTab('verification'); fetchPendingVerifications();
+     } catch (error) { toast.error('Failed to save marks'); } finally { setLoading(false); }
+  };
+
+  const handleIdentifyCompartment = async () => {
+    if (!selectedExam) { toast.error('Please select an exam'); return; }
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`${API_BASE}/exams-enhanced/compartment/eligible/${selectedExam.id}/${selectedExam.classId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      setVerificationData(prev => ({ ...prev, compartmentStudents: data.data || [] }));
+      toast.success(`${data.data.length} students identified for compartment`);
+    } catch (error) { toast.error('Failed to identify students'); } finally { setLoading(false); }
+  };
+
+  const handleInvigilatorDuty = async () => {
+    toast.success('Invigilator duty chart generated (mock)');
+  };
+
   const tabs = [
+    { id: 'marks-entry', label: 'Marks Entry', icon: Edit3 },
     { id: 'verification', label: 'Verification', icon: Shield },
     { id: 'hall-tickets', label: 'Hall Tickets', icon: FileText },
     { id: 'seating', label: 'Seating', icon: MapPin },
@@ -192,6 +276,74 @@ export default function ExamEnhanced() {
           </button>
         ))}
       </div>
+
+      {/* Marks Entry Tab */}
+      {activeTab === 'marks-entry' && (
+        <div className="card">
+           <h3 className="text-lg font-semibold mb-4 text-gray-900">1. Marks Entry - Level 1 (Teacher Draft)</h3>
+           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="md:col-span-2">
+                 <label className="label">Select Subject</label>
+                 <select 
+                    className="input font-medium"
+                    onChange={(e) => setSelectedSubject(selectedExam?.examSubjects?.find(s => s.subjectId === e.target.value))}
+                 >
+                    <option value="">-- Choose Subject to enter marks --</option>
+                    {selectedExam?.examSubjects?.map(es => (
+                       <option key={es.subjectId} value={es.subjectId}>{es.subject.name} (Max: {es.maxMarks}, Pass: {es.passMarks})</option>
+                    ))}
+                 </select>
+              </div>
+              <div className="flex items-end">
+                 <button onClick={handleLoadStudentsForEntry} className="btn btn-secondary w-full py-[10px] flex items-center justify-center gap-2">
+                    <Users className="w-4 h-4" /> Load Students
+                 </button>
+              </div>
+           </div>
+
+           {entryStudents.length > 0 && (
+              <div className="overflow-x-auto border rounded-xl overflow-hidden shadow-sm">
+                 <table className="w-full">
+                    <thead className="bg-[#1B2A4A] text-white text-xs uppercase tracking-wider">
+                       <tr>
+                         <th className="px-6 py-4 text-left font-semibold">Student Name</th>
+                         <th className="px-6 py-4 text-left font-semibold">Roll No</th>
+                         <th className="px-6 py-4 text-center font-semibold">Marks Obtained</th>
+                         <th className="px-6 py-4 text-center font-semibold">Max Marks</th>
+                       </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 bg-white">
+                       {entryStudents.map((student, idx) => (
+                          <tr key={student.id} className="hover:bg-blue-50/30 transition-colors">
+                             <td className="px-6 py-4 text-sm font-bold text-gray-900 border-r">{student.profile.firstName} {student.profile.lastName}</td>
+                             <td className="px-6 py-4 text-sm text-gray-500 border-r font-mono">{student.rollNumber}</td>
+                             <td className="px-6 py-4 text-center flex justify-center border-r">
+                                <input 
+                                  type="number" className="input py-2 w-28 text-center text-lg font-bold border-2 border-gray-100 focus:border-primary-500 shadow-sm" 
+                                  placeholder="0.0"
+                                  value={student.obtainedMarks} 
+                                  onChange={(e) => {
+                                     const newStudents = [...entryStudents]; 
+                                     newStudents[idx].obtainedMarks = e.target.value; 
+                                     setEntryStudents(newStudents);
+                                  }} 
+                                />
+                             </td>
+                             <td className="px-6 py-4 text-center text-sm font-bold text-gray-400 bg-gray-50/50">{selectedSubject.maxMarks}</td>
+                          </tr>
+                       ))}
+                    </tbody>
+                 </table>
+                 <div className="flex justify-end p-6 bg-gray-50 border-t items-center gap-4">
+                    <p className="text-xs text-gray-500 italic">Unsaved changes will be lost after reloading.</p>
+                    <button onClick={handleBulkSaveMarks} className="btn btn-primary px-8 py-3 rounded-lg shadow-lg shadow-primary-500/20 active:scale-95 transition-transform flex items-center gap-2">
+                       <Save className="w-5 h-5" /> Save All as Draft
+                    </button>
+                 </div>
+              </div>
+           )}
+        </div>
+      )}
 
       {/* Verification Workflow Tab */}
       {activeTab === 'verification' && (
@@ -268,6 +420,11 @@ export default function ExamEnhanced() {
                       <td className="px-4 py-3 text-sm">Level {mark.verificationLevel}/3</td>
                       <td className="px-4 py-3">
                         <div className="flex gap-2">
+                          {mark.status === 'DRAFT' && (
+                             <button onClick={() => handleTeacherSubmit(mark.id)} className="btn btn-primary text-xs py-1 px-2">
+                                <Send className="w-3 h-3 mr-1" /> Submit to HOD
+                             </button>
+                          )}
                           {mark.status === 'SUBMITTED' && (
                             <>
                               <button onClick={() => handleHODVerify(mark.id, 'APPROVE')} className="btn btn-success text-xs py-1 px-2">
@@ -330,6 +487,29 @@ export default function ExamEnhanced() {
               </div>
             </div>
           </div>
+
+          {/* Hall Ticket List */}
+          {verificationData?.hallTicketStudents && (
+             <div className="card mt-6">
+                <h3 className="text-lg font-semibold mb-4">Print Hall Tickets</h3>
+                <div className="overflow-x-auto">
+                   <table className="w-full">
+                      <thead><tr><th>Name</th><th>ID</th><th>Action</th></tr></thead>
+                      <tbody>
+                         {verificationData.hallTicketStudents.map(student => (
+                            <tr key={student.id}>
+                               <td className="text-sm">{student.profile.firstName} {student.profile.lastName}</td>
+                               <td className="text-sm">{student.studentId}</td>
+                               <td>
+                                  <button onClick={() => handlePrintHallTicket(student.id)} className="btn btn-secondary py-1 text-xs">Print</button>
+                               </td>
+                            </tr>
+                         ))}
+                      </tbody>
+                   </table>
+                </div>
+             </div>
+          )}
         </div>
       )}
 
@@ -352,11 +532,13 @@ export default function ExamEnhanced() {
               </div>
               <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
                 <h4 className="font-medium text-amber-900 mb-2">Print Room Charts</h4>
-                <p className="text-sm text-amber-700">Room-wise seating chart for door display + attendance sheet</p>
+                <p className="text-sm text-amber-700 mb-2">Room-wise seating chart for door display</p>
+                <button className="btn btn-secondary text-xs w-full"><Printer className="w-3 h-3 mr-1" /> Print Charts</button>
               </div>
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <h4 className="font-medium text-green-900 mb-2">Invigilator Duty</h4>
-                <p className="text-sm text-green-700">Auto-assign teachers to rooms with duty chart</p>
+                <p className="text-sm text-green-700 mb-2">Auto-assign teachers with duty chart</p>
+                <button onClick={handleInvigilatorDuty} className="btn btn-secondary text-xs w-full"><Users className="w-3 h-3 mr-1" /> Assign Duty</button>
               </div>
             </div>
           </div>
@@ -415,13 +597,37 @@ export default function ExamEnhanced() {
               </ul>
             </div>
             <div className="flex gap-3">
-              <button className="btn btn-primary flex items-center gap-2">
+              <button onClick={handleIdentifyCompartment} className="btn btn-primary flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" /> Identify Eligible Students
               </button>
               <button className="btn btn-secondary flex items-center gap-2">
                 <Calendar className="w-4 h-4" /> Schedule Compartment Exam
               </button>
             </div>
+
+            {/* Compartment Student List */}
+            {verificationData?.compartmentStudents && (
+               <div className="mt-8 border-t pt-6">
+                  <h4 className="font-bold text-gray-900 mb-4">Eligible Students (Fail in 1 Subject)</h4>
+                  <div className="overflow-x-auto">
+                     <table className="w-full">
+                        <thead className="bg-gray-50 uppercase text-xs">
+                           <tr><th>Student</th><th>Failed Subject</th><th>Current %</th><th>Action</th></tr>
+                        </thead>
+                        <tbody className="divide-y">
+                           {verificationData.compartmentStudents.map((s, idx) => (
+                              <tr key={idx}>
+                                 <td className="px-4 py-3 text-sm font-medium">{s.student.profile.firstName} {s.student.profile.lastName}</td>
+                                 <td className="px-4 py-3 text-sm text-red-600 font-bold">{s.failedSubjects.join(', ')}</td>
+                                 <td className="px-4 py-3 text-sm">{s.percentage}%</td>
+                                 <td className="px-4 py-3"><button className="btn btn-ghost text-xs text-primary-600">Register</button></td>
+                              </tr>
+                           ))}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            )}
           </div>
         </div>
       )}
@@ -486,6 +692,11 @@ export default function ExamEnhanced() {
                               }`}>
                                 {student.result}
                               </span>
+                            </td>
+                            <td className="px-4 py-3">
+                               <button onClick={() => handlePrintReportCard(student.student?.id)} className="btn btn-ghost p-1 text-primary-600" title="Print Report Card">
+                                  <Printer className="w-4 h-4" />
+                               </button>
                             </td>
                           </tr>
                         ))}

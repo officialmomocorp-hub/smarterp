@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { studentAPI } from '../services/api';
-import { Search, Plus, Edit, Trash2, Eye, Filter, FileOutput } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, Filter, FileOutput, User as UserIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { CLASSES, SECTIONS } from '../config/constants';
 import StudentForm from '../components/Students/StudentForm';
@@ -223,6 +223,23 @@ export default function Students() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button onClick={() => setViewStudentModal(student)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600" title="View"><Eye className="w-4 h-4" /></button>
+                        <button 
+                          onClick={async () => {
+                            try {
+                              const response = await studentAPI.generateIDCard(student.id);
+                              const url = window.URL.createObjectURL(new Blob([response.data]));
+                              const link = document.createElement('a');
+                              link.href = url;
+                              link.setAttribute('download', `ID-${student.studentId}.pdf`);
+                              document.body.appendChild(link);
+                              link.click();
+                            } catch (e) { toast.error('Failed to generate ID card'); }
+                          }} 
+                          className="p-1.5 rounded-lg hover:bg-green-50 text-green-600" 
+                          title="Generate ID Card"
+                        >
+                          <UserIcon className="w-4 h-4" />
+                        </button>
                         <button onClick={() => handleIssueTC(student)} className="p-1.5 rounded-lg hover:bg-purple-50 text-purple-600" title="Issue TC"><FileOutput className="w-4 h-4" /></button>
                         <button onClick={() => handleEditClick(student)} className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600" title="Edit"><Edit className="w-4 h-4" /></button>
                         <button onClick={() => handleDelete(student.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-600" title="Delete"><Trash2 className="w-4 h-4" /></button>

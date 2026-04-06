@@ -4,7 +4,7 @@ const { AppError } = require('../utils/appError');
 
 const authenticate = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(' ')[1] || req.query.token;
 
     if (!token) {
       throw new AppError('Authentication required', 401);

@@ -41,6 +41,7 @@ export const studentAPI = {
   getStatistics: (params) => api.get('/students/statistics', { params }),
   getDefaulters: (params) => api.get('/students/defaulters', { params }),
   issueTC: (id, data) => api.post(`/pdf/tc/${id}`, data, { responseType: 'blob' }),
+  generateIDCard: (id) => api.get(`/pdf/idcard/${id}`, { responseType: 'blob' }),
 };
 
 export const admissionAPI = {
@@ -98,18 +99,64 @@ export const staffAPI = {
 export const noticeAPI = {
   getAll: (params) => api.get('/notices', { params }),
   create: (data) => api.post('/notices', data),
+  delete: (id) => api.delete(`/notices/${id}`),
 };
 
 export const academicAPI = {
   getClasses: (params) => api.get('/academic/classes', { params }),
   createClass: (data) => api.post('/academic/classes', data),
   createSection: (data) => api.post('/academic/sections', data),
+  getSubjects: (params) => api.get('/academic/subjects', { params }),
   createSubject: (data) => api.post('/academic/subjects', data),
   getAcademicYears: () => api.get('/academic/academic-years'),
   createAcademicYear: (data) => api.post('/academic/academic-years', data),
   createHomework: (data) => api.post('/academic/homework', data),
   submitHomework: (id, data) => api.post(`/academic/homework/${id}/submit`, data),
   getStudyMaterial: (params) => api.get('/academic/study-material', { params }),
+};
+
+export const timetableAPI = {
+  getAll: (params) => api.get('/timetable', { params }),
+  create: (data) => api.post('/timetable', data),
+  getTeacher: (id) => api.get(`/timetable/teacher/${id}`),
+  getFreePeriods: (params) => api.get('/timetable/free-periods', { params }),
+};
+
+export const libraryAPI = {
+  getBooks: (params) => api.get('/library/books', { params }),
+  addBook: (data) => api.post('/library/books', data),
+  issueBook: (data) => api.post('/library/issue', data),
+  returnBook: (data) => api.post('/library/return', data),
+};
+
+export const transportAPI = {
+  getRoutes: () => api.get('/transport/routes'),
+  addRoute: (data) => api.post('/transport/routes', data),
+  getVehicles: () => api.get('/transport/vehicles'),
+  addVehicle: (data) => api.post('/transport/vehicles', data),
+  getAssignments: () => api.get('/transport/assignments'),
+  assignStudent: (data) => api.post('/transport/assignments', data),
+};
+
+export const hostelAPI = {
+  getRooms: () => api.get('/hostel/rooms'),
+  addRoom: (data) => api.post('/hostel/rooms', data),
+  getStudents: () => api.get('/hostel/students'),
+  assignRoom: (data) => api.post('/hostel/assign', data),
+};
+
+export const salaryAPI = {
+  getStaffSalary: (staffId) => api.get(`/salary/staff/${staffId}`),
+  processBulk: (data) => api.post('/salary/bulk-process', data),
+  getSlip: (id) => api.get(`/pdf/salary/${id}`, { responseType: 'blob' }),
+};
+
+
+
+export const leaveAPI = {
+  getAll: (params) => api.get('/leaves', { params }),
+  apply: (data) => api.post('/leaves', data),
+  updateStatus: (id, data) => api.put(`/leaves/${id}/status`, data),
 };
 
 export default api;

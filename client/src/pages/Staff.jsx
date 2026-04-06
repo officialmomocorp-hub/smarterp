@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { staffAPI } from '../services/api';
-import { Plus, Search, X, User } from 'lucide-react';
+import { staffAPI, salaryAPI } from '../services/api';
+import { Plus, Search, X, FileText, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const INITIAL_FORM = {
@@ -122,14 +122,33 @@ export default function Staff() {
                     <p className="text-xs text-gray-400">{s.staffId} | {s.qualification}</p>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-2 text-sm">
+                <div className="mt-4 pt-4 border-t flex justify-between items-center text-sm">
                   <div>
                     <p className="text-gray-500">Joining Date</p>
                     <p className="font-medium">{new Date(s.dateOfJoining).toLocaleDateString('en-IN')}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Basic Pay</p>
-                    <p className="font-medium">₹{parseFloat(s.basicPay || 0).toLocaleString('en-IN')}</p>
+                    <button 
+                      onClick={async () => {
+                         try {
+                           const response = await salaryAPI.getSlip(s.id);
+                           const url = window.URL.createObjectURL(new Blob([response.data]));
+                           const link = document.createElement('a');
+                           link.href = url;
+                           link.setAttribute('download', `Salary-${s.staffId}.pdf`);
+                           const linkElem = document.createElement('a');
+                           linkElem.href = url;
+                           linkElem.download = `SalarySlip-${s.staffId}.pdf`;
+                           document.body.appendChild(linkElem);
+                           linkElem.click();
+                           document.body.removeChild(linkElem);
+                         } catch (e) { toast.error('No salary record found for this month'); }
+                      }}
+                      className="p-2 bg-primary-50 rounded-lg text-primary-600 hover:bg-primary-100" 
+                      title="Download Last Salary Slip"
+                    >
+                       <Download className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </div>

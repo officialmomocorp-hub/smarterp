@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BookOpen, Search, Plus, Upload, AlertTriangle, Clock, CheckCircle, XCircle, Download, Filter } from 'lucide-react';
+import { libraryAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
 export default function Library() {
@@ -8,21 +9,20 @@ export default function Library() {
   const [showAddBook, setShowAddBook] = useState(false);
   const [showIssueModal, setShowIssueModal] = useState(false);
 
-  const books = [
-    { id: 1, title: 'Mathematics for Class 10', author: 'R.D. Sharma', isbn: '978-9386028501', category: 'Textbook', totalCopies: 40, availableCopies: 32, rack: 'A-1' },
-    { id: 2, title: 'Science for Class 9', author: 'Lakhmir Singh', isbn: '978-9352531196', category: 'Textbook', totalCopies: 35, availableCopies: 28, rack: 'A-2' },
-    { id: 3, title: 'English Grammar', author: 'Wren & Martin', isbn: '978-8121902342', category: 'Reference', totalCopies: 20, availableCopies: 15, rack: 'B-1' },
-    { id: 4, title: 'Hindi Vyakaran', author: 'Vasudeva Nandan Sharma', isbn: '978-8121902343', category: 'Reference', totalCopies: 15, availableCopies: 12, rack: 'B-2' },
-    { id: 5, title: 'Panchatantra Stories', author: 'Vishnu Sharma', isbn: '978-8121902344', category: 'Story Book', totalCopies: 10, availableCopies: 0, rack: 'C-1' },
-    { id: 6, title: 'NCERT Science Class 8', author: 'NCERT', isbn: '978-8174506337', category: 'Textbook', totalCopies: 45, availableCopies: 40, rack: 'A-3' },
-  ];
+  const [books, setBooks] = useState([]);
+  const [issues, setIssues] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const issues = [
-    { id: 1, book: 'Mathematics for Class 10', student: 'Aarav Verma', class: 'Class 10-A', issueDate: '2025-03-01', dueDate: '2025-03-15', status: 'Issued', fine: 0 },
-    { id: 2, book: 'Science for Class 9', student: 'Diya Sharma', class: 'Class 9-B', issueDate: '2025-02-20', dueDate: '2025-03-05', status: 'Overdue', fine: 25 },
-    { id: 3, book: 'English Grammar', student: 'Arjun Patel', class: 'Class 8-A', issueDate: '2025-03-10', dueDate: '2025-03-24', status: 'Issued', fine: 0 },
-    { id: 4, book: 'Panchatantra Stories', student: 'Ananya Singh', class: 'Class 5-A', issueDate: '2025-02-15', dueDate: '2025-03-01', status: 'Returned', fine: 10 },
-  ];
+  const fetchBooks = async () => {
+    setLoading(true);
+    try {
+      const { data } = await libraryAPI.getBooks({ search: searchQuery });
+      setBooks(data.data || []);
+    } catch (e) { toast.error('Failed to load books'); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { fetchBooks(); }, [searchQuery]);
 
   const getStatusBadge = (status) => {
     switch (status) {

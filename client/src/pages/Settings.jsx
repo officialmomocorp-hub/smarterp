@@ -4,7 +4,7 @@ import { Lock, User, Shield, AlertCircle, Calendar, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Settings() {
-  const [activeTab, setActiveTab] = useState('security');
+  const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -12,8 +12,49 @@ export default function Settings() {
     confirmPassword: ''
   });
 
+  const [schoolData, setSchoolData] = useState({
+    name: '', address: '', city: '', state: '', pincode: '',
+    phone: '', email: '', udiseCode: '', affiliationNumber: '',
+    principalName: '', logoUrl: '', letterheadUrl: ''
+  });
+
+  const [logoFile, setLogoFile] = useState(null);
+  const [letterheadFile, setLetterheadFile] = useState(null);
+
   const [holidayForm, setHolidayForm] = useState({ name: '', date: '', type: 'Festival', isNational: false });
   const [holidays, setHolidays] = useState([]);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await api.get('/schools/settings');
+        if (data.success) setSchoolData(data.data);
+      } catch (err) { console.error('Failed to fetch settings', err); }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleUpdateSchool = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      Object.keys(schoolData).forEach(key => {
+        if (schoolData[key]) formData.append(key, schoolData[key]);
+      });
+      if (logoFile) formData.append('logo', logoFile);
+      if (letterheadFile) formData.append('letterhead', letterheadFile);
+
+      await api.put('/schools/settings', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success('School profile updated successfully! 🏢');
+    } catch (err) {
+      toast.error('Failed to update school profile');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -58,6 +99,7 @@ export default function Settings() {
 
       <div className="flex gap-2 border-b border-gray-200">
         {[
+          { id: 'profile', icon: User, label: 'School Profile' },
           { id: 'security', icon: Lock, label: 'Security & Password' },
           { id: 'holidays', icon: Calendar, label: 'Holidays & Calendar' },
         ].map(tab => (
@@ -75,6 +117,95 @@ export default function Settings() {
           </button>
         ))}
       </div>
+
+      {activeTab === 'profile' && (
+        <div className="card">
+          <form onSubmit={handleUpdateSchool} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-1 space-y-4">
+                <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
+                  <div className="w-32 h-32 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                    {schoolData.logoUrl || logoFile ? (
+                      <img 
+                        src={logoFile ? URL.createObjectURL(logoFile) : `http://localhost:5000${schoolData.logoUrl}`} 
+                        className="w-full h-full object-contain" 
+                        alt="Logo"
+                      />
+                    ) : (
+                      <Plus className="w-8 h-8 text-gray-400" />
+                    )}
+                  </div>
+                  <label className="btn btn-secondary cursor-pointer block text-center">
+                    Upload School Logo
+                    <input type="file" className="hidden" accept="image/*" onChange={e => setLogoFile(e.target.files[0])} />
+                  </label>
+                  <p className="text-[10px] text-gray-400 mt-2">Recommended: Square PNG, max 1MB</p>
+                </div>
+
+                <div>
+                   <label className="label">School Name</label>
+                   <input className="input" value={schoolData.name} onChange={e => setSchoolData({...schoolData, name: e.target.value})} />
+                </div>
+                <div>
+                   <label className="label">UDISE Code</label>
+                   <input className="input" value={schoolData.udiseCode} onChange={e => setSchoolData({...schoolData, udiseCode: e.target.value})} />
+                </div>
+                <div>
+                   <label className="label">Affiliation Number</label>
+                   <input className="input" value={schoolData.affiliationNumber || ''} onChange={e => setSchoolData({...schoolData, affiliationNumber: e.target.value})} />
+                </div>
+              </div>
+
+              <div className="lg:col-span-2 space-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="label">Principal Name</label>
+                      <input className="input" value={schoolData.principalName || ''} onChange={e => setSchoolData({...schoolData, principalName: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="label">Email Address</label>
+                      <input className="input" value={schoolData.email} onChange={e => setSchoolData({...schoolData, email: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="label">Phone Number</label>
+                      <input className="input" value={schoolData.phone} onChange={e => setSchoolData({...schoolData, phone: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="label">Website</label>
+                      <input className="input" value={schoolData.website || ''} onChange={e => setSchoolData({...schoolData, website: e.target.value})} />
+                    </div>
+                 </div>
+
+                 <div>
+                    <label className="label">Full Address</label>
+                    <textarea className="input h-20" value={schoolData.address} onChange={e => setSchoolData({...schoolData, address: e.target.value})} />
+                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="label">City</label>
+                      <input className="input" value={schoolData.city} onChange={e => setSchoolData({...schoolData, city: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="label">State</label>
+                      <input className="input" value={schoolData.state} onChange={e => setSchoolData({...schoolData, state: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="label">Pincode</label>
+                      <input className="input" value={schoolData.pincode} onChange={e => setSchoolData({...schoolData, pincode: e.target.value})} />
+                    </div>
+                 </div>
+
+                 <div className="pt-6 flex justify-end">
+                    <button type="submit" disabled={loading} className="btn btn-primary px-8">
+                       {loading ? 'Saving Settings...' : 'Save School Profile'}
+                    </button>
+                 </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
 
       {activeTab === 'security' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

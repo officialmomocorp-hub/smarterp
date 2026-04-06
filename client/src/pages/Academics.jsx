@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { School, Calendar, BookOpen, Layers, Plus } from 'lucide-react';
 import { academicAPI } from '../services/api';
 import toast from 'react-hot-toast';
@@ -12,6 +12,7 @@ export default function Academics() {
   
   const [yearForm, setYearForm] = useState({ name: '', startDate: '', endDate: '', isCurrent: false });
   const [classForm, setClassForm] = useState({ name: '', displayName: '', sortOrder: 1 });
+  const sectionFormRef = useRef(null);
 
   useEffect(() => {
     fetchAcademicYears();
@@ -191,7 +192,7 @@ export default function Academics() {
               </form>
             </div>
 
-            <div className="card">
+            <div className="card" ref={sectionFormRef}>
               <h3 className="text-lg font-semibold mb-4">Add Section to Class</h3>
               <form onSubmit={handleCreateSection} className="space-y-4">
                 <div>
@@ -226,7 +227,10 @@ export default function Academics() {
                     <div className="flex justify-between items-center mb-3">
                       <p className="font-bold text-gray-900 text-lg">{cls.displayName}</p>
                       <button 
-                        onClick={() => setSectionForm({...sectionForm, classId: cls.id})}
+                        onClick={() => {
+                          setSectionForm({...sectionForm, classId: cls.id});
+                          sectionFormRef.current?.scrollIntoView({ behavior: 'smooth' });
+                        }}
                         className="text-primary-600 hover:text-primary-700 text-sm font-medium"
                       >
                         + Add Section
