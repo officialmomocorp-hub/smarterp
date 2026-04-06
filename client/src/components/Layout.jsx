@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import { useAuthStore, useAppStore } from '../store';
 import {
   LayoutDashboard, Users, IndianRupee, Calendar, BookOpen,
@@ -126,20 +127,37 @@ const schoolAdminMenu = [
   },
 ];
 
-const getMenuItems = (role) => {
+const getMenuItems = (role, impersonateId) => {
   if (role === 'SUPER_ADMIN') {
-    return [...commonMenu.filter(i => i.roles.includes(role)), ...superAdminMenu];
+    const base = [...commonMenu.filter(i => i.roles.includes(role)), ...superAdminMenu];
+    if (impersonateId) {
+      return [...base, ...schoolAdminMenu];
+    }
+    return base;
   }
   return [...commonMenu.filter(i => i.roles.includes(role)), ...schoolAdminMenu.filter(i => i.roles.includes(role))];
 };
 
 
 export default function Layout({ children }) {
-  const { user, logout } = useAuthStore();
+  const { user, logout, impersonateId, setImpersonateId } = useAuthStore();
   const { sidebarOpen, toggleSidebar } = useAppStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [expandedMenus, setExpandedMenus] = React.useState({});
+  const [schools, setSchools] = React.useState([]);
+
+  React.useEffect(() => {
+    if (user?.role === 'SUPER_ADMIN') {
+      const fetchSchools = async () => {
+        try {
+          const { data } = await api.get('/schools');
+          setSchools(data.data || []);
+        } catch (err) { console.error('Failed to load schools for switcher'); }
+      };
+      fetchSchools();
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -150,7 +168,7 @@ export default function Layout({ children }) {
     setExpandedMenus(prev => ({ ...prev, [title]: !prev[title] }));
   };
 
-  const filteredMenu = getMenuItems(user?.role);
+  const filteredMenu = getMenuItems(user?.role, impersonateId);
 
   return (
     <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
@@ -182,7 +200,25 @@ export default function Layout({ children }) {
           </button>
         </div>
 
-        <nav className="p-4 space-y-1 overflow-y-auto h-[calc(100vh-4rem)]">
+        <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+          {user?.role === 'SUPER_ADMIN' && sidebarOpen && (
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Active School Context</label>
+              <select 
+                className="w-full bg-white border border-gray-200 rounded-lg text-xs p-2 focus:ring-1 focus:ring-primary-500"
+                value={impersonateId || ''}
+                onChange={(e) => setImpersonateId(e.target.value)}
+              >
+                <option value="">Platform Management</option>
+                {schools.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+
+        <nav className="p-4 space-y-1 overflow-y-auto h-[calc(100vh-8rem)]">
           {filteredMenu.map((item) => (
             <div key={item.title}>
               {item.children ? (

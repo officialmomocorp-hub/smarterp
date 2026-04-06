@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { useAuthStore } from '../store';
 import { Lock, User, Shield, AlertCircle, Calendar, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -24,15 +25,23 @@ export default function Settings() {
   const [holidayForm, setHolidayForm] = useState({ name: '', date: '', type: 'Festival', isNational: false });
   const [holidays, setHolidays] = useState([]);
 
+  const { impersonateId } = useAuthStore();
+
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         const { data } = await api.get('/schools/settings');
-        if (data.success) setSchoolData(data.data);
-      } catch (err) { console.error('Failed to fetch settings', err); }
+        if (data.success && data.data) setSchoolData(data.data);
+      } catch (err) { 
+        if (err.response?.status === 403) {
+           toast.error('Global Super Admins must select a school to manage settings.');
+        } else {
+           console.error('Failed to fetch settings', err); 
+        }
+      }
     };
     fetchSettings();
-  }, []);
+  }, [impersonateId]);
 
   const handleUpdateSchool = async (e) => {
     e.preventDefault();
@@ -127,7 +136,7 @@ export default function Settings() {
                   <div className="w-32 h-32 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center overflow-hidden">
                     {schoolData.logoUrl || logoFile ? (
                       <img 
-                        src={logoFile ? URL.createObjectURL(logoFile) : `http://localhost:5000${schoolData.logoUrl}`} 
+                        src={logoFile ? URL.createObjectURL(logoFile) : schoolData.logoUrl} 
                         className="w-full h-full object-contain" 
                         alt="Logo"
                       />

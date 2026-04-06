@@ -37,7 +37,15 @@ const authenticate = async (req, res, next) => {
     req.user = user;
     req.userId = user.id;
     req.userRole = user.role;
-    req.schoolId = user.schoolId;
+    
+    // FEATURE: Super Admin Impersonation
+    // If Super Admin sends X-School-Id header, override the null schoolId.
+    const impersonatedSchoolId = req.headers['x-school-id'];
+    if (user.role === 'SUPER_ADMIN' && impersonatedSchoolId) {
+       req.schoolId = impersonatedSchoolId;
+    } else {
+       req.schoolId = user.schoolId;
+    }
 
     next();
   } catch (error) {

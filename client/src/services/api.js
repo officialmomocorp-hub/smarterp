@@ -7,9 +7,15 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token;
+  const state = useAuthStore.getState();
+  const token = state.token;
+  const impersonateId = state.impersonateId;
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  if (impersonateId) {
+    config.headers['X-School-Id'] = impersonateId;
   }
   return config;
 });
