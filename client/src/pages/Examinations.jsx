@@ -250,8 +250,17 @@ export default function Examinations() {
                     value={formData.classId} onChange={e => setFormData({...formData, classId: e.target.value})}
                   >
                     <option value="">-- Choose Class --</option>
-                    {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    {classes.length > 0 ? (
+                      classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)
+                    ) : (
+                      <option disabled>No classes found. Add classes in Academic page first.</option>
+                    )}
                   </select>
+                  {classes.length === 0 && (
+                    <p className="mt-1 text-xs text-red-500">
+                      You must add classes in Academic Management before scheduling exams.
+                    </p>
+                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>

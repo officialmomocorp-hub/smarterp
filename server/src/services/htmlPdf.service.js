@@ -442,8 +442,16 @@ class HTMLPDFService {
   async generateReportCard(studentId, examId, schoolId, res) {
     const student = await prisma.student.findUnique({
       where: { id: studentId },
-      include: { profile: true, class: true, section: true }
+      include: { 
+        profile: true, 
+        class: true, 
+        section: true,
+        academicYear: true,
+        parents: { include: { parent: true } }
+      }
     });
+    
+    if (!student) throw new Error('Student not found');
 
     const exam = await prisma.exam.findUnique({
       where: { id: examId },

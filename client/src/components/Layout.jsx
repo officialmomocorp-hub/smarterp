@@ -116,7 +116,7 @@ const schoolAdminMenu = [
     title: 'School Reports',
     icon: FileSpreadsheet,
     path: '/reports',
-    roles: ['ADMIN'],
+    roles: ['ADMIN', 'TEACHER'],
   },
   {
     title: 'Academic',
