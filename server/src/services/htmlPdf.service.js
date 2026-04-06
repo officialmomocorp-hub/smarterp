@@ -555,7 +555,13 @@ class HTMLPDFService {
   async generateTC(studentId, schoolId, res) {
     const student = await prisma.student.findUnique({
       where: { id: studentId },
-      include: { profile: true, class: true, section: true, academicYear: true }
+      include: { 
+        profile: true, 
+        class: true, 
+        section: true, 
+        academicYear: true,
+        parents: { include: { parent: true } }
+      }
     });
 
     const school = await prisma.school.findUnique({ where: { id: schoolId } });
@@ -684,7 +690,13 @@ class HTMLPDFService {
   async generateIDCard(studentId, schoolId, res) {
     const student = await prisma.student.findUnique({
       where: { id: studentId },
-      include: { profile: true, class: true, section: true, academicYear: true }
+      include: { 
+        profile: true, 
+        class: true, 
+        section: true, 
+        academicYear: true,
+        parents: { include: { parent: true } }
+      }
     });
 
     const school = await prisma.school.findUnique({ where: { id: schoolId } });
