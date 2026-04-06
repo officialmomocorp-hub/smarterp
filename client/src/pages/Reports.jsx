@@ -271,14 +271,15 @@ export default function Reports() {
                       const response = await api.get('/pdf/tc/demo', {
                         responseType: 'blob',
                       });
-                      const url = window.URL.createObjectURL(new Blob([response.data]));
+                      const blob = new Blob([response.data], { type: 'application/pdf' });
+                      const url = window.URL.createObjectURL(blob);
                       const link = document.createElement('a');
                       link.href = url;
                       link.setAttribute('download', 'TC-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
                       document.body.removeChild(link);
-                      window.URL.revokeObjectURL(url);
+                      setTimeout(() => window.URL.revokeObjectURL(url), 100);
                     } catch (e) { toast.error('Failed to generate TC demo'); }
                   }} 
                   className="btn btn-secondary text-sm flex items-center gap-2"
@@ -297,14 +298,15 @@ export default function Reports() {
                       const response = await api.get('/pdf/salary/demo', {
                         responseType: 'blob',
                       });
-                      const url = window.URL.createObjectURL(new Blob([response.data]));
+                      const blob = new Blob([response.data], { type: 'application/pdf' });
+                      const url = window.URL.createObjectURL(blob);
                       const link = document.createElement('a');
                       link.href = url;
                       link.setAttribute('download', 'Salary-Slip-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
                       document.body.removeChild(link);
-                      window.URL.revokeObjectURL(url);
+                      setTimeout(() => window.URL.revokeObjectURL(url), 100);
                     } catch (e) { toast.error('No salary records found for demo'); }
                   }} 
                   className="btn btn-secondary text-sm flex items-center gap-2"
@@ -323,14 +325,15 @@ export default function Reports() {
                       const response = await api.get('/pdf/idcard/demo', {
                         responseType: 'blob',
                       });
-                      const url = window.URL.createObjectURL(new Blob([response.data]));
+                      const blob = new Blob([response.data], { type: 'application/pdf' });
+                      const url = window.URL.createObjectURL(blob);
                       const link = document.createElement('a');
                       link.href = url;
                       link.setAttribute('download', 'ID-Card-Demo.pdf');
                       document.body.appendChild(link);
                       link.click();
                       document.body.removeChild(link);
-                      window.URL.revokeObjectURL(url);
+                      setTimeout(() => window.URL.revokeObjectURL(url), 100);
                     } catch (e) { toast.error('No students found for ID card demo'); }
                   }} 
                   className="btn btn-secondary text-sm flex items-center gap-2"

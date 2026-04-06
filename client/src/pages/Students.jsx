@@ -228,14 +228,15 @@ export default function Students() {
                             toast.success('Generating ID Card...');
                             try {
                               const response = await studentAPI.generateIDCard(student.id);
-                              const url = window.URL.createObjectURL(new Blob([response.data]));
+                              const blob = new Blob([response.data], { type: 'application/pdf' });
+                              const url = window.URL.createObjectURL(blob);
                               const link = document.createElement('a');
                               link.href = url;
                               link.setAttribute('download', `ID-${student.studentId}.pdf`);
                               document.body.appendChild(link);
                               link.click();
                               document.body.removeChild(link);
-                              window.URL.revokeObjectURL(url);
+                              setTimeout(() => window.URL.revokeObjectURL(url), 100);
                             } catch (e) { toast.error('Failed to generate ID card'); }
                           }} 
                           className="p-1.5 rounded-lg hover:bg-green-50 text-green-600" 
