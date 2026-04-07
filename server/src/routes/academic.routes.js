@@ -27,6 +27,12 @@ router.post('/classes', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next
 router.post('/sections', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
     const { classId, name } = req.body;
+    const targetClass = await prisma.class.findFirst({
+      where: { id: classId, schoolId: req.schoolId }
+    });
+    if (!targetClass) {
+      return res.status(404).json({ success: false, message: 'Class not found or does not belong to your school.' });
+    }
     const existing = await prisma.section.findFirst({
       where: { classId, name: name.trim().toUpperCase() }
     });
@@ -50,8 +56,14 @@ router.get('/subjects', async (req, res, next) => {
 
 router.post('/subjects', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, res, next) => {
   try {
-    const { description, ...subjectData } = req.body;
-    const subject = await prisma.subject.create({ data: { ...subjectData } });
+    const { description, classId, ...subjectData } = req.body;
+    const targetClass = await prisma.class.findFirst({
+      where: { id: classId, schoolId: req.schoolId }
+    });
+    if (!targetClass) {
+      return res.status(404).json({ success: false, message: 'Class not found or does not belong to your school.' });
+    }
+    const subject = await prisma.subject.create({ data: { classId, ...subjectData } });
     res.status(201).json({ success: true, data: subject });
   } catch (error) { next(error); }
 });

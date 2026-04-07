@@ -36,11 +36,16 @@ class ExamService {
     return exam;
   }
 
-  async enterMarks(data, enteredBy) {
+  async enterMarks(data, enteredBy, schoolId) {
     const { examId, studentId, subjectId, marksObtained } = data;
 
+    // Security Fix: Verify exam ownership
     const examSubject = await prisma.examSubject.findFirst({
-      where: { examId, subjectId },
+      where: { 
+        examId, 
+        subjectId,
+        exam: { schoolId }
+      },
       include: { exam: true },
     });
 
@@ -77,7 +82,7 @@ class ExamService {
     return mark;
   }
 
-  async bulkEnterMarks(data, enteredBy) {
+  async bulkEnterMarks(data, enteredBy, schoolId) {
     const { examId, marks } = data;
     const results = [];
 
@@ -87,7 +92,7 @@ class ExamService {
         studentId: markData.studentId,
         subjectId: markData.subjectId,
         marksObtained: markData.marksObtained,
-      }, enteredBy);
+      }, enteredBy, schoolId);
 
       results.push(mark);
     }
@@ -95,9 +100,13 @@ class ExamService {
     return results;
   }
 
-  async getStudentResult(studentId, examId) {
+  async getStudentResult(studentId, examId, schoolId) {
     const marks = await prisma.mark.findMany({
-      where: { studentId, examId },
+      where: { 
+        studentId, 
+        examId,
+        exam: { schoolId }
+      },
       include: { subject: true, exam: true },
     });
 
@@ -144,9 +153,9 @@ class ExamService {
     };
   }
 
-  async generateMeritList(examId, classId) {
+  async generateMeritList(examId, classId, schoolId) {
     const students = await prisma.student.findMany({
-      where: { classId, status: 'ACTIVE' },
+      where: { classId, schoolId, status: 'ACTIVE' },
       include: { profile: true, section: true },
     });
 
@@ -183,14 +192,14 @@ class ExamService {
     return results;
   }
 
-  async getFailedStudentList(examId, classId) {
-    const meritList = await this.generateMeritList(examId, classId);
+  async getFailedStudentList(examId, classId, schoolId) {
+    const meritList = await this.generateMeritList(examId, classId, schoolId);
     return meritList.filter(r => r.result === 'FAIL');
   }
 
-  async publishResults(examId) {
+  async publishResults(examId, schoolId) {
     await prisma.exam.update({
-      where: { id: examId },
+      where: { id: examId, schoolId },
       data: { resultsPublished: true },
     });
 

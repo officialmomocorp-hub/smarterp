@@ -61,7 +61,7 @@ class AttendanceService {
     attendanceDate.setHours(0, 0, 0, 0);
 
     const existing = await prisma.attendance.findFirst({
-      where: { staffId, date: attendanceDate },
+      where: { staffId, date: attendanceDate, schoolId },
     });
 
     let attendance;
@@ -90,10 +90,11 @@ class AttendanceService {
     return attendance;
   }
 
-  async getAttendance(studentId, startDate, endDate) {
+  async getAttendance(studentId, startDate, endDate, schoolId) {
     const attendance = await prisma.attendance.findMany({
       where: {
         studentId,
+        schoolId,
         date: {
           gte: new Date(startDate),
           lte: new Date(endDate),
@@ -126,13 +127,14 @@ class AttendanceService {
     };
   }
 
-  async getClassAttendance(classId, sectionId, date) {
+  async getClassAttendance(classId, sectionId, date, schoolId) {
     const attendanceDate = new Date(date);
 
     const students = await prisma.student.findMany({
       where: {
         classId,
         sectionId,
+        schoolId,
         status: 'ACTIVE',
       },
       include: { profile: true },

@@ -28,14 +28,14 @@ router.get('/', async (req, res, next) => {
 
 router.post('/marks', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), async (req, res, next) => {
   try {
-    const mark = await examService.enterMarks(req.body, req.userId);
+    const mark = await examService.enterMarks(req.body, req.userId, req.schoolId);
     res.status(201).json({ success: true, data: mark });
   } catch (error) { next(error); }
 });
 
 router.post('/marks/bulk', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), async (req, res, next) => {
   try {
-    const marks = await examService.bulkEnterMarks(req.body, req.userId);
+    const marks = await examService.bulkEnterMarks(req.body, req.userId, req.schoolId);
     res.status(201).json({ success: true, data: marks });
   } catch (error) { next(error); }
 });
@@ -43,7 +43,7 @@ router.post('/marks/bulk', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), async (
 router.get('/result/student/:studentId', async (req, res, next) => {
   try {
     const { examId } = req.query;
-    const result = await examService.getStudentResult(req.params.studentId, examId);
+    const result = await examService.getStudentResult(req.params.studentId, examId, req.schoolId);
     res.json({ success: true, data: result });
   } catch (error) { next(error); }
 });
@@ -51,7 +51,7 @@ router.get('/result/student/:studentId', async (req, res, next) => {
 router.get('/merit-list', async (req, res, next) => {
   try {
     const { examId, classId } = req.query;
-    const meritList = await examService.generateMeritList(examId, classId);
+    const meritList = await examService.generateMeritList(examId, classId, req.schoolId);
     res.json({ success: true, data: meritList });
   } catch (error) { next(error); }
 });
@@ -59,14 +59,14 @@ router.get('/merit-list', async (req, res, next) => {
 router.get('/failed-students', async (req, res, next) => {
   try {
     const { examId, classId } = req.query;
-    const failed = await examService.getFailedStudentList(examId, classId);
+    const failed = await examService.getFailedStudentList(examId, classId, req.schoolId);
     res.json({ success: true, data: failed });
   } catch (error) { next(error); }
 });
 
 router.post('/:id/publish', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
-    const result = await examService.publishResults(req.params.id);
+    const result = await examService.publishResults(req.params.id, req.schoolId);
     res.json({ success: true, data: result });
   } catch (error) { next(error); }
 });

@@ -24,7 +24,8 @@ router.post('/staff', authorize('ADMIN', 'SUPER_ADMIN'), async (req, res, next) 
 router.get('/student/:studentId', async (req, res, next) => {
   try {
     const { startDate, endDate } = req.query;
-    const attendance = await attendanceService.getAttendance(req.params.studentId, startDate, endDate);
+    // Security Fix: Pass schoolId to service for isolation
+    const attendance = await attendanceService.getAttendance(req.params.studentId, startDate, endDate, req.schoolId);
     res.json({ success: true, data: attendance });
   } catch (error) { next(error); }
 });
@@ -33,7 +34,8 @@ router.get('/class/:classId', async (req, res, next) => {
   try {
     const { sectionId, date } = req.query;
     if (!date) throw new AppError('Date is required', 400);
-    const students = await attendanceService.getClassAttendance(req.params.classId, sectionId, date);
+    // Security Fix: Pass schoolId to verify class/section ownership
+    const students = await attendanceService.getClassAttendance(req.params.classId, sectionId, date, req.schoolId);
     res.json({ success: true, data: students });
   } catch (error) { next(error); }
 });
@@ -88,6 +90,16 @@ router.get('/leave', async (req, res, next) => {
 router.put('/leave/:id/approve', authorize('ADMIN', 'SUPER_ADMIN', 'TEACHER'), async (req, res, next) => {
   try {
     const { status, rejectionReason } = req.body;
+    
+    // Security Fix: Verify leave ownership via schoolId
+    const existing = await prisma.leaveApplication.findFirst({
+      where: { id: req.params.id, schoolId: req.schoolId }
+    });
+    
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Leave application not found or unauthorized.' });
+    }
+
     const leave = await prisma.leaveApplication.update({
       where: { id: req.params.id },
       data: { status, rejectionReason, approvedBy: req.userId, approvedAt: new Date() },

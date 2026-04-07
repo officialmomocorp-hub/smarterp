@@ -66,6 +66,15 @@ router.post('/homework/:id/submit', async (req, res, next) => {
   try {
     const { submissionUrl, remarks } = req.body;
 
+    // Security Fix: Verify homework belongs to this school
+    const homework = await prisma.homework.findFirst({
+      where: { id: req.params.id, schoolId: req.schoolId }
+    });
+
+    if (!homework) {
+      throw new AppError('Homework not found or unauthorized', 404);
+    }
+
     const submission = await prisma.homeworkSubmission.upsert({
       where: {
         homeworkId_studentId: {
@@ -90,6 +99,15 @@ router.post('/homework/:id/submit', async (req, res, next) => {
 router.post('/homework/:id/grade/:studentId', authorize('TEACHER', 'ADMIN'), async (req, res, next) => {
   try {
     const { marksObtained, remarks } = req.body;
+
+    // Security Fix: Verify homework belongs to this school
+    const homework = await prisma.homework.findFirst({
+      where: { id: req.params.id, schoolId: req.schoolId }
+    });
+
+    if (!homework) {
+      throw new AppError('Homework not found or unauthorized', 404);
+    }
 
     const submission = await prisma.homeworkSubmission.update({
       where: {
@@ -166,6 +184,15 @@ router.post('/leave/apply', async (req, res, next) => {
 router.put('/leave/:id/approve', authorize('ADMIN', 'SUPER_ADMIN'), async (req, res, next) => {
   try {
     const { status, rejectionReason } = req.body;
+
+    // Security Fix: Guard update with schoolId check
+    const existing = await prisma.leaveApplication.findFirst({
+      where: { id: req.params.id, schoolId: req.schoolId }
+    });
+    
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Leave application not found or unauthorized.' });
+    }
 
     const leave = await prisma.leaveApplication.update({
       where: { id: req.params.id },

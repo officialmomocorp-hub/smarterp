@@ -68,6 +68,15 @@ class FeeService {
   }
 
   async createConcession(data, schoolId) {
+    // Security Fix: Verify fee structure ownership
+    const feeStructure = await prisma.feeStructure.findFirst({
+      where: { id: data.feeStructureId, schoolId }
+    });
+
+    if (!feeStructure) {
+      throw new AppError('Fee structure not found or unauthorized', 404);
+    }
+
     const concession = await prisma.feeConcession.create({
       data: {
         feeStructureId: data.feeStructureId,
@@ -86,118 +95,163 @@ class FeeService {
   }
 
   async processPayment(data, schoolId) {
-    const { studentId, feeStructureId, installmentNumber, paymentMode, transactionId, amount, concessionId, remarks } = data;
+    const { 
+      studentId, 
+      feeStructureId, 
+      installmentNumber, 
+      paymentMode, 
+      transactionId, 
+      amount, 
+      concessionId, 
+      concessionIds: inputConcessionIds,
+      remarks 
+    } = data;
 
-    let student = await prisma.student.findFirst({
-      where: { id: studentId, schoolId },
-      include: { class: true, feePayments: true },
-    });
+    // Support both single ID (backward compatibility) and array of IDs
+    const concessionIds = inputConcessionIds || (concessionId ? [concessionId] : []);
 
-    if (!student) {
-      student = await prisma.student.findFirst({
-        where: { studentId, schoolId },
+    return prisma.$transaction(async (tx) => {
+      let student = await tx.student.findFirst({
+        where: { id: studentId, schoolId },
         include: { class: true, feePayments: true },
       });
-    }
 
-    if (!student) {
-      throw new AppError('Student not found', 404);
-    }
+      if (!student) {
+        student = await tx.student.findFirst({
+          where: { studentId, schoolId },
+          include: { class: true, feePayments: true },
+        });
+      }
 
-    if (!feeStructureId) {
-      throw new AppError('Fee structure ID is required', 400);
-    }
+      if (!student) {
+        throw new AppError('Student not found', 404);
+      }
 
-    const feeStructure = await prisma.feeStructure.findUnique({
-      where: { id: feeStructureId },
-      include: { concessions: true },
-    });
+      // 1. Race Condition Prevention: Check if this installment is already fully paid
+      const existingPaid = await tx.feePayment.findFirst({
+        where: { studentId: student.id, installmentNumber, status: 'PAID' }
+      });
+      if (existingPaid) {
+        throw new AppError(`Installment ${installmentNumber} for this student is already fully paid. Duplicate receipt blocked.`, 400);
+      }
 
-    if (!feeStructure) {
-      throw new AppError('Fee structure not found', 404);
-    }
+      if (!feeStructureId) {
+        throw new AppError('Fee structure ID is required', 400);
+      }
 
-    const dates = typeof feeStructure.dueDates === 'string' ? JSON.parse(feeStructure.dueDates) : feeStructure.dueDates;
-    const installmentData = dates[installmentNumber - 1];
+      // 2. Security Fix: Verify fee structure ownership
+      const feeStructure = await tx.feeStructure.findFirst({
+        where: { id: feeStructureId, schoolId },
+        include: { concessions: true },
+      });
 
-    if (!installmentData) {
-      throw new AppError('Invalid installment number', 400);
-    }
+      if (!feeStructure) {
+        throw new AppError('Fee structure not found', 404);
+      }
 
-    const dueDate = new Date(installmentData.date);
-    const now = new Date();
-    let lateFine = 0;
+      const dates = typeof feeStructure.dueDates === 'string' ? JSON.parse(feeStructure.dueDates) : feeStructure.dueDates;
+      const installmentData = dates[installmentNumber - 1];
 
-    if (now > dueDate && feeStructure.lateFinePerDay > 0) {
-      const daysLate = Math.ceil((now - dueDate) / (1000 * 60 * 60 * 24));
-      lateFine = daysLate * parseFloat(feeStructure.lateFinePerDay);
-    }
+      if (!installmentData) {
+        throw new AppError('Invalid installment number', 400);
+      }
 
-    let concessionAmount = 0;
-    if (concessionId) {
-      const concession = feeStructure.concessions.find(c => c.id === concessionId);
-      if (concession) {
-        if (concession.discountType === 'PERCENTAGE') {
-          concessionAmount = (parseFloat(installmentData.amount) * parseFloat(concession.discountValue)) / 100;
-        } else {
-          concessionAmount = parseFloat(concession.discountValue);
-        }
+      const dueDate = new Date(installmentData.date);
+      const now = new Date();
+      let lateFine = 0;
 
-        if (concession.maxDiscountAmount && concessionAmount > parseFloat(concession.maxDiscountAmount)) {
-          concessionAmount = parseFloat(concession.maxDiscountAmount);
+      if (now > dueDate && feeStructure.lateFinePerDay > 0) {
+        const daysLate = Math.ceil((now - dueDate) / (1000 * 60 * 60 * 24));
+        lateFine = daysLate * parseFloat(feeStructure.lateFinePerDay);
+      }
+
+      // 3. Discount Stacking Logic: Sum multiple concessions
+      let totalConcessionAmount = 0;
+      const appliedConcessions = [];
+
+      if (concessionIds.length > 0) {
+        for (const cid of concessionIds) {
+          const concession = feeStructure.concessions.find(c => c.id === cid);
+          if (concession) {
+            let currentAmount = 0;
+            if (concession.discountType === 'PERCENTAGE') {
+              currentAmount = (parseFloat(installmentData.amount) * parseFloat(concession.discountValue)) / 100;
+            } else {
+              currentAmount = parseFloat(concession.discountValue);
+            }
+
+            if (concession.maxDiscountAmount && currentAmount > parseFloat(concession.maxDiscountAmount)) {
+              currentAmount = parseFloat(concession.maxDiscountAmount);
+            }
+
+            totalConcessionAmount += currentAmount;
+            appliedConcessions.push({
+              concessionId: concession.id,
+              amount: currentAmount
+            });
+          }
         }
       }
-    }
 
-    const installmentAmount = parseFloat(installmentData.amount) - concessionAmount;
-    const gstAmount = (installmentAmount * parseFloat(feeStructure.gstPercentage)) / 100;
-    const totalAmount = installmentAmount + gstAmount + lateFine;
-    const paidAmount = parseFloat(amount) || totalAmount;
-    const balanceAmount = totalAmount - paidAmount;
+      const installmentAmount = parseFloat(installmentData.amount) - totalConcessionAmount;
+      const gstAmount = (installmentAmount * parseFloat(feeStructure.gstPercentage)) / 100;
+      const totalAmount = installmentAmount + gstAmount + lateFine;
+      const paidAmount = parseFloat(amount) || totalAmount;
+      const balanceAmount = totalAmount - paidAmount;
 
-    let status = 'PAID';
-    if (balanceAmount > 0 && paidAmount > 0) {
-      status = 'PARTIAL';
-    } else if (paidAmount === 0) {
-      status = 'PENDING';
-    }
+      let status = 'PAID';
+      if (balanceAmount > 0 && paidAmount > 0) {
+        status = 'PARTIAL';
+      } else if (paidAmount === 0) {
+        status = 'PENDING';
+      }
 
-    if (now > dueDate && status !== 'PAID') {
-      status = 'OVERDUE';
-    }
+      if (now > dueDate && status !== 'PAID') {
+        status = 'OVERDUE';
+      }
 
-    const receiptNumber = this.generateReceiptNumber(schoolId);
+      const receiptNumber = this.generateReceiptNumber(schoolId);
 
-    const feePayment = await prisma.feePayment.create({
-      data: {
-        schoolId,
-        academicYearId: student.academicYearId,
-        studentId: student.id,
-        feeStructureId,
-        concessionId,
-        receiptNumber,
-        installmentNumber,
-        dueDate,
-        paymentDate: now,
-        totalAmount,
-        concessionAmount,
-        gstAmount,
-        lateFine,
-        paidAmount,
-        balanceAmount,
-        status,
-        paymentMode: paymentMode || 'CASH',
-        transactionId,
-        remarks,
-        createdBy: 'system',
-      },
-      include: {
-        student: { include: { profile: true, class: true, section: true } },
-        feeStructure: true,
-      },
+      const feePayment = await tx.feePayment.create({
+        data: {
+          schoolId,
+          academicYearId: student.academicYearId,
+          studentId: student.id,
+          feeStructureId,
+          // Maintain concessionId for legacy single-discount compatibility (first applied)
+          concessionId: appliedConcessions[0]?.concessionId || null,
+          receiptNumber,
+          installmentNumber,
+          dueDate,
+          paymentDate: now,
+          totalAmount,
+          concessionAmount: totalConcessionAmount,
+          gstAmount,
+          lateFine,
+          paidAmount,
+          balanceAmount,
+          status,
+          paymentMode: paymentMode || 'CASH',
+          transactionId,
+          remarks,
+          createdBy: 'system',
+          // Create entries in junction table for stacked discounts
+          concessions: {
+            create: appliedConcessions.map(c => ({
+              concessionId: c.concessionId,
+              amount: c.amount
+            }))
+          }
+        },
+        include: {
+          student: { include: { profile: true, class: true, section: true } },
+          feeStructure: true,
+          concessions: { include: { concession: true } }
+        },
+      });
+
+      return feePayment;
     });
-
-    return feePayment;
   }
 
   async getStudentFeeStatus(studentIdOrCode, schoolId, academicYearId) {
@@ -373,7 +427,7 @@ class FeeService {
     };
   }
 
-  async createRazorpayOrder(studentId, feePaymentId, amount) {
+  async createRazorpayOrder(studentId, feePaymentId, amount, schoolId) {
     const razorpay = require('razorpay');
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
@@ -393,7 +447,7 @@ class FeeService {
     });
 
     await prisma.feePayment.update({
-      where: { id: feePaymentId },
+      where: { id: feePaymentId, schoolId },
       data: {
         razorpayOrderId: order.id,
       },

@@ -101,6 +101,15 @@ router.get('/:id', async (req, res, next) => {
 
 router.put('/:id', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
+    // Security Fix: Guard update with schoolId check
+    const existing = await prisma.staff.findFirst({
+      where: { id: req.params.id, schoolId: req.schoolId }
+    });
+    
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Staff record not found or unauthorized.' });
+    }
+
     const staff = await prisma.staff.update({
       where: { id: req.params.id },
       data: req.body,

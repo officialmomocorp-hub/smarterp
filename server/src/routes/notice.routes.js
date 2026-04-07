@@ -35,6 +35,15 @@ router.post('/', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, res, 
 
 router.put('/:id', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
+    // Security Fix: Guard update with schoolId check
+    const existing = await prisma.notice.findFirst({
+      where: { id: req.params.id, schoolId: req.schoolId }
+    });
+    
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Notice not found or unauthorized.' });
+    }
+
     const notice = await prisma.notice.update({
       where: { id: req.params.id },
       data: req.body,

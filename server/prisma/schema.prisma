@@ -519,6 +519,7 @@ model FeeConcession {
 
   feeStructure      FeeStructure @relation(fields: [feeStructureId], references: [id])
   feePayments       FeePayment[]
+  concessionPayments FeePaymentConcession[]
 
   @@index([feeStructureId])
 }
@@ -557,6 +558,7 @@ model FeePayment {
   student           Student         @relation(fields: [studentId], references: [id])
   feeStructure      FeeStructure    @relation(fields: [feeStructureId], references: [id])
   concession        FeeConcession?  @relation(fields: [concessionId], references: [id])
+  concessions       FeePaymentConcession[]
   academicYear      AcademicYear    @relation(fields: [academicYearId], references: [id])
 
   @@index([studentId, academicYearId])
@@ -1511,4 +1513,16 @@ model PasswordHistory {
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model FeePaymentConcession {
+  id                String    @id @default(uuid())
+  feePaymentId      String
+  concessionId      String
+  amount            Float
+  
+  feePayment        FeePayment @relation(fields: [feePaymentId], references: [id], onDelete: Cascade)
+  concession        FeeConcession @relation(fields: [concessionId], references: [id])
+  
+  @@unique([feePaymentId, concessionId])
 }

@@ -65,6 +65,16 @@ router.get('/:id', async (req, res, next) => {
 router.put('/:id/status', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
     const { status, remarks } = req.body;
+    
+    // Security Fix: Guard update with schoolId check
+    const existing = await prisma.admission.findFirst({
+      where: { id: req.params.id, schoolId: req.schoolId }
+    });
+    
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Admission record not found or unauthorized.' });
+    }
+
     const admission = await prisma.admission.update({
       where: { id: req.params.id },
       data: { status, remarks, processedAt: new Date(), processedBy: req.userId },

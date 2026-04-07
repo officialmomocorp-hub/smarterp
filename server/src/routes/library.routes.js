@@ -34,10 +34,19 @@ router.post('/books', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, 
 router.post('/issue', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), async (req, res, next) => {
   try {
     const { bookId, studentId, dueDate } = req.body;
-    const book = await prisma.libraryBook.findUnique({ where: { id: bookId } });
-    if (!book || book.availableCopies <= 0) throw new AppError('Book not available', 400);
+    
+    // Security Fix: Verify book belongs to this school
+    const book = await prisma.libraryBook.findFirst({ 
+      where: { id: bookId, schoolId: req.schoolId } 
+    });
+    
+    if (!book || book.availableCopies <= 0) throw new AppError('Book not available or unauthorized', 400);
+    
     const issue = await prisma.$transaction(async (tx) => {
-      await tx.libraryBook.update({ where: { id: bookId }, data: { availableCopies: { decrement: 1 } } });
+      await tx.libraryBook.update({ 
+        where: { id: bookId }, 
+        data: { availableCopies: { decrement: 1 } } 
+      });
       return tx.bookIssue.create({
         data: { schoolId: req.schoolId, bookId, studentId, dueDate: new Date(dueDate), issuedBy: req.userId },
         include: { book: true, student: { include: { profile: true } } },
@@ -49,8 +58,13 @@ router.post('/issue', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), async (req, 
 
 router.post('/return/:id', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), async (req, res, next) => {
   try {
-    const issue = await prisma.bookIssue.findUnique({ where: { id: req.params.id } });
-    if (!issue) throw new AppError('Book issue not found', 404);
+    // Security Fix: Verify issue record belongs to this school
+    const issue = await prisma.bookIssue.findFirst({ 
+      where: { id: req.params.id, schoolId: req.schoolId } 
+    });
+    
+    if (!issue) throw new AppError('Book issue not found or unauthorized', 404);
+    
     const returnDate = new Date();
     const dueDate = new Date(issue.dueDate);
     let fineAmount = 0;
@@ -59,7 +73,10 @@ router.post('/return/:id', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), async (
       fineAmount = daysLate * 5;
     }
     const updated = await prisma.$transaction(async (tx) => {
-      await tx.libraryBook.update({ where: { id: issue.bookId }, data: { availableCopies: { increment: 1 } } });
+      await tx.libraryBook.update({ 
+        where: { id: issue.bookId }, 
+        data: { availableCopies: { increment: 1 } } 
+      });
       return tx.bookIssue.update({
         where: { id: req.params.id },
         data: { returnDate, fineAmount, status: fineAmount > 0 ? 'Returned with Fine' : 'Returned' },
