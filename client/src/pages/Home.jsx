@@ -59,7 +59,7 @@ export default function Home() {
             <div className="mt-20 flex items-center justify-center gap-10 opacity-30 grayscale saturate-0 pointer-events-none">
                <span className="text-2xl font-black italic">CBSE ALIGNED</span>
                <span className="text-2xl font-black italic">ISO CERTIFIED</span>
-               <span className="text-2xl font-black italic">SECURE BEYOND BARK</span>
+               <span className="text-2xl font-black italic">SECURE BEYOND BANK</span>
             </div>
           </div>
         </div>
