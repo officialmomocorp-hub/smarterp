@@ -75,10 +75,42 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</p>
-            <p className="text-xs text-gray-500">Admin: admin@smarterp.in / admin123</p>
-            <p className="text-xs text-gray-500">Teacher: teacher@smarterp.in / admin123</p>
+          <div className="mt-8 space-y-3">
+            <p className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <Settings className="w-4 h-4 text-primary-600" />
+              Quick Demo Access:
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button 
+                onClick={() => { setEmailOrPhone('admin@smarterp.in'); setPassword('admin123'); }}
+                className="text-left p-2 bg-gray-50 hover:bg-primary-50 border border-gray-100 rounded-lg transition-colors group"
+              >
+                <p className="text-[10px] font-bold text-primary-700 uppercase tracking-wider">School Admin</p>
+                <p className="text-[11px] text-gray-500 group-hover:text-primary-600 truncate">admin@smarterp.in</p>
+              </button>
+              <button 
+                onClick={() => { setEmailOrPhone('teacher@smarterp.in'); setPassword('admin123'); }}
+                className="text-left p-2 bg-gray-50 hover:bg-primary-50 border border-gray-100 rounded-lg transition-colors group"
+              >
+                <p className="text-[10px] font-bold text-primary-700 uppercase tracking-wider">Teacher</p>
+                <p className="text-[11px] text-gray-500 group-hover:text-primary-600 truncate">teacher@smarterp.in</p>
+              </button>
+              <button 
+                onClick={() => { setEmailOrPhone('9999999999'); setPassword('admin123'); }}
+                className="text-left p-2 bg-gray-50 hover:bg-primary-50 border border-gray-100 rounded-lg transition-colors group"
+              >
+                <p className="text-[10px] font-bold text-primary-700 uppercase tracking-wider">Student</p>
+                <p className="text-[11px] text-gray-500 group-hover:text-primary-600 truncate">9999999999</p>
+              </button>
+              <button 
+                onClick={() => { setEmailOrPhone('9888888888'); setPassword('admin123'); }}
+                className="text-left p-2 bg-gray-50 hover:bg-primary-50 border border-gray-100 rounded-lg transition-colors group"
+              >
+                <p className="text-[10px] font-bold text-primary-700 uppercase tracking-wider">Parent</p>
+                <p className="text-[11px] text-gray-500 group-hover:text-primary-600 truncate">9888888888</p>
+              </button>
+            </div>
+            <p className="text-[10px] text-center text-gray-400">Password for all demo accounts: <span className="font-mono font-bold">admin123</span></p>
           </div>
         </div>
 
