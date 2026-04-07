@@ -66,6 +66,18 @@ class StudentController {
       next(error);
     }
   }
+
+  async importStudents(req, res, next) {
+    try {
+      if (!req.file) {
+        throw new AppError('Please upload an Excel or CSV file', 400);
+      }
+      const result = await studentService.importStudents(req.file.path, req.schoolId);
+      res.json({ success: true, message: `Successfully imported ${result.count} students`, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new StudentController();

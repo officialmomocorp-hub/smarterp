@@ -2,19 +2,19 @@ Connected!
 
 >>> cd /var/www/smarterp && git fetch origin && git reset --hard origin/main 2>&1
 OUT:
-HEAD is now at de5bc9a fix: fee payment JSON parsing and academic subject visibility
+HEAD is now at c434971 Added sitemap and robots.txt for Google indexing
 
 ERR:
 From https://github.com/officialmomocorp-hub/smarterp
-   5dd7285..de5bc9a  main       -> origin/main
+   5fb2353..c434971  main       -> origin/main
 
 
 >>> cd /var/www/smarterp/server && npm install --no-color 2>&1
 OUT:
 
-up to date, audited 438 packages in 735ms
+up to date, audited 462 packages in 782ms
 
-90 packages are looking for funding
+99 packages are looking for funding
   run `npm fund` for details
 
 1 high severity vulnerability
@@ -30,23 +30,28 @@ OUT:
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 384ms
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 438ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
 
 
 
 >>> cd /var/www/smarterp/client && npm install --no-color 2>&1
 OUT:
 
-up to date, audited 256 packages in 625ms
+up to date, audited 256 packages in 715ms
 
 54 packages are looking for funding
   run `npm fund` for details
 
-found 0 vulnerabilities
+1 high severity vulnerability
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
 
 
 >>> cd /var/www/smarterp/client && npm run build --no-color 2>&1
@@ -57,18 +62,19 @@ OUT:
 
 vite v6.4.1 building for production...
 transforming...
-✓ 1670 modules transformed.
+src/pages/Reports.jsx (5:14): "API_BASE" is not exported by "src/services/api.js", imported by "src/pages/Reports.jsx".
+✓ 1680 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                   0.73 kB │ gzip:   0.42 kB
-dist/assets/index-Z4a2VF38.css   35.12 kB │ gzip:   6.08 kB
-dist/assets/index-BFwd5uvw.js   613.35 kB │ gzip: 177.97 kB
+dist/index.html                   1.90 kB │ gzip:   0.88 kB
+dist/assets/index-Cni-ATTB.css   47.67 kB │ gzip:   7.70 kB
+dist/assets/index-Cp85gsvG.js   684.20 kB │ gzip: 195.48 kB
 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 2.64s
+✓ built in 3.02s
 
 
 >>> pm2 restart smarterp-backend --no-color 2>&1
@@ -79,8 +85,8 @@ Use --update-env to update environment variables
 ┌────┬─────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
 │ id │ name                │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
 ├────┼─────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
-│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 194261   │ 12h    │ 1    │ online    │ 0%       │ 61.8mb   │ root     │ disabled │
-│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 211853   │ 0s     │ 12   │ online    │ 0%       │ 16.9mb   │ root     │ disabled │
+│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 230427   │ 32h    │ 8    │ online    │ 0%       │ 63.1mb   │ root     │ disabled │
+│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 296011   │ 0s     │ 36   │ online    │ 0%       │ 16.8mb   │ root     │ disabled │
 └────┴─────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
 
 

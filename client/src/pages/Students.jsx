@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { studentAPI } from '../services/api';
-import { Search, Plus, Edit, Trash2, Eye, Filter, FileOutput, User as UserIcon } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, Filter, FileOutput, User as UserIcon, FileUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { CLASSES, SECTIONS } from '../config/constants';
 import StudentForm from '../components/Students/StudentForm';
@@ -16,7 +16,8 @@ export default function Students() {
   const [pagination, setPagination] = useState({});
   const [showForm, setShowForm] = useState(false);
   const [viewStudentModal, setViewStudentModal] = useState(null);
-  const [editStudentId, setEditStudentId] = useState(null);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
   const [formData, setFormData] = useState({
     profile: {
       firstName: '', middleName: '', lastName: '', dateOfBirth: '',
@@ -134,6 +135,24 @@ export default function Students() {
       fetchStudents();
     } catch (error) {
       toast.error('Failed to issue TC');
+  const handleImport = async (e) => {
+    e.preventDefault();
+    const file = e.target.file.files[0];
+    if (!file) return toast.error('Please select a file');
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setImportLoading(true);
+    try {
+      await studentAPI.import(formData);
+      toast.success('Students imported successfully!');
+      setShowImportModal(false);
+      fetchStudents();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to import students');
+    } finally {
+      setImportLoading(false);
     }
   };
 
@@ -144,9 +163,14 @@ export default function Students() {
           <h2 className="text-2xl font-bold text-gray-900">Student Management</h2>
           <p className="text-gray-500 mt-1">{pagination.total || 0} students enrolled</p>
         </div>
-        <button onClick={() => { setEditStudentId(null); resetForm(); setShowForm(true); }} className="btn btn-primary flex items-center gap-2">
-          <Plus className="w-4 h-4" /> Add Student
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => setShowImportModal(true)} className="btn btn-secondary flex items-center gap-2">
+            <FileUp className="w-4 h-4" /> Import
+          </button>
+          <button onClick={() => { setEditStudentId(null); resetForm(); setShowForm(true); }} className="btn btn-primary flex items-center gap-2">
+            <Plus className="w-4 h-4" /> Add Student
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -277,6 +301,34 @@ export default function Students() {
           onSubmit={handleSubmit} 
           onCancel={() => setShowForm(false)} 
         />
+      )}
+
+      {showImportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Import Students</h3>
+              <button onClick={() => setShowImportModal(false)} className="text-gray-400 hover:text-gray-500">✕</button>
+            </div>
+            <form onSubmit={handleImport} className="space-y-4">
+              <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center">
+                <FileUp className="w-10 h-10 text-gray-400 mx-auto mb-4" />
+                <p className="text-sm text-gray-500 mb-4">Click to select or drag and drop your Excel/CSV file here</p>
+                <input name="file" type="file" accept=".xlsx, .xls, .csv" required className="text-xs text-gray-500 block w-full" />
+              </div>
+              <div className="bg-blue-50 p-4 rounded-lg text-xs text-blue-700">
+                <p className="font-bold mb-1">Expected Format:</p>
+                <p>Columns: firstName*, lastName, class*, section*, fatherPhone, motherPhone, dateOfBirth...</p>
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button type="button" onClick={() => setShowImportModal(false)} className="btn btn-outline">Cancel</button>
+                <button type="submit" disabled={importLoading} className="btn btn-primary">
+                  {importLoading ? 'Importing...' : 'Upload & Process'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {viewStudentModal && (

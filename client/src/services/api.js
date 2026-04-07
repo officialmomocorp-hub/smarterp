@@ -48,6 +48,9 @@ export const studentAPI = {
   getDefaulters: (params) => api.get('/students/defaulters', { params }),
   issueTC: (id, data) => api.post(`/pdf/tc/${id}`, data, { responseType: 'blob' }),
   generateIDCard: (id) => api.get(`/pdf/idcard/${id}`, { responseType: 'blob' }),
+  import: (formData) => api.post('/students/import', formData, { 
+    headers: { 'Content-Type': 'multipart/form-data' } 
+  }),
 };
 
 export const admissionAPI = {

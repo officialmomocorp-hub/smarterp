@@ -7,7 +7,7 @@ export default function NotFound() {
     <div className="min-h-screen bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 flex items-center justify-center p-4">
       <div className="text-center max-w-lg">
         <div className="text-9xl font-black text-white/20 select-none mb-4">404</div>
-        <h1 className="text-4xl font-bold text-white mb-4">Page Not Found</h1>
+        <h1 className="text-4xl font-bold text-white mb-4">Page Not Found - Server Synced</h1>
         <p className="text-primary-100 text-lg mb-8">
           The page you're looking for doesn't exist or has been moved. 
           Please check the URL or navigate back to the dashboard.

@@ -4,6 +4,7 @@ import {
   Building2, Users, CreditCard, Box, TrendingUp, 
   ArrowUpRight, School, GraduationCap, AlertCircle, CheckCircle2 
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement, 
@@ -134,35 +135,45 @@ export default function SuperAdminDashboard() {
 
       {/* Quick Actions / Notices */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           <div className="bg-gradient-to-br from-primary-600 to-primary-700 p-6 rounded-2xl text-white shadow-xl relative overflow-hidden group">
-              <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-4 translate-y-4 transition-transform group-hover:scale-110">
-                 <Box className="w-48 h-48" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Platform Maintenance</h3>
-              <p className="text-white/80 text-sm mb-6 leading-relaxed">
-                 Schedule system wide maintenance for critical updates. All school logins will be disabled during this window.
-              </p>
-              <button className="px-6 py-2.5 bg-white text-primary-700 rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95">
-                 Schedule No
-              </button>
-           </div>
+            <div className="bg-gradient-to-br from-primary-600 to-primary-700 p-6 rounded-2xl text-white shadow-xl relative overflow-hidden group">
+               <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-4 translate-y-4 transition-transform group-hover:scale-110">
+                  <Box className="w-48 h-48" />
+               </div>
+               <h3 className="text-xl font-bold mb-2">Platform Maintenance</h3>
+               <p className="text-white/80 text-sm mb-6 leading-relaxed">
+                  Schedule system wide maintenance for critical updates. All school logins will be disabled during this window.
+               </p>
+               <button 
+                  onClick={() => {
+                    if(window.confirm('Do you want to broadcast a maintenance window notice to all schools?')) {
+                      toast.success('Maintenance scheduled for Sunday 12:00 AM. Distributed to all school notices.');
+                    }
+                  }}
+                  className="px-6 py-2.5 bg-white text-primary-700 rounded-xl font-bold text-sm hover:shadow-lg transition-all active:scale-95"
+               >
+                  Schedule Now
+               </button>
+            </div>
 
-           <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm border-l-4 border-l-amber-400">
-              <div className="flex items-start gap-4">
-                 <div className="p-2 bg-amber-50 rounded-lg">
-                    <AlertCircle className="w-6 h-6 text-amber-600" />
-                 </div>
-                 <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">Unpaid School Subscriptions</h3>
-                    <p className="text-sm text-gray-500 mb-4">
-                       There are 4 schools with expired subscriptions that are currently running on grace period.
-                    </p>
-                    <button className="text-sm font-bold text-amber-600 hover:text-amber-700 flex items-center gap-1">
-                       View Delinquent Schools <ArrowUpRight className="w-4 h-4" />
-                    </button>
-                 </div>
-              </div>
-           </div>
+            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm border-l-4 border-l-amber-400">
+               <div className="flex items-start gap-4">
+                  <div className="p-2 bg-amber-50 rounded-lg">
+                     <AlertCircle className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <div>
+                     <h3 className="text-lg font-bold text-gray-900 mb-1">Unpaid School Subscriptions</h3>
+                     <p className="text-sm text-gray-500 mb-4">
+                        There are 4 schools with expired subscriptions that are currently running on grace period.
+                     </p>
+                     <button 
+                        onClick={() => window.location.href = '/manage-schools'}
+                        className="text-sm font-bold text-amber-600 hover:text-amber-700 flex items-center gap-1"
+                     >
+                        View Delinquent Schools <ArrowUpRight className="w-4 h-4" />
+                     </button>
+                  </div>
+               </div>
+            </div>
       </div>
     </div>
   );

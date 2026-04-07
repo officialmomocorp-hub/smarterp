@@ -1,7 +1,65 @@
 const prisma = require('../config/database');
 const { AppError } = require('../utils/appError');
+const xlsx = require('xlsx');
+const fs = require('fs');
 
 class StudentService {
+  async importStudents(filePath, schoolId) {
+    const workbook = xlsx.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    const currentYear = await prisma.academicYear.findFirst({
+      where: { schoolId, isCurrent: true }
+    });
+
+    if (!currentYear) {
+      throw new AppError('No active academic year found. Please set one first.', 400);
+    }
+
+    let count = 0;
+    const results = [];
+
+    // Cleanup file synchronously after reading
+    try { fs.unlinkSync(filePath); } catch (e) {}
+
+    for (const row of data) {
+      try {
+        // Map excel columns to student data structure
+        const studentData = {
+          profile: {
+            firstName: row.firstName || row['First Name'],
+            lastName: row.lastName || row['Last Name'] || 'Student',
+            dateOfBirth: row.dateOfBirth || row['DOB'] ? new Date(row.dateOfBirth || row['DOB']) : new Date(),
+            gender: row.gender || row['Gender'] || 'OTHER',
+            aadharNumber: row.aadharNumber || row['Aadhar'] || 'N/A',
+            address: row.address || row['Address'] || '',
+          },
+          parentData: {
+            fatherName: row.fatherName || row['Father Name'] || 'N/A',
+            fatherPhone: row.fatherPhone?.toString() || row['Father Phone']?.toString() || '',
+            motherName: row.motherName || row['Mother Name'] || 'N/A',
+            motherPhone: row.motherPhone?.toString() || row['Mother Phone']?.toString() || '',
+          },
+          class: (row.class || row['Class'] || '').toString(),
+          section: (row.section || row['Section'] || 'A').toString(),
+          city: row.city || row['City'] || '',
+          state: row.state || row['State'] || '',
+          pincode: row.pincode?.toString() || row['Pincode']?.toString() || '',
+        };
+
+        if (!studentData.class || !studentData.profile.firstName) continue;
+
+        await this.create(studentData, schoolId);
+        count++;
+      } catch (err) {
+        console.error(`Failed to import row: ${JSON.stringify(row)}`, err);
+      }
+    }
+
+    return { count, total: data.length };
+  }
+
   async create(data, schoolId) {
     const { profile, parentData, class: className, section, ...studentData } = data;
 

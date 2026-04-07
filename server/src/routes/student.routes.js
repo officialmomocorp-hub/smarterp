@@ -3,9 +3,13 @@ const router = express.Router();
 const studentController = require('../controllers/student.controller');
 const { authenticate, authorize, schoolScoped } = require('../middleware/auth');
 
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
 router.use(authenticate, schoolScoped);
 
 router.post('/', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), studentController.create);
+router.post('/import', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), upload.single('file'), studentController.importStudents);
 router.get('/', studentController.findAll);
 router.get('/statistics', studentController.getStatistics);
 router.get('/defaulters', studentController.getDefaulterList);
