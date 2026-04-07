@@ -5,10 +5,10 @@ const fs = require('fs');
 
 class HTMLPDFService {
   constructor() {
-    this.primaryColor = '#1B2A4A'; // Deep Navy
-    this.accentColor = '#C9A84C';  // Gold
-    this.bodyFont = "'Noto Sans', sans-serif";
-    this.headingFont = "'Poppins', sans-serif";
+    this.primaryColor = '#2563EB'; // Electric Blue
+    this.accentColor = '#F59E0B';  // Refined Amber
+    this.bodyFont = "'Inter', system-ui, -apple-system, sans-serif";
+    this.headingFont = "'Montserrat', sans-serif";
   }
 
   async getBaseTemplate(title, school, content) {
@@ -23,7 +23,7 @@ class HTMLPDFService {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
         <style>
           :root {
             --primary-color: ${this.primaryColor};

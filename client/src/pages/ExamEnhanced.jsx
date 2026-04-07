@@ -51,9 +51,7 @@ export default function ExamEnhanced() {
   const fetchPendingVerifications = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_BASE}/exams-enhanced/verification/pending`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      const { data } = await api.get('/exams-enhanced/verification/pending');
       setPendingMarks(data.data || []);
     } catch (error) {
       toast.error('Failed to fetch pending verifications');
@@ -64,10 +62,7 @@ export default function ExamEnhanced() {
 
   const handleHODVerify = async (markId, action) => {
     try {
-      await axios.put(`${API_BASE}/exams-enhanced/marks/${markId}/hod-verify`,
-        { action, remarks: action === 'APPROVE' ? 'Verified' : 'Please review' },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
+      await api.put(`/exams-enhanced/marks/${markId}/hod-verify`, { action, remarks: action === 'APPROVE' ? 'Verified' : 'Please review' });
       toast.success(action === 'APPROVE' ? 'Marks verified' : 'Sent back to teacher');
       fetchPendingVerifications();
     } catch (error) {
@@ -77,10 +72,7 @@ export default function ExamEnhanced() {
 
   const handlePrincipalApprove = async (markId, action) => {
     try {
-      await axios.put(`${API_BASE}/exams-enhanced/marks/${markId}/principal-approve`,
-        { action, remarks: action === 'APPROVE' ? 'Approved for publication' : 'Needs review' },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
+      await api.put(`/exams-enhanced/marks/${markId}/principal-approve`, { action, remarks: action === 'APPROVE' ? 'Approved for publication' : 'Needs review' });
       toast.success(action === 'APPROVE' ? 'Marks approved' : 'Sent back to HOD');
       fetchPendingVerifications();
     } catch (error) {
@@ -90,24 +82,19 @@ export default function ExamEnhanced() {
 
   const handlePrintHallTicket = async (studentId) => {
     if (!selectedExam) { toast.error('Please select an exam'); return; }
-    const url = `${API_BASE}/pdf/hallticket/${studentId}/${selectedExam.id}`;
-    window.open(`${axios.defaults.baseURL || ''}${url}`, '_blank');
+    window.open(`/api/v1/pdf/hallticket/${studentId}/${selectedExam.id}`, '_blank');
   };
 
   const handlePrintReportCard = async (studentId) => {
     if (!selectedExam) { toast.error('Please select an exam'); return; }
-    const url = `${API_BASE}/pdf/reportcard/${studentId}/${selectedExam.id}`;
-    window.open(`${axios.defaults.baseURL || ''}${url}`, '_blank');
+    window.open(`/api/v1/pdf/reportcard/${studentId}/${selectedExam.id}`, '_blank');
   };
 
   const handleGenerateHallTickets = async () => {
     if (!selectedExam) { toast.error('Please select an exam'); return; }
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_BASE}/exams-enhanced/hall-tickets/bulk/${selectedExam.id}/${selectedExam.classId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
-      // For now, let's just fetch the list of students who have tickets
+      const { data } = await api.get(`/exams-enhanced/hall-tickets/bulk/${selectedExam.id}/${selectedExam.classId}`);
       setVerificationData(prev => ({ ...prev, hallTicketStudents: data.data }));
       toast.success(`${data.data.length} hall tickets ready for printing`);
     } catch (error) {
@@ -121,10 +108,7 @@ export default function ExamEnhanced() {
     if (!selectedExam) { toast.error('Please select an exam'); return; }
     setLoading(true);
     try {
-      await axios.post(`${API_BASE}/exams-enhanced/seating/generate`,
-        { examId: selectedExam.id, classId: selectedExam.classId },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
+      await api.post('/exams-enhanced/seating/generate', { examId: selectedExam.id, classId: selectedExam.classId });
       toast.success('Seating arrangement generated');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to generate seating');
@@ -137,10 +121,7 @@ export default function ExamEnhanced() {
     if (!selectedExam) { toast.error('Please select an exam'); return; }
     setLoading(true);
     try {
-      await axios.post(`${API_BASE}/exams-enhanced/answer-books/generate`,
-        { examId: selectedExam.id, count: 100 },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
+      await api.post('/exams-enhanced/answer-books/generate', { examId: selectedExam.id, count: 100 });
       toast.success('100 answer books generated with barcodes');
     } catch (error) {
       toast.error('Failed to generate answer books');
@@ -153,9 +134,7 @@ export default function ExamEnhanced() {
     if (!selectedExam) { toast.error('Please select an exam'); return; }
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_BASE}/exams-enhanced/analytics/${selectedExam.id}/${selectedExam.classId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      const { data } = await api.get(`/exams-enhanced/analytics/${selectedExam.id}/${selectedExam.classId}`);
       setVerificationData(data.data);
       if (activeTab !== 'analytics') setActiveTab('analytics');
     } catch (error) {
@@ -167,9 +146,7 @@ export default function ExamEnhanced() {
 
   const handleTeacherSubmit = async (markId) => {
     try {
-      await axios.put(`${API_BASE}/exams-enhanced/marks/${markId}/submit`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
+      await api.put(`/exams-enhanced/marks/${markId}/submit`);
       toast.success('Marks submitted for verification');
       fetchPendingVerifications();
     } catch (error) { toast.error('Submission failed'); }
@@ -181,10 +158,8 @@ export default function ExamEnhanced() {
     if (!selectedExam || !selectedSubject) { toast.error('Select exam and subject'); return; }
     setLoading(true);
     try {
-       const { data } = await axios.get(`${API_BASE}/students?classId=${selectedExam.classId}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-       });
-       setEntryStudents(data.data.map(s => ({ ...s, obtainedMarks: '', remarks: '' })));
+       const { data } = await api.get(`/students?classId=${selectedExam.classId}`);
+       setEntryStudents(data.data.students || data.data.map(s => ({ ...s, obtainedMarks: '', remarks: '' })));
     } catch (error) { toast.error('Failed to load students'); } finally { setLoading(false); }
   };
 
@@ -199,9 +174,7 @@ export default function ExamEnhanced() {
              marksObtained: parseFloat(s.obtainedMarks),
              maxMarks: selectedSubject.maxMarks
           }));
-        await axios.post(`${API_BASE}/exams/marks/bulk`, { examId: selectedExam.id, marks }, {
-           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
+        await examAPI.bulkEnterMarks({ examId: selectedExam.id, marks });
         toast.success('Marks saved as Draft'); setEntryStudents([]); setActiveTab('verification'); fetchPendingVerifications();
      } catch (error) { toast.error('Failed to save marks'); } finally { setLoading(false); }
   };
@@ -210,9 +183,7 @@ export default function ExamEnhanced() {
     if (!selectedExam) { toast.error('Please select an exam'); return; }
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_BASE}/exams-enhanced/compartment/eligible/${selectedExam.id}/${selectedExam.classId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      const { data } = await api.get(`/exams-enhanced/compartment/eligible/${selectedExam.id}/${selectedExam.classId}`);
       setVerificationData(prev => ({ ...prev, compartmentStudents: data.data || [] }));
       toast.success(`${data.data.length} students identified for compartment`);
     } catch (error) { toast.error('Failed to identify students'); } finally { setLoading(false); }

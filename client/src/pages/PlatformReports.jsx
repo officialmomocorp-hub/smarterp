@@ -13,6 +13,22 @@ export default function PlatformReports() {
 
   const [downloading, setDownloading] = React.useState(null);
 
+  const jsonToCSV = (json, title) => {
+    if (!json || json.length === 0) return '';
+    const items = Array.isArray(json) ? json : [json];
+    const replacer = (key, value) => (value === null ? '' : value);
+    const header = Object.keys(items[0]);
+    const csv = [
+      header.join(','),
+      ...items.map((row) =>
+        header
+          .map((fieldName) => JSON.stringify(row[fieldName], replacer))
+          .join(',')
+      ),
+    ].join('\r\n');
+    return csv;
+  };
+
   const handleDownload = async (title) => {
     setDownloading(title);
     try {
@@ -20,13 +36,14 @@ export default function PlatformReports() {
                       title.includes('Revenue') ? '/platform/reports/revenue' :
                       title.includes('Usage') ? '/platform/reports/usage' : '/platform/reports/school-list';
       const { data } = await api.get(endpoint);
-      const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
+      const csvData = jsonToCSV(data.data, title);
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.json`;
+      a.download = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.csv`;
       a.click();
-      toast.success(`${title} downloaded successfully! 📊`);
+      toast.success(`${title} downloaded as Excel (CSV)! 📊`);
     } catch (err) {
       toast.error(`Failed to download ${title}`);
     } finally {

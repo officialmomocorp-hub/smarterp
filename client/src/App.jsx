@@ -9,6 +9,7 @@ import Students from './pages/Students';
 import FeeManagement from './pages/FeeManagement';
 import Attendance from './pages/Attendance';
 import Examinations from './pages/Examinations';
+import ExaminationsEnhanced from './pages/ExaminationsEnhanced';
 import ExamEnhanced from './pages/ExamEnhanced';
 import Staff from './pages/Staff';
 import Notices from './pages/Notices';
@@ -37,6 +38,7 @@ export default function App() {
     <BrowserRouter>
       <Toaster position="top-right" />
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/manage-schools" element={<ProtectedRoute><ManageSchools /></ProtectedRoute>} />
@@ -57,7 +59,6 @@ export default function App() {
         <Route path="/academic" element={<ProtectedRoute><Academics /></ProtectedRoute>} />
         <Route path="/billing" element={<ProtectedRoute><Subscriptions /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

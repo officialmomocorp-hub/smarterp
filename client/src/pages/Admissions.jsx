@@ -211,6 +211,22 @@ export default function Admissions() {
                           <button onClick={() => handleStatusChange(adm.id, 'REJECTED')} className="p-1.5 rounded-lg hover:bg-red-50 text-red-600" title="Reject"><XCircle className="w-4 h-4" /></button>
                         </>
                       )}
+                      {adm.status === 'APPROVED' && (
+                        <button 
+                          onClick={async () => {
+                            try {
+                              await admissionAPI.convertToStudent(adm.id);
+                              toast.success('Successfully converted to student!');
+                              fetchAdmissions();
+                            } catch (e) {
+                              toast.error(e.response?.data?.message || 'Conversion failed');
+                            }
+                          }} 
+                          className="btn btn-secondary text-xs py-1"
+                        >
+                          Enroll Now
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

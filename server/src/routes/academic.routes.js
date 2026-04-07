@@ -38,6 +38,16 @@ router.post('/sections', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, nex
   } catch (error) { next(error); }
 });
 
+router.get('/subjects', async (req, res, next) => {
+  try {
+    const subjects = await prisma.subject.findMany({
+      where: { class: { schoolId: req.schoolId } },
+      include: { class: true },
+    });
+    res.json({ success: true, data: subjects });
+  } catch (error) { next(error); }
+});
+
 router.post('/subjects', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, res, next) => {
   try {
     const { description, ...subjectData } = req.body;

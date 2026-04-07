@@ -216,13 +216,15 @@ class FeeService {
     }
 
     if (!student) {
-      // Try by aadhar or partial match
+      // Try by aadhar or name or partial match
       student = await prisma.student.findFirst({
         where: {
           schoolId,
           OR: [
-            { studentId: { contains: studentIdOrCode } },
-            { profile: { aadharNumber: studentIdOrCode } },
+            { studentId: { contains: studentIdOrCode, mode: 'insensitive' } },
+            { profile: { aadharNumber: { contains: studentIdOrCode } } },
+            { profile: { firstName: { contains: studentIdOrCode, mode: 'insensitive' } } },
+            { profile: { lastName: { contains: studentIdOrCode, mode: 'insensitive' } } },
           ],
         },
         include: { profile: true, class: true, section: true },

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { attendanceAPI, studentAPI } from '../services/api';
+import { attendanceAPI, studentAPI, academicAPI } from '../services/api';
+import api from '../services/api';
 import { Calendar, UserCheck, UserX, Clock, AlertTriangle, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -14,7 +15,17 @@ export default function Attendance() {
   const [sectionId, setSectionId] = useState('');
   const [fetched, setFetched] = useState(false);
 
-  const CLASSES = ['Nursery', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'];
+  const [classes, setClasses] = useState([]);
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const { data } = await api.get('/academic/classes');
+        setClasses(data.data || []);
+      } catch (err) { console.error('Failed to load classes'); }
+    };
+    fetchClasses();
+  }, []);
 
   // Fetch students from DB when class/section selected
   const fetchStudents = async () => {
@@ -27,7 +38,7 @@ export default function Attendance() {
       setFetched(true);
       // Reset attendance records
       const init = {};
-      list.forEach(s => { init[s.id] = 'PRESENT'; });
+      list.forEach(s => { init[s.id] = { status: 'PRESENT', remark: '' }; });
       setAttendanceRecords(init);
     } catch (err) {
       console.error('Failed to fetch students', err);
@@ -49,9 +60,10 @@ export default function Attendance() {
 
     setSaving(true);
     try {
-      const attendanceData = records.map(([studentId, status]) => ({
+      const attendanceData = records.map(([studentId, data]) => ({
         studentId,
-        status,
+        status: data.status,
+        remark: data.remark || '',
       }));
 
       await attendanceAPI.mark({
@@ -71,7 +83,7 @@ export default function Attendance() {
   const handleSelectAll = (status) => {
     const newRecords = {};
     students.forEach(s => {
-      newRecords[s.id] = status;
+      newRecords[s.id] = { ...attendanceRecords[s.id], status };
     });
     setAttendanceRecords(newRecords);
   };
@@ -126,7 +138,7 @@ export default function Attendance() {
                 <label className="label">Class</label>
                 <select className="input" value={classId} onChange={(e) => setClassId(e.target.value)}>
                   <option value="">Select Class</option>
-                  {CLASSES.map(c => <option key={c} value={c}>{c}</option>)}
+                  {classes.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                 </select>
               </div>
               <div>
@@ -188,9 +200,9 @@ export default function Attendance() {
                           <td className="px-4 py-3">
                             <div className="flex justify-center gap-2">
                               <button
-                                onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: 'PRESENT' })}
+                                onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: { ...attendanceRecords[student.id], status: 'PRESENT' } })}
                                 className={`p-2 rounded-lg transition-colors ${
-                                  attendanceRecords[student.id] === 'PRESENT'
+                                  attendanceRecords[student.id]?.status === 'PRESENT'
                                     ? 'bg-green-100 text-green-700 ring-2 ring-green-500'
                                     : 'bg-gray-100 text-gray-400 hover:bg-green-50'
                                 }`}
@@ -198,9 +210,9 @@ export default function Attendance() {
                                 <UserCheck className="w-5 h-5" />
                               </button>
                               <button
-                                onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: 'ABSENT' })}
+                                onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: { ...attendanceRecords[student.id], status: 'ABSENT' } })}
                                 className={`p-2 rounded-lg transition-colors ${
-                                  attendanceRecords[student.id] === 'ABSENT'
+                                  attendanceRecords[student.id]?.status === 'ABSENT'
                                     ? 'bg-red-100 text-red-700 ring-2 ring-red-500'
                                     : 'bg-gray-100 text-gray-400 hover:bg-red-50'
                                 }`}
@@ -208,9 +220,9 @@ export default function Attendance() {
                                 <UserX className="w-5 h-5" />
                               </button>
                               <button
-                                onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: 'LATE' })}
+                                onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: { ...attendanceRecords[student.id], status: 'LATE' } })}
                                 className={`p-2 rounded-lg transition-colors ${
-                                  attendanceRecords[student.id] === 'LATE'
+                                  attendanceRecords[student.id]?.status === 'LATE'
                                     ? 'bg-amber-100 text-amber-700 ring-2 ring-amber-500'
                                     : 'bg-gray-100 text-gray-400 hover:bg-amber-50'
                                 }`}
@@ -220,7 +232,12 @@ export default function Attendance() {
                             </div>
                           </td>
                           <td className="px-4 py-3">
-                            <input className="input text-sm" placeholder="Optional" />
+                            <input 
+                              className="input text-sm" 
+                              placeholder="Optional" 
+                              value={attendanceRecords[student.id]?.remark || ''}
+                              onChange={(e) => setAttendanceRecords({ ...attendanceRecords, [student.id]: { ...attendanceRecords[student.id], remark: e.target.value } })}
+                            />
                           </td>
                         </tr>
                       ))}

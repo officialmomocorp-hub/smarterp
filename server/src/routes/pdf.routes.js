@@ -165,9 +165,22 @@ router.get('/tc/demo', async (req, res, next) => {
 // FEATURE 7: SALARY SLIP PDF
 // ==========================================
 
-router.get('/salary/:salaryId', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, res, next) => {
+router.get('/salary/:id', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, res, next) => {
   try {
-    await pdfService.generateSalarySlip(req.params.salaryId, req.schoolId, res);
+    // Check if :id is a salary record ID or a staff ID
+    let salary = await prisma.salary.findUnique({ where: { id: req.params.id } });
+    
+    if (!salary) {
+      // Try treating as staffId and get latest
+      salary = await prisma.salary.findFirst({
+        where: { staffId: req.params.id, schoolId: req.schoolId },
+        orderBy: { createdAt: 'desc' }
+      });
+    }
+
+    if (!salary) throw new AppError('Salary record not found', 404);
+
+    await pdfService.generateSalarySlip(salary.id, req.schoolId, res);
   } catch (error) { next(error); }
 });
 

@@ -75,7 +75,13 @@ router.get('/', async (req, res, next) => {
     if (status) where.status = status;
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const [staff, total] = await Promise.all([
-      prisma.staff.findMany({ where, skip, take: parseInt(limit), include: { user: true }, orderBy: { dateOfJoining: 'desc' } }),
+      prisma.staff.findMany({
+        where,
+        skip,
+        take: parseInt(limit),
+        include: { user: { include: { profile: true } } },
+        orderBy: { dateOfJoining: 'desc' }
+      }),
       prisma.staff.count({ where }),
     ]);
     res.json({ success: true, data: { staff, pagination: { page: parseInt(page), limit: parseInt(limit), total, pages: Math.ceil(total / parseInt(limit)) } } });

@@ -201,7 +201,7 @@ export default function Timetable() {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Teacher Workload Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {staff.slice(0, 8).map(teacher => {
-            const teacherName = `${teacher.profile.firstName} ${teacher.profile.lastName}`;
+            const teacherName = `${teacher.user?.profile?.firstName || 'Staff'} ${teacher.user?.profile?.lastName || ''}`;
             const count = Object.values(timetable).flat().filter(e => e.teacherId === teacher.id).length;
             return (
               <div key={teacher.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -233,20 +233,20 @@ export default function Timetable() {
                 <Calendar className="w-4 h-4" />
                 <span>{DAYS[selectedSlot?.dayIndex]}</span>
                 <Clock className="w-4 h-4 ml-2" />
-                <span>Period {selectedSlot?.periodIndex + 1} ({PERIODS[selectedSlot?.periodIndex]?.time})</span>
+                <span>Period {selectedSlot?.periodIndex + 1} ({periods[selectedSlot?.periodIndex]?.time})</span>
               </div>
               <div>
                 <label className="label">Subject</label>
-                <select className="input" value={newEntry.subject} onChange={(e) => setNewEntry({...newEntry, subject: e.target.value})}>
+                <select className="input" value={newEntry.subjectId} onChange={(e) => setNewEntry({...newEntry, subjectId: e.target.value})}>
                   <option value="">Select Subject</option>
                   {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="label">Teacher</label>
-                <select className="input" value={newEntry.teacher} onChange={(e) => setNewEntry({...newEntry, teacher: e.target.value})}>
+                <select className="input" value={newEntry.teacherId} onChange={(e) => setNewEntry({...newEntry, teacherId: e.target.value})}>
                   <option value="">Select Teacher</option>
-                  {staff.map(t => <option key={t.id} value={t.id}>{t.profile.firstName} {t.profile.lastName}</option>)}
+                  {staff.map(t => <option key={t.id} value={t.id}>{t.user?.profile?.firstName || 'Staff'} {t.user?.profile?.lastName || ''}</option>)}
                 </select>
               </div>
               <div className="flex gap-3 pt-4">

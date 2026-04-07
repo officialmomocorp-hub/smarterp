@@ -297,8 +297,13 @@ export default function Layout({ children }) {
       >
         <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-40">
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">
-              {filteredMenu.find(item => location.pathname === item.path)?.title || 'Smarterp'}
+             {impersonateId && (
+               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-600 animate-gradient-x" />
+             )}
+            <h1 className="text-lg font-black text-gray-900 tracking-tight flex items-center gap-2">
+              {impersonateId && <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />}
+              {filteredMenu.find(item => location.pathname === item.path)?.title || 'SmartERP'}
+              {impersonateId && <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold uppercase">Impersonating {schools.find(s=>s.id===impersonateId)?.name}</span>}
             </h1>
           </div>
           <div className="flex items-center gap-4">

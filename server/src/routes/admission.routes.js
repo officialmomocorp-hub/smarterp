@@ -73,16 +73,12 @@ router.put('/:id/status', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, ne
   } catch (error) { next(error); }
 });
 
+const studentService = require('../services/student.service');
+
 router.post('/:id/convert-to-student', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
-    const admission = await prisma.admission.findUnique({ where: { id: req.params.id } });
-    if (!admission || admission.status !== 'APPROVED') {
-      throw new AppError('Admission must be approved before conversion', 400);
-    }
-    if (admission.studentId) {
-      throw new AppError('Already converted to student', 400);
-    }
-    res.json({ success: true, message: 'Use student creation API with admission reference' });
+    const student = await studentService.convertFromAdmission(req.params.id, req.schoolId);
+    res.json({ success: true, data: student, message: 'Converted to student successfully' });
   } catch (error) { next(error); }
 });
 

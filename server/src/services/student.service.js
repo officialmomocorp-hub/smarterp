@@ -317,6 +317,58 @@ class StudentService {
     return defaulters;
   }
 
+  async convertFromAdmission(admissionId, schoolId) {
+    const admission = await prisma.admission.findFirst({
+      where: { id: admissionId, schoolId, status: 'APPROVED' },
+    });
+
+    if (!admission) {
+      throw new AppError('Approved admission not found', 404);
+    }
+
+    const data = {
+      profile: {
+        firstName: admission.applicantName.split(' ')[0],
+        lastName: admission.applicantName.split(' ').slice(1).join(' ') || 'Student',
+        dateOfBirth: admission.dateOfBirth,
+        gender: admission.gender,
+        casteCategory: admission.casteCategory,
+        religion: admission.religion,
+        motherTongue: admission.motherTongue,
+        aadharNumber: admission.aadharNumber || 'N/A',
+      },
+      parentData: {
+        fatherName: admission.fatherName,
+        fatherOccupation: admission.fatherOccupation,
+        fatherPhone: admission.fatherPhone,
+        motherName: admission.motherName,
+        motherOccupation: admission.motherOccupation,
+        motherPhone: admission.motherPhone,
+        annualIncome: admission.annualIncome,
+      },
+      class: admission.classApplied,
+      section: admission.sectionPreferred || 'A',
+      address: admission.address,
+      city: admission.city,
+      state: admission.state,
+      pincode: admission.pincode,
+      dateOfAdmission: new Date(),
+    };
+
+    const student = await this.create(data, schoolId);
+
+    // Update admission record
+    await prisma.admission.update({
+      where: { id: admissionId },
+      data: { 
+        status: 'CONVERTED', 
+        studentId: student.id 
+      }
+    });
+
+    return student;
+  }
+
   generateStudentId(schoolCode, className, section, rollNumber) {
     const year = new Date().getFullYear().toString().slice(-2);
     const classCode = className.replace('Class ', '').replace('Nursery', 'N').replace('LKG', 'LK').replace('UKG', 'UK');

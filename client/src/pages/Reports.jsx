@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, Printer, Users, AlertTriangle, TrendingDown, Send, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { FileText, Download, Printer, Users, AlertTriangle, TrendingDown, Send, Calendar, CheckCircle, XCircle, Clock, TrendingUp } from 'lucide-react';
+import { Line, Pie, Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement } from 'chart.js';
 import api, { API_BASE } from '../services/api';
 import toast from 'react-hot-toast';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement);
 
 function formatINR(amount) {
   return `₹${parseFloat(amount).toLocaleString('en-IN')}`;
 }
 
 export default function Reports() {
-  const [activeTab, setActiveTab] = useState('udise');
+  const [activeTab, setActiveTab] = useState('analytics');
   const [loading, setLoading] = useState(false);
   const [below75Students, setBelow75Students] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
@@ -99,7 +103,83 @@ export default function Reports() {
         ))}
       </div>
 
-      {/* UDISE+ Export Tab */}
+      {/* Analytics Tab */}
+      {activeTab === 'analytics' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="card bg-gradient-to-br from-blue-600 to-indigo-700 text-white border-none shadow-xl shadow-blue-500/20">
+               <div className="flex justify-between items-start mb-4">
+                  <div className="p-2 bg-white/10 rounded-lg"><TrendingUp className="w-6 h-6 text-white" /></div>
+                  <span className="text-xs font-bold bg-white/20 px-2 py-1 rounded">+12% vs last month</span>
+               </div>
+               <p className="text-blue-100 text-sm font-medium">Monthly Gross Revenue</p>
+               <p className="text-3xl font-black mt-1">₹8,45,200</p>
+            </div>
+            <div className="card bg-white border-slate-100 shadow-sm">
+               <div className="flex justify-between items-start mb-4">
+                  <div className="p-2 bg-green-50 rounded-lg"><Users className="w-6 h-6 text-green-600" /></div>
+                  <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">Target 95%</span>
+               </div>
+               <p className="text-slate-500 text-sm font-medium">Admission Conversion Rate</p>
+               <p className="text-3xl font-black text-slate-900 mt-1">87.4%</p>
+            </div>
+            <div className="card bg-white border-slate-100 shadow-sm">
+               <div className="flex justify-between items-start mb-4">
+                  <div className="p-2 bg-amber-50 rounded-lg"><Clock className="w-6 h-6 text-amber-600" /></div>
+                  <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">24 Students</span>
+               </div>
+               <p className="text-slate-500 text-sm font-medium">Pending Fee Defaulters</p>
+               <p className="text-3xl font-black text-slate-900 mt-1">₹1,12,000</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="card">
+               <h3 className="text-lg font-bold text-slate-900 mb-6">Fee Collection Trend (Annual)</h3>
+               <div className="h-[300px]">
+                 <Line 
+                    data={{
+                      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                      datasets: [{
+                        label: 'Revenue (₹)',
+                        data: [420000, 380000, 650000, 920000, 845200, 410000, 390000],
+                        borderColor: '#2563EB',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#2563EB'
+                      }]
+                    }}
+                    options={{
+                       maintainAspectRatio: false,
+                       plugins: { legend: { display: false } },
+                       scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5] } }, x: { grid: { display: false } } }
+                    }}
+                 />
+               </div>
+            </div>
+
+            <div className="card">
+               <h3 className="text-lg font-bold text-slate-900 mb-6">Fee Status Distribution</h3>
+               <div className="h-[300px] flex items-center justify-center">
+                 <Pie 
+                    data={{
+                      labels: ['Fully Paid', 'Partially Paid', 'Not Paid', 'Concessions'],
+                      datasets: [{
+                        data: [540, 120, 24, 35],
+                        backgroundColor: ['#10B981', '#F59E0B', '#EF4444', '#6366F1'],
+                        hoverOffset: 10
+                      }]
+                    }}
+                    options={{ maintainAspectRatio: false }}
+                 />
+               </div>
+            </div>
+          </div>
+        </div>
+      )}
       {activeTab === 'udise' && (
         <div className="space-y-6">
           <div className="card">

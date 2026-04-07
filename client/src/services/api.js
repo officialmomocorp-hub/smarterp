@@ -55,6 +55,7 @@ export const admissionAPI = {
   getById: (id) => api.get(`/admissions/${id}`),
   create: (data) => api.post('/admissions', data),
   updateStatus: (id, data) => api.put(`/admissions/${id}/status`, data),
+  convertToStudent: (id) => api.post(`/admissions/${id}/convert-to-student`),
 };
 
 export const feeAPI = {
