@@ -31,7 +31,7 @@ class StudentController {
 
   async update(req, res, next) {
     try {
-      const student = await studentService.update(req.params.id, req.schoolId, req.body);
+      const student = await studentService.update(req.params.id, req.schoolId, req.body, req);
       res.json({ success: true, data: student });
     } catch (error) {
       next(error);
@@ -40,7 +40,7 @@ class StudentController {
 
   async delete(req, res, next) {
     try {
-      const result = await studentService.delete(req.params.id, req.schoolId);
+      const result = await studentService.delete(req.params.id, req.schoolId, req);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);

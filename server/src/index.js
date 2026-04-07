@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
+const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
@@ -10,6 +11,7 @@ const swaggerSpec = require('./config/swagger');
 const { errorHandler } = require('./middleware/errorHandler');
 const { logger } = require('./utils/logger');
 const { AppError } = require('./utils/appError');
+const healthRoutes = require('./routes/health.routes');
 
 dotenv.config();
 
@@ -17,6 +19,19 @@ const app = express();
 
 // Global performance
 app.use(compression());
+app.use(cookieParser());
+
+// Request Profiler for Observability
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    if (duration > 300) {
+      logger.info(`Slow Request: ${req.method} ${req.originalUrl} [${res.statusCode}] - ${duration}ms`);
+    }
+  });
+  next();
+});
 
 // Security middleware
 app.use(helmet({
@@ -42,7 +57,6 @@ app.use(cors({
     'http://localhost:5173', 
     'http://localhost:3000',
     'https://smarterpsolution.duckdns.org',
-    'http://103.179.97.107'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
@@ -69,9 +83,8 @@ app.use(express.static(path.join(__dirname, '../../client/dist')));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
+app.use('/api/v1/health', healthRoutes);
+app.get('/health', (req, res) => res.json({ status: 'OK', uptime: process.uptime() }));
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

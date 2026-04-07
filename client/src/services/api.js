@@ -4,16 +4,13 @@ import { useAuthStore } from '../store';
 const api = axios.create({
   baseURL: '/api/v1',
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
   const state = useAuthStore.getState();
-  const token = state.token;
   const impersonateId = state.impersonateId;
   
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
   if (impersonateId) {
     config.headers['X-School-Id'] = impersonateId;
   }

@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate, authorize, schoolScoped } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
+const examValidation = require('../validations/exam.validation');
 const examService = require('../services/exam.service');
 const prisma = require('../config/database');
 const { AppError } = require('../utils/appError');
 
 router.use(authenticate, schoolScoped);
 
-router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), validate(examValidation.createExam), async (req, res, next) => {
   try {
     const exam = await examService.createExam(req.body, req.schoolId);
     res.status(201).json({ success: true, data: exam });
@@ -26,14 +28,14 @@ router.get('/', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.post('/marks', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), async (req, res, next) => {
+router.post('/marks', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), validate(examValidation.enterMarks), async (req, res, next) => {
   try {
     const mark = await examService.enterMarks(req.body, req.userId, req.schoolId);
     res.status(201).json({ success: true, data: mark });
   } catch (error) { next(error); }
 });
 
-router.post('/marks/bulk', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), async (req, res, next) => {
+router.post('/marks/bulk', authorize('TEACHER', 'ADMIN', 'SUPER_ADMIN'), validate(examValidation.bulkEnterMarks), async (req, res, next) => {
   try {
     const marks = await examService.bulkEnterMarks(req.body, req.userId, req.schoolId);
     res.status(201).json({ success: true, data: marks });

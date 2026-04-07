@@ -1,0 +1,27 @@
+FAIL server/tests/isolation/exam-integration.test.js
+  Exam API Integration Tests
+    √ Fetching exams for the school should return a successful response (10 ms)
+    × Creating an exam without a required name should fail (400) - Checking Joi Validation (16 ms)
+
+  ● Exam API Integration Tests › Creating an exam without a required name should fail (400) - Checking Joi Validation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 400
+    Received: 500
+
+    [0m [90m 34 |[39m     })[33m;[39m
+     [90m 35 |[39m
+    [31m[1m>[22m[39m[90m 36 |[39m     expect(response[33m.[39mstatus)[33m.[39mtoBe([35m400[39m)[33m;[39m [90m// Expecting Bad Request due to validation[39m
+     [90m    |[39m                             [31m[1m^[22m[39m
+     [90m 37 |[39m   })[33m;[39m
+     [90m 38 |[39m })[33m;[39m
+     [90m 39 |[39m[0m
+
+      at Object.toBe (smarterp/server/tests/isolation/exam-integration.test.js:36:29)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 1 passed, 2 total
+Snapshots:   0 total
+Time:        1.671 s
+Ran all test suites matching  server/tests/isolation/staff-integration.test.js|server/tests/isolation/exam-integration.test.js.

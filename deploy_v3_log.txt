@@ -3,21 +3,17 @@ Connected!
 
 >>> cd /var/www/smarterp && git fetch origin && git reset --hard origin/main 2>&1
 OUT:
-HEAD is now at 3aac8f5 feat: implement Joi validation, harden CSP, and add AuditLog system
+HEAD is now at ed62ace fix: resolve duplicate AuditLog model and consolidate fields
 
 ERR:
 From https://github.com/officialmomocorp-hub/smarterp
-   efea0ac..3aac8f5  main       -> origin/main
+   3aac8f5..ed62ace  main       -> origin/main
 
 
 >>> cd /var/www/smarterp/server && npm install --no-color 2>&1
 OUT:
-npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
-added 257 packages, and audited 719 packages in 2s
+up to date, audited 719 packages in 815ms
 
 137 packages are looking for funding
   run `npm fund` for details
@@ -34,19 +30,13 @@ Run `npm audit` for details.
 OUT:
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
-Error: Prisma schema validation - (get-dmmf wasm)
-Error code: P1012
-[1;91merror[0m: [1mThe model "AuditLog" cannot be defined because a model with that name already exists.[0m
-  [1;94m-->[0m  [4mprisma/schema.prisma:1530[0m
-[1;94m   | [0m
-[1;94m1529 | [0m
-[1;94m1530 | [0mmodel [1;91mAuditLog[0m {
-[1;94m   | [0m
 
-Validation Error Count: 1
-[Context: getDmmf]
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 408ms
 
-Prisma CLI Version : 5.22.0
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
+
 
 
 >>> cd /var/www/smarterp/server && npx prisma db push --accept-data-loss 2>&1
@@ -54,15 +44,12 @@ OUT:
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 Datasource "db": PostgreSQL database "smarterp", schema "public" at "localhost:5432"
-Error: P1012
 
-error: The model "AuditLog" cannot be defined because a model with that name already exists.
-  -->  prisma/schema.prisma:1530
-   | 
-1529 | 
-1530 | model AuditLog {
-   | 
+🚀  Your database is now in sync with your Prisma schema. Done in 131ms
 
+Running generate... (Use --skip-generate to skip the generators)
+[2K[1A[2K[GRunning generate... - Prisma Client
+[2K[1A[2K[G✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 411ms
 
 
 
@@ -75,7 +62,7 @@ Use --update-env to update environment variables
 │ id │ name                │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
 ├────┼─────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
 │ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 230427   │ 38h    │ 8    │ online    │ 0%       │ 60.4mb   │ root     │ disabled │
-│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 306415   │ 0s     │ 39   │ online    │ 0%       │ 16.8mb   │ root     │ disabled │
+│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 306673   │ 0s     │ 40   │ online    │ 0%       │ 14.0mb   │ root     │ disabled │
 └────┴─────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
 
 

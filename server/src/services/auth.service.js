@@ -191,7 +191,8 @@ class AuthService {
     });
 
     if (!user) {
-      throw new AppError('User not found', 404);
+      // Security: Do not reveal if user exists. Return generic success message.
+      return { message: 'If an account exists with this email/phone, a reset link will be sent.' };
     }
 
     const resetToken = jwt.sign(
@@ -200,7 +201,8 @@ class AuthService {
       { expiresIn: '1h' }
     );
 
-    return { resetToken, message: 'Reset token generated' };
+    // In a real app, send the email here. For now, we return the token (standard demo behavior).
+    return { resetToken, message: 'If an account exists with this email/phone, a reset link will be sent.' };
   }
 
   async resetPassword(resetToken, newPassword) {
@@ -229,6 +231,21 @@ class AuthService {
     ]);
 
     return { message: 'Password reset successfully' };
+  }
+
+  async logout(token, userId) {
+    const decoded = jwt.decode(token);
+    const expiry = new Date(decoded.exp * 1000);
+
+    await prisma.tokenBlacklist.create({
+      data: {
+        token,
+        userId,
+        expiry,
+      },
+    });
+
+    return { message: 'Logged out successfully' };
   }
 
   generateToken(user) {

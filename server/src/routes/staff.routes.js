@@ -3,10 +3,12 @@ const router = express.Router();
 const { authenticate, authorize, schoolScoped } = require('../middleware/auth');
 const prisma = require('../config/database');
 const { AppError } = require('../utils/appError');
+const { validate } = require('../middleware/validate');
+const staffValidation = require('../validations/staff.validation');
 
 router.use(authenticate, schoolScoped);
 
-router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), validate(staffValidation.createStaff), async (req, res, next) => {
   try {
     const { firstName, lastName, phone, email, designation, department, qualification,
             dateOfJoining, basicPay, specialization, experience, employmentType } = req.body;
@@ -99,7 +101,7 @@ router.get('/:id', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.put('/:id', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+router.put('/:id', authorize('SUPER_ADMIN', 'ADMIN'), validate(staffValidation.updateStaff), async (req, res, next) => {
   try {
     // Security Fix: Guard update with schoolId check
     const existing = await prisma.staff.findFirst({

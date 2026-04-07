@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate, authorize, schoolScoped } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
+const academicValidation = require('../validations/academic.validation');
 const prisma = require('../config/database');
 
 router.use(authenticate, schoolScoped);
@@ -17,14 +19,14 @@ router.get('/classes', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.post('/classes', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+router.post('/classes', authorize('SUPER_ADMIN', 'ADMIN'), validate(academicValidation.createClass), async (req, res, next) => {
   try {
     const cls = await prisma.class.create({ data: { schoolId: req.schoolId, ...req.body } });
     res.status(201).json({ success: true, data: cls });
   } catch (error) { next(error); }
 });
 
-router.post('/sections', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+router.post('/sections', authorize('SUPER_ADMIN', 'ADMIN'), validate(academicValidation.createSection), async (req, res, next) => {
   try {
     const { classId, name } = req.body;
     const targetClass = await prisma.class.findFirst({
@@ -54,7 +56,7 @@ router.get('/subjects', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.post('/subjects', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, res, next) => {
+router.post('/subjects', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), validate(academicValidation.createSubject), async (req, res, next) => {
   try {
     const { description, classId, ...subjectData } = req.body;
     const targetClass = await prisma.class.findFirst({
@@ -78,7 +80,7 @@ router.get('/academic-years', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.post('/academic-years', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+router.post('/academic-years', authorize('SUPER_ADMIN', 'ADMIN'), validate(academicValidation.createAcademicYear), async (req, res, next) => {
   try {
     const year = await prisma.academicYear.create({
       data: {
@@ -92,7 +94,7 @@ router.post('/academic-years', authorize('SUPER_ADMIN', 'ADMIN'), async (req, re
   } catch (error) { next(error); }
 });
 
-router.post('/homework', authorize('TEACHER', 'ADMIN'), async (req, res, next) => {
+router.post('/homework', authorize('TEACHER', 'ADMIN'), validate(academicValidation.createHomework), async (req, res, next) => {
   try {
     const homework = await prisma.homework.create({
       data: {

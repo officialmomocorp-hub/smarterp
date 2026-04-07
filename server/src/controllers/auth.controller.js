@@ -5,6 +5,15 @@ class AuthController {
   async register(req, res, next) {
     try {
       const result = await authService.register(req.body);
+
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      };
+
+      res.cookie('token', result.token, cookieOptions);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -20,6 +29,15 @@ class AuthController {
       }
 
       const result = await authService.login(emailOrPhone, password);
+
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      };
+
+      res.cookie('token', result.token, cookieOptions);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -74,6 +92,25 @@ class AuthController {
     try {
       const user = await authService.sanitizeUser(req.user);
       res.json({ success: true, data: user });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async logout(req, res, next) {
+    try {
+      const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
+      if (!token) throw new AppError('Token not provided', 400);
+
+      const result = await authService.logout(token, req.userId);
+
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict'
+      };
+
+      res.clearCookie('token', cookieOptions);
+      res.json({ success: true, ...result });
     } catch (error) {
       next(error);
     }

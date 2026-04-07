@@ -5,13 +5,14 @@ export const useAuthStore = create(
   persist(
     (set) => ({
       user: null,
-      token: null,
       isAuthenticated: false,
       impersonateId: null,
 
-      setAuth: (user, token) => set({ user, token, isAuthenticated: true }),
+      setAuth: (user) => set({ user, isAuthenticated: !!user }),
       setImpersonateId: (id) => set({ impersonateId: id }),
-      logout: () => set({ user: null, token: null, isAuthenticated: false, impersonateId: null }),
+      logout: () => {
+        set({ user: null, isAuthenticated: false, impersonateId: null });
+      },
     }),
     { name: 'smarterp-auth' }
   )

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize } = require('../middleware/auth');
 
 /**
  * @swagger
@@ -20,7 +20,7 @@ const { authenticate } = require('../middleware/auth');
  *               email: { type: string }
  *               phone: { type: string }
  *               password: { type: string }
- *               role: { type: string, enum: [SUPER_ADMIN, ADMIN, TEACHER, STUDENT, PARENT] }
+ *               role: { type: string, enum: [ADMIN, TEACHER, STUDENT, PARENT] }
  *               schoolId: { type: string }
  *     responses:
  *       201:
@@ -29,7 +29,7 @@ const { authenticate } = require('../middleware/auth');
 const { loginLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
 const { validatePasswordReset, validateResults } = require('../middleware/passwordValidator');
 
-router.post('/register', authController.register);
+router.post('/register', authenticate, authorize('SUPER_ADMIN'), authController.register);
 
 /**
  * @swagger
@@ -67,5 +67,6 @@ router.post('/reset-password',
   authController.resetPassword
 );
 router.get('/profile', authenticate, authController.getProfile);
+router.post('/logout', authenticate, authController.logout);
 
 module.exports = router;

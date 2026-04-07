@@ -251,7 +251,7 @@ class StudentService {
     return student;
   }
 
-  async update(id, schoolId, data) {
+  async update(id, schoolId, data, req = null) {
     const student = await prisma.student.findFirst({
       where: { id, schoolId },
     });
@@ -312,13 +312,14 @@ class StudentService {
         resourceId: id,
         oldValue: { status: student.status },
         newValue: fullUpdatedStudent,
+        req,
       });
 
       return fullUpdatedStudent;
     });
   }
 
-  async delete(id, schoolId) {
+  async delete(id, schoolId, req = null) {
     const student = await prisma.student.findFirst({
       where: { id, schoolId },
     });
@@ -339,7 +340,8 @@ class StudentService {
       action: Actions.DELETE,
       resource: Resources.STUDENT,
       resourceId: id,
-      newValue: { status: 'DROPPED_OUT' }
+      newValue: { status: 'DROPPED_OUT' },
+      req,
     });
 
     return { message: 'Student deleted successfully' };

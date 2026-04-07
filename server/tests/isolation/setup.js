@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const BASE_URL = 'https://smarterpsolution.duckdns.org/api/v1';
+const BASE_URL = 'http://localhost:5000/api/v1';
 
 const getClient = (token = null) => {
   const config = {
