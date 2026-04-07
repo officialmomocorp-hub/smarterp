@@ -135,6 +135,9 @@ export default function Students() {
       fetchStudents();
     } catch (error) {
       toast.error('Failed to issue TC');
+    }
+  };
+
   const handleImport = async (e) => {
     e.preventDefault();
     const file = e.target.file.files[0];
