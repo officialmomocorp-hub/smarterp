@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /manage-schools
+Disallow: /api/
+
+Sitemap: https://smarterpsolution.duckdns.org/sitemap.xml
