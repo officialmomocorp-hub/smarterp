@@ -94,6 +94,75 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Solutions Section */}
+      <section id="solutions" className="py-32 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center gap-16">
+            <div className="flex-1">
+              <h2 className="text-4xl font-black text-slate-900 mb-6">Expert Solutions for Your Specific Needs</h2>
+              <div className="space-y-6">
+                {[
+                  { title: 'Admission Ecosystem', desc: 'Manage inquiries, registrations, and entrance tests in a unified digital portal.' },
+                  { title: 'Fee Automation', desc: 'Custom fee structures for different categories with automated late fine logic.' },
+                  { title: 'Result Management', desc: 'Generate CBSE/ISCE compliant report cards with internal & external assessment split.' }
+                ].map((s, i) => (
+                  <div key={i} className="flex gap-4 p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
+                    <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
+                    <div>
+                      <h4 className="font-bold text-slate-900">{s.title}</h4>
+                      <p className="text-slate-500 text-sm">{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex-1 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-[40px] p-12 text-white shadow-2xl relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+               <div className="relative z-10">
+                  <h3 className="text-3xl font-bold mb-6">Why Choose SmartERP?</h3>
+                  <ul className="space-y-4 text-blue-50">
+                    <li>✓ 256-bit SSL Data Encryption</li>
+                    <li>✓ Zero Data Downtime Policy</li>
+                    <li>✓ Daily Automated Backups</li>
+                    <li>✓ Multi-Campus Support Ready</li>
+                  </ul>
+                  <button className="mt-10 bg-white text-blue-600 px-8 py-3 rounded-full font-bold hover:bg-blue-50 transition-colors">Learn More</button>
+               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-black text-slate-900 mb-4">Transparent Pricing</h2>
+          <p className="text-slate-500 mb-16">Choose the plan that best fits your institution's scale.</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
+            {[
+              { title: 'Starter', price: '₹15,000', per: '/school/year', features: ['Up to 500 Students', 'Basic Academic Management', 'Essential Fee Tracking', 'Standard Support'] },
+              { title: 'Professional', price: '₹45,000', per: '/school/year', features: ['Unlimited Students', 'Advanced Analytics Hub', 'Custom Report Designer', 'Priority 24/7 Support'], highlight: true },
+              { title: 'Enterprise', price: 'Custom', per: '', features: ['Multiple Campus Sync', 'On-Premise Deployment Ops', 'Dedicated Account Manager', 'Custom API Integration'] }
+            ].map((p, i) => (
+              <div key={i} className={`p-10 rounded-[32px] border-2 transition-all hover:scale-105 ${p.highlight ? 'bg-slate-900 text-white border-slate-900 shadow-2xl skew-y-1' : 'bg-white border-slate-100 hover:border-blue-200'}`}>
+                <h4 className={`font-bold mb-2 ${p.highlight ? 'text-blue-400' : 'text-slate-500'}`}>{p.title}</h4>
+                <div className="flex items-baseline justify-center gap-1 mb-8">
+                  <span className="text-4xl font-black">{p.price}</span>
+                  <span className="text-sm opacity-60 font-medium">{p.per}</span>
+                </div>
+                <ul className="space-y-4 text-sm text-left mb-10 opacity-80">
+                  {p.features.map((f, fi) => <li key={fi} className="flex items-center gap-3"><CheckCircle2 className="w-4 h-4 shrink-0 text-blue-500" /> {f}</li>)}
+                </ul>
+                <button className={`w-full py-4 rounded-2xl font-bold transition-all ${p.highlight ? 'bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-500/20' : 'bg-slate-100 text-slate-900 hover:bg-blue-600 hover:text-white'}`}>
+                  {p.title === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Trust Quote */}
       <section className="bg-slate-900 py-32 text-white relative overflow-hidden">
          <div className="absolute top-0 right-0 opacity-10 blur-3xl w-96 h-96 bg-blue-500" />
