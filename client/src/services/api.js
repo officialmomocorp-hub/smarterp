@@ -94,6 +94,7 @@ export const dashboardAPI = {
   getAdmin: () => api.get('/dashboard/admin'),
   getTeacher: () => api.get('/dashboard/teacher'),
   getParent: () => api.get('/dashboard/parent'),
+  getStudent: () => api.get('/dashboard/student'),
 };
 
 export const staffAPI = {

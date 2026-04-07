@@ -192,48 +192,63 @@ async function main() {
   });
 
   if (class5) {
-    const studentUser = await prisma.user.create({
-      data: {
-        schoolId: school.id,
-        phone: '9999999999',
-        password: '',
-        role: 'STUDENT',
-        student: {
-          create: {
-            schoolId: school.id,
-            studentId: 'STU2505A001',
-            classId: class5.id,
-            sectionId: class5.sections[0].id,
-            rollNumber: 1,
-            academicYearId: academicYear.id,
-            house: 'RED',
-            midDayMealOpted: true,
-            profile: {
-              create: {
-                firstName: 'Aarav',
-                middleName: 'Kumar',
-                lastName: 'Verma',
-                dateOfBirth: new Date('2014-03-15'),
-                gender: 'MALE',
-                casteCategory: 'GENERAL',
-                religion: 'HINDU',
-                motherTongue: 'HINDI',
-                aadharNumber: '123456789012',
-                nationality: 'Indian',
+    const existingStudentUser = await prisma.user.findFirst({ where: { phone: '9999999999' } });
+    const studentUser = existingStudentUser ? 
+      await prisma.user.findUnique({ where: { id: existingStudentUser.id }, include: { student: true } }) :
+      await prisma.user.create({
+        data: {
+          schoolId: school.id,
+          phone: '9999999999',
+          password: hashedPassword,
+          role: 'STUDENT',
+          student: {
+            create: {
+              schoolId: school.id,
+              studentId: 'STU2505A001',
+              classId: class5.id,
+              sectionId: class5.sections[0].id,
+              rollNumber: 1,
+              academicYearId: academicYear.id,
+              house: 'RED',
+              midDayMealOpted: true,
+              profile: {
+                create: {
+                  firstName: 'Aarav',
+                  middleName: 'Kumar',
+                  lastName: 'Verma',
+                  dateOfBirth: new Date('2014-03-15'),
+                  gender: 'MALE',
+                  casteCategory: 'GENERAL',
+                  religion: 'HINDU',
+                  motherTongue: 'HINDI',
+                  aadharNumber: '123456789012',
+                  nationality: 'Indian',
+                },
               },
             },
           },
         },
-      },
-      include: { student: true },
-    });
+        include: { student: true },
+      });
 
-    const parent = await prisma.parent.create({
+    const existingParentUser = await prisma.user.findFirst({ where: { phone: '9888888888' } });
+    const parentUser = existingParentUser || await prisma.user.create({
       data: {
         schoolId: school.id,
+        phone: '9888888888',
+        password: hashedPassword,
+        role: 'PARENT',
+      }
+    });
+
+    const existingParent = await prisma.parent.findFirst({ where: { userId: parentUser.id } });
+    const parent = existingParent || await prisma.parent.create({
+      data: {
+        schoolId: school.id,
+        userId: parentUser.id,
         fatherName: 'Rajesh Verma',
         fatherOccupation: 'Business',
-        fatherPhone: '9999999999',
+        fatherPhone: '9888888888',
         motherName: 'Priya Verma',
         motherOccupation: 'Homemaker',
         motherPhone: '9999999998',
@@ -245,16 +260,22 @@ async function main() {
       },
     });
 
-    await prisma.parentStudent.create({
-      data: {
-        parentId: parent.id,
-        studentId: studentUser.student.id,
-        relation: 'Parent',
-        isPrimary: true,
-      },
+    const existingParentStudent = await prisma.parentStudent.findFirst({
+        where: { parentId: parent.id, studentId: studentUser.student.id }
     });
+    
+    if (!existingParentStudent) {
+        await prisma.parentStudent.create({
+            data: {
+                parentId: parent.id,
+                studentId: studentUser.student.id,
+                relation: 'Parent',
+                isPrimary: true,
+            },
+        });
+    }
 
-    console.log('Demo student and parent created');
+    console.log('Demo student and parent created/verified');
   }
 
   // Create Fee Structure for Class 5

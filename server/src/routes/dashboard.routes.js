@@ -251,4 +251,69 @@ router.get('/parent', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+router.get('/student', async (req, res, next) => {
+  try {
+    const student = await prisma.student.findFirst({
+      where: { userId: req.userId },
+      include: {
+        profile: true,
+        class: true,
+        section: true,
+      }
+    });
+
+    if (!student) {
+      return res.json({ success: true, data: {} });
+    }
+
+    const today = new Date().getDay();
+    const [myTimetable, myAttendance, recentHomework] = await Promise.all([
+      prisma.timetable.findMany({
+        where: { 
+          classId: student.classId, 
+          sectionId: student.sectionId,
+          dayOfWeek: today 
+        },
+        include: { subject: true },
+        orderBy: { period: 'asc' },
+      }),
+      prisma.attendance.findMany({
+        where: {
+          studentId: student.id,
+          date: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) },
+        },
+      }),
+      prisma.homework.findMany({
+        where: {
+          classId: student.classId,
+          sectionId: student.sectionId,
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        include: { subject: true }
+      })
+    ]);
+
+    const totalDays = myAttendance.length;
+    const presentDays = myAttendance.filter(a => a.status === 'PRESENT' || a.status === 'LATE').length;
+    const attendancePercentage = totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(2) : 0;
+
+    res.json({
+      success: true,
+      data: {
+        profile: student.profile,
+        class: student.class,
+        section: student.section,
+        timetable: myTimetable,
+        attendanceSummary: {
+          totalDays,
+          presentDays,
+          attendancePercentage
+        },
+        homework: recentHomework
+      }
+    });
+  } catch (error) { next(error); }
+});
+
 module.exports = router;
