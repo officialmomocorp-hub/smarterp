@@ -9,6 +9,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 const { errorHandler } = require('./middleware/errorHandler');
 const { logger } = require('./utils/logger');
+const { AppError } = require('./utils/appError');
 
 dotenv.config();
 
@@ -19,8 +20,10 @@ app.use(compression());
 
 // Security middleware
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false, // For local testing
 }));
+
 app.use(cors({
   origin: [
     'http://localhost:8000', 
@@ -37,7 +40,7 @@ app.use(cors({
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000, // Higher for production
   message: 'Too many requests from this IP, please try again later.',
 });
 app.use('/api/', limiter);
@@ -49,7 +52,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(xssSanitizer);
 
-// Static files
+// Static files (Serve Vite build)
+app.use(express.static(path.join(__dirname, '../../client/dist')));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health check
@@ -60,7 +64,7 @@ app.get('/health', (req, res) => {
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Routes
+// API Routes
 app.use('/api/v1/auth', require('./routes/auth.routes'));
 app.use('/api/v1/students', require('./routes/student.routes'));
 app.use('/api/v1/admissions', require('./routes/admission.routes'));
@@ -91,9 +95,12 @@ app.use('/api/v1/platform', require('./routes/platform.routes'));
 // Cron jobs
 require('./config/cron');
 
-// 404 Handler for API
-app.use((req, res, next) => {
-  next(new AppError(`Endpoint ${req.originalUrl} not found on this server.`, 404));
+// Catch-all route to serve React app for SPA routing
+app.get('*', (req, res) => {
+  if (req.originalUrl.startsWith('/api/')) {
+    return res.status(404).json({ success: false, message: 'API Endpoint not found' });
+  }
+  res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
 });
 
 // Error handling
@@ -104,7 +111,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
   logger.info(`Environment: ${process.env.NODE_ENV}`);
-  logger.info(`API Docs: http://localhost:${PORT}/api-docs`);
 });
 
 module.exports = app;
