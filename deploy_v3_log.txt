@@ -1,0 +1,87 @@
+Connecting to 103.179.97.107...
+Connected!
+
+>>> cd /var/www/smarterp && git fetch origin && git reset --hard origin/main 2>&1
+OUT:
+HEAD is now at 3aac8f5 feat: implement Joi validation, harden CSP, and add AuditLog system
+
+ERR:
+From https://github.com/officialmomocorp-hub/smarterp
+   efea0ac..3aac8f5  main       -> origin/main
+
+
+>>> cd /var/www/smarterp/server && npm install --no-color 2>&1
+OUT:
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 257 packages, and audited 719 packages in 2s
+
+137 packages are looking for funding
+  run `npm fund` for details
+
+1 high severity vulnerability
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+
+
+>>> cd /var/www/smarterp/server && npx prisma generate 2>&1
+OUT:
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Error: Prisma schema validation - (get-dmmf wasm)
+Error code: P1012
+[1;91merror[0m: [1mThe model "AuditLog" cannot be defined because a model with that name already exists.[0m
+  [1;94m-->[0m  [4mprisma/schema.prisma:1530[0m
+[1;94m   | [0m
+[1;94m1529 | [0m
+[1;94m1530 | [0mmodel [1;91mAuditLog[0m {
+[1;94m   | [0m
+
+Validation Error Count: 1
+[Context: getDmmf]
+
+Prisma CLI Version : 5.22.0
+
+
+>>> cd /var/www/smarterp/server && npx prisma db push --accept-data-loss 2>&1
+OUT:
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "smarterp", schema "public" at "localhost:5432"
+Error: P1012
+
+error: The model "AuditLog" cannot be defined because a model with that name already exists.
+  -->  prisma/schema.prisma:1530
+   | 
+1529 | 
+1530 | model AuditLog {
+   | 
+
+
+
+
+>>> pm2 restart smarterp-backend --no-color 2>&1
+OUT:
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [smarterp-backend](ids: [ 1 ])
+[PM2] [smarterp-backend](1) ✓
+┌────┬─────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼─────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 230427   │ 38h    │ 8    │ online    │ 0%       │ 60.4mb   │ root     │ disabled │
+│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 306415   │ 0s     │ 39   │ online    │ 0%       │ 16.8mb   │ root     │ disabled │
+└────┴─────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+
+
+>>> echo DEPLOY_SUCCESS
+OUT:
+DEPLOY_SUCCESS
+
+
+=== DEPLOYMENT V3 COMPLETE ===

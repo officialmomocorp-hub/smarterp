@@ -1125,23 +1125,23 @@ model StudyMaterial {
 // ==========================================
 
 model AuditLog {
-  id                String    @id @default(uuid())
-  schoolId          String
-  userId            String
-  action            String
-  entityType        String
-  entityId          String
-  oldValue          String?
-  newValue          String?
-  ipAddress         String?
-  userAgent         String?
-  createdAt         DateTime  @default(now())
+  id          String   @id @default(uuid())
+  schoolId    String
+  userId      String
+  action      String   // CREATE, UPDATE, DELETE, LOGIN
+  resource    String   // STUDENT, FEE, ADMISSION, etc.
+  resourceId  String?
+  oldValue    Json?
+  newValue    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
 
-  user              User      @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
 
-  @@index([schoolId, entityType, entityId])
+  @@index([schoolId, createdAt])
   @@index([userId, createdAt])
-  @@index([createdAt])
+  @@index([resource, resourceId])
 }
 
 model Session {
@@ -1527,22 +1527,3 @@ model FeePaymentConcession {
   @@unique([feePaymentId, concessionId])
 }
 
-model AuditLog {
-  id          String   @id @default(uuid())
-  schoolId    String
-  userId      String
-  action      String   // CREATE, UPDATE, DELETE, LOGIN
-  resource    String   // STUDENT, FEE, ADMISSION, etc.
-  resourceId  String?
-  oldValue    Json?
-  newValue    Json?
-  ipAddress   String?
-  userAgent   String?
-  createdAt   DateTime @default(now())
-
-  user        User     @relation(fields: [userId], references: [id])
-
-  @@index([schoolId, createdAt])
-  @@index([userId, createdAt])
-  @@index([resource, resourceId])
-}
