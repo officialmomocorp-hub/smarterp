@@ -49,7 +49,7 @@ export default function Login() {
                 className="input"
                 value={emailOrPhone}
                 onChange={(e) => setEmailOrPhone(e.target.value)}
-                placeholder="admin@smarterp.in"
+                placeholder="info@dpsdemo.edu.in"
                 required
               />
             </div>
