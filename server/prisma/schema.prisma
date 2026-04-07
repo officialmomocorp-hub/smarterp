@@ -1526,3 +1526,23 @@ model FeePaymentConcession {
   
   @@unique([feePaymentId, concessionId])
 }
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  schoolId    String
+  userId      String
+  action      String   // CREATE, UPDATE, DELETE, LOGIN
+  resource    String   // STUDENT, FEE, ADMISSION, etc.
+  resourceId  String?
+  oldValue    Json?
+  newValue    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([schoolId, createdAt])
+  @@index([userId, createdAt])
+  @@index([resource, resourceId])
+}

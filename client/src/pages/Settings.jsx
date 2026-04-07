@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuthStore } from '../store';
-import { Lock, User, Shield, AlertCircle, Calendar, Plus } from 'lucide-react';
+import { Lock, User, Shield, AlertCircle, Calendar, Plus, Save, ShieldCheck, UploadCloud } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Settings() {
@@ -106,7 +106,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="flex gap-2 border-b border-gray-200">
+      <div className="flex gap-2 p-1 bg-gray-100/50 rounded-xl w-fit mb-6">
         {[
           { id: 'profile', icon: User, label: 'School Profile' },
           { id: 'security', icon: Lock, label: 'Security & Password' },
@@ -115,10 +115,10 @@ export default function Settings() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+            className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-white text-primary-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -144,7 +144,8 @@ export default function Settings() {
                       <Plus className="w-8 h-8 text-gray-400" />
                     )}
                   </div>
-                  <label className="btn btn-secondary cursor-pointer block text-center">
+                  <label className="btn btn-secondary cursor-pointer flex items-center justify-center gap-2">
+                    <UploadCloud className="w-4 h-4" />
                     Upload School Logo
                     <input type="file" className="hidden" accept="image/*" onChange={e => setLogoFile(e.target.files[0])} />
                   </label>
@@ -206,8 +207,13 @@ export default function Settings() {
                  </div>
 
                  <div className="pt-6 flex justify-end">
-                    <button type="submit" disabled={loading} className="btn btn-primary px-8">
-                       {loading ? 'Saving Settings...' : 'Save School Profile'}
+                    <button type="submit" disabled={loading} className="btn btn-primary px-8 flex items-center gap-2">
+                       {loading ? 'Saving Settings...' : (
+                         <>
+                           <Save className="w-4 h-4" />
+                           Save School Profile
+                         </>
+                       )}
                     </button>
                  </div>
               </div>
@@ -276,8 +282,13 @@ export default function Settings() {
               </div>
 
               <div className="pt-4 border-t border-gray-100 mt-6 flex justify-end">
-                <button disabled={loading} type="submit" className="btn btn-primary">
-                  {loading ? 'Updating...' : 'Update Password'}
+                <button disabled={loading} type="submit" className="btn btn-primary flex items-center gap-2">
+                   {loading ? 'Updating...' : (
+                     <>
+                       <ShieldCheck className="w-4 h-4" />
+                       Update Password
+                     </>
+                   )}
                 </button>
               </div>
             </form>

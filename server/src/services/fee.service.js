@@ -1,5 +1,6 @@
 const prisma = require('../config/database');
 const { AppError } = require('../utils/appError');
+const { logAction, Actions, Resources } = require('../utils/auditLogger');
 
 class FeeService {
   async createFeeStructure(data, schoolId) {
@@ -248,6 +249,21 @@ class FeeService {
           feeStructure: true,
           concessions: { include: { concession: true } }
         },
+      });
+
+      // Audit Log for Payment
+      await logAction({
+        schoolId,
+        userId: 'system', // TODO: Pass req.userId from controller
+        action: Actions.CREATE,
+        resource: Resources.FEE,
+        resourceId: feePayment.id,
+        newValue: { 
+          studentId: student.id, 
+          installment: installmentNumber, 
+          paid: paidAmount, 
+          status: feePayment.status 
+        }
       });
 
       return feePayment;

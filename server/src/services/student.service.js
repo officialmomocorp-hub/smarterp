@@ -2,6 +2,7 @@ const prisma = require('../config/database');
 const { AppError } = require('../utils/appError');
 const xlsx = require('xlsx');
 const fs = require('fs');
+const { logAction, Actions, Resources } = require('../utils/auditLogger');
 
 class StudentService {
   async importStudents(filePath, schoolId) {
@@ -280,7 +281,7 @@ class StudentService {
     }
 
     return prisma.$transaction(async (tx) => {
-      const updatedStudent = await tx.student.update({
+      const baseUpdate = await tx.student.update({
         where: { id },
         data: studentData,
       });
@@ -292,7 +293,7 @@ class StudentService {
         });
       }
 
-      return tx.student.findUnique({
+      const fullUpdatedStudent = await tx.student.findUnique({
         where: { id },
         include: {
           profile: true,
@@ -301,6 +302,19 @@ class StudentService {
           parents: { include: { parent: true } },
         },
       });
+
+      // Audit Log for Student Update
+      await logAction({
+        schoolId,
+        userId: 'system',
+        action: Actions.UPDATE,
+        resource: Resources.STUDENT,
+        resourceId: id,
+        oldValue: { status: student.status },
+        newValue: fullUpdatedStudent,
+      });
+
+      return fullUpdatedStudent;
     });
   }
 
@@ -316,6 +330,16 @@ class StudentService {
     await prisma.student.update({
       where: { id },
       data: { status: 'DROPPED_OUT' },
+    });
+
+    // Audit Log for Student Withdrawal
+    await logAction({
+      schoolId,
+      userId: 'system',
+      action: Actions.DELETE,
+      resource: Resources.STUDENT,
+      resourceId: id,
+      newValue: { status: 'DROPPED_OUT' }
     });
 
     return { message: 'Student deleted successfully' };

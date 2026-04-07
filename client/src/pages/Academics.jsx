@@ -99,7 +99,7 @@ export default function Academics() {
         <p className="text-gray-500 mt-1">Manage academic years, classes, sections, and subjects.</p>
       </div>
 
-      <div className="flex gap-2 border-b border-gray-200">
+      <div className="flex gap-2 p-1 bg-gray-100/50 rounded-xl w-fit mb-6">
         {[
           { id: 'years', icon: Calendar, label: 'Academic Years' },
           { id: 'classes', icon: Layers, label: 'Classes & Sections' },
@@ -108,10 +108,10 @@ export default function Academics() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+            className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-white text-primary-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
             <tab.icon className="w-4 h-4" />

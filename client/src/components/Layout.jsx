@@ -7,7 +7,7 @@ import {
   Bus, BedDouble, FileText, MessageSquare, GraduationCap,
   Library, UserCheck, ClipboardList, Settings, LogOut,
   Menu, ChevronDown, ChevronRight, Receipt, BarChart3,
-  School, Award, FileSpreadsheet, Bell, Building2
+  School, Award, FileSpreadsheet, Bell, Building2, X
 } from 'lucide-react';
 
 const commonMenu = [
@@ -159,6 +159,13 @@ export default function Layout({ children }) {
     }
   }, [user]);
 
+  // Close sidebar on navigation (mobile only)
+  React.useEffect(() => {
+    if (window.innerWidth < 1024 && sidebarOpen) {
+      toggleSidebar();
+    }
+  }, [location.pathname]);
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -194,9 +201,11 @@ export default function Layout({ children }) {
           )}
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded-lg hover:bg-gray-100"
+            className="p-2 rounded-lg hover:bg-gray-100 lg:block"
           >
-            <Menu className="w-5 h-5" />
+            {sidebarOpen ? <X className="w-5 h-5 text-gray-500 lg:hidden" /> : <Menu className="w-5 h-5" />}
+            {!sidebarOpen && <Menu className="w-5 h-5 hidden lg:block" />}
+            {sidebarOpen && <Menu className="w-5 h-5 hidden lg:block" />}
           </button>
         </div>
 

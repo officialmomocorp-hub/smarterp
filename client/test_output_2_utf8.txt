@@ -1,0 +1,197 @@
+﻿
+Running 1 test using 1 worker
+
+node.exe :   
+[38;5;45;1mpw:api [0m=> 
+browserType.launch started 
+[38;5;45m+0ms[0m
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (    
+  [38;5;45;1mp...8;5;45m   
+ +0ms[0m:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  [38;5;45;1mpw:api 
+[0m<= browserType.launch 
+succeeded 
+[38;5;45m+71ms[0m
+  [38;5;45;1mpw:api 
+[0m=> browser.newContext 
+started [38;5;45m+3ms[0m
+  [38;5;45;1mpw:api 
+[0m<= browser.newContext 
+succeeded 
+[38;5;45m+7ms[0m
+  [38;5;45;1mpw:api 
+[0m=> 
+browserContext.newPage 
+started [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0m<= 
+browserContext.newPage 
+succeeded 
+[38;5;45m+63ms[0m
+  [38;5;45;1mpw:api 
+[0m=> page.goto started 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mnavigating to "https://
+smarterpsolution.duckdns.or
+g/", waiting until "load" 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+"commit" event fired 
+[38;5;45m+338ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/" 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+"domcontentloaded" event 
+fired [38;5;45m+128ms[0m
+  [38;5;45;1mpw:api [0m  
+"load" event fired 
+[38;5;45m+3ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.goto succeeded 
+[38;5;45m+0ms[0m
+Starting at URL: https://smarterpsolution.duckdns.org/
+  [38;5;45;1mpw:api 
+[0m=> page.title started 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/" 
+[38;5;45m+3ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.title 
+succeeded 
+[38;5;45m+100ms[0m
+Page Title: SmartERP | World-Class School Management Solution
+  [38;5;45;1mpw:api 
+[0m=> locator.isVisible 
+started [38;5;45m+4ms[0m
+  [38;5;45;1mpw:api [0m  
+checking visibility of loca
+tor('a:has-text("Login")') 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0m<= locator.isVisible 
+succeeded 
+[38;5;45m+18ms[0m
+  [38;5;45;1mpw:api 
+[0m=> page.goto started 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mnavigating to "https://
+smarterpsolution.duckdns.or
+g/login", waiting until 
+"load" [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+"commit" event fired 
+[38;5;45m+8ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/log
+in" [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+"domcontentloaded" event 
+fired [38;5;45m+7ms[0m
+  [38;5;45;1mpw:api [0m  
+"load" event fired 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/log
+in" [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.goto succeeded 
+[38;5;45m+0ms[0m
+Logging in...
+  [38;5;45;1mpw:api 
+[0m=> 
+page.waitForSelector 
+started [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for locator('in
+put[name="email"], 
+input[type="email"], input[
+placeholder*="Email"]') to 
+be visible 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+"networkidle" event fired 
+[38;5;45m+516ms[0m
+  [38;5;45;1mpw:api 
+[0m<= 
+page.waitForSelector 
+failed [38;5;45m+14s[0m
+Login selector not found. 
+Current URL: https://smarte
+rpsolution.duckdns.org/logi
+n
+  [38;5;45;1mpw:api 
+[0m=> page.screenshot 
+started [38;5;45m+6ms[0m
+  [38;5;45;1mpw:api 
+[0mtaking page screenshot 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for fonts to 
+load... [38;5;45m+55ms[0m
+  [38;5;45;1mpw:api 
+[0mfonts loaded 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.screenshot 
+succeeded 
+[38;5;45m+155ms[0m
+  [38;5;45;1mpw:api 
+[0m=> 
+browserContext.close 
+started [38;5;45m+17ms[0m
+  [38;5;45;1mpw:api 
+[0m<= 
+browserContext.close 
+succeeded 
+[38;5;45m+7ms[0m
+  [38;5;45;1mpw:api 
+[0m=> browser.close 
+started [38;5;45m+10ms[0m
+  [38;5;45;1mpw:api 
+[0m<= browser.close 
+succeeded 
+[38;5;45m+49ms[0m
+  Γ£ÿ  1 tests\e2e\smarterp.spec.js:12:3 ΓÇ║ SmarterP E2E Journey ΓÇ║ Main Journey: Login, Dashboard, and Settings (15.9s)
+
+
+  1) tests\e2e\smarterp.spec.js:12:3 ΓÇ║ SmarterP E2E Journey ΓÇ║ Main Journey: Login, Dashboard, and Settings 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[name="email"], input[type="email"], input[placeholder*="Email"]') to be visible[22m
+
+
+      31 |       console.log('Logging in...');
+      32 |       try {
+    > 33 |         await page.waitForSelector('input[name="email"], input[type="email"], input[placeholder*="Email"]', { timeout: 15000 });
+         |                    ^
+      34 |         await page.fill('input[name="email"], input[type="email"], input[placeholder*="Email"]', 'admin@smarterp.in');
+      35 |         await page.fill('input[name="password"]', 'admin123');
+      36 |         await page.click('button[type="submit"]');
+        at C:\Users\Administrator\.gemini\antigravity\scratch\smarterp\client\tests\e2e\smarterp.spec.js:33:20
+
+    Error Context: test-results\tests-e2e-smarterp-Smarter-58f5d-ogin-Dashboard-and-Settings\error-context.md
+
+  1 failed
+    tests\e2e\smarterp.spec.js:12:3 ΓÇ║ SmarterP E2E Journey ΓÇ║ Main Journey: Login, Dashboard, and Settings 

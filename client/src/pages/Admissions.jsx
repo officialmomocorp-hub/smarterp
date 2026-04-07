@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Search, CheckCircle, XCircle, Clock, Eye, Upload, AlertTriangle } from 'lucide-react';
+import { FileText, Plus, Search, CheckCircle, XCircle, Clock, Eye, Upload, AlertTriangle, UserPlus, Save, X } from 'lucide-react';
 import { admissionAPI } from '../services/api';
 import toast from 'react-hot-toast';
+import { StatsSkeleton, TableSkeleton } from '../components/Skeleton';
 
 const CLASSES = ['Nursery', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'];
 const CASTES = ['GENERAL', 'OBC', 'OBC_NCL', 'SC', 'ST'];
@@ -108,55 +109,75 @@ export default function Admissions() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Admission Management</h2>
-          <p className="text-gray-500 mt-1">Manage online admissions for academic year 2025-26</p>
+          <p className="text-gray-600 mt-1">Manage online admissions for academic year 2025-26</p>
         </div>
-        <button id="new-admission-btn" data-testid="new-admission" onClick={() => setShowForm(true)} className="btn btn-primary flex items-center gap-2">
+        <button 
+          id="new-admission-btn" 
+          aria-label="Create New Admission Entry"
+          data-testid="new-admission" 
+          onClick={() => setShowForm(true)} 
+          className="btn btn-primary flex items-center gap-2"
+        >
           <Plus className="w-4 h-4" /> New Admission
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-yellow-100 rounded-lg"><Clock className="w-6 h-6 text-yellow-600" /></div>
-            <div><p className="text-sm text-gray-500">Pending</p><p className="text-xl font-bold text-yellow-600">2</p></div>
+      {loading ? <StatsSkeleton count={4} /> : (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="card">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-yellow-100 rounded-lg"><Clock className="w-6 h-6 text-yellow-600" aria-hidden="true" /></div>
+              <div><p className="text-sm font-bold text-gray-600">Pending</p><p className="text-xl font-bold text-yellow-700">2</p></div>
+            </div>
+          </div>
+          <div className="card">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-green-100 rounded-lg"><CheckCircle className="w-6 h-6 text-green-600" aria-hidden="true" /></div>
+              <div><p className="text-sm font-bold text-gray-600">Approved</p><p className="text-xl font-bold text-green-700">1</p></div>
+            </div>
+          </div>
+          <div className="card">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-blue-100 rounded-lg"><FileText className="w-6 h-6 text-blue-600" aria-hidden="true" /></div>
+              <div><p className="text-sm font-bold text-gray-600">Waitlisted</p><p className="text-xl font-bold text-blue-700">1</p></div>
+            </div>
+          </div>
+          <div className="card">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-red-100 rounded-lg"><XCircle className="w-6 h-6 text-red-600" aria-hidden="true" /></div>
+              <div><p className="text-sm font-bold text-gray-600">Rejected</p><p className="text-xl font-bold text-red-700">1</p></div>
+            </div>
           </div>
         </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-100 rounded-lg"><CheckCircle className="w-6 h-6 text-green-600" /></div>
-            <div><p className="text-sm text-gray-500">Approved</p><p className="text-xl font-bold text-green-600">1</p></div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-100 rounded-lg"><FileText className="w-6 h-6 text-blue-600" /></div>
-            <div><p className="text-sm text-gray-500">Waitlisted</p><p className="text-xl font-bold text-blue-600">1</p></div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-red-100 rounded-lg"><XCircle className="w-6 h-6 text-red-600" /></div>
-            <div><p className="text-sm text-gray-500">Rejected</p><p className="text-xl font-bold text-red-600">1</p></div>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Filters */}
       <div className="card">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-[200px]">
-            <label className="label">Search</label>
+            <label className="label">Search Applicants</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input type="text" className="input pl-10" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Name, ID, Phone..." />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
+              <input 
+                type="text" 
+                aria-label="Search by Name, ID, or Phone"
+                className="input pl-10" 
+                value={searchQuery} 
+                onChange={(e) => setSearchQuery(e.target.value)} 
+                placeholder="Name, ID, Phone..." 
+              />
             </div>
           </div>
           <div>
-            <label className="label">Status</label>
-            <select className="input" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-              <option value="">All</option>
+            <label className="label">Status Filter</label>
+            <select 
+              aria-label="Filter by Admission Status"
+              className="input" 
+              value={filterStatus} 
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="">All Applications</option>
               <option value="PENDING">Pending</option>
               <option value="APPROVED">Approved</option>
               <option value="REJECTED">Rejected</option>
@@ -167,74 +188,103 @@ export default function Admissions() {
       </div>
 
       {/* Admissions List */}
-      <div className="card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">App ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Parent Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {admissions.map((adm) => (
-                <tr key={adm.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm font-mono text-primary-600">{adm.admissionNumber}</td>
-                  <td className="px-4 py-3">
-                    <p className="text-sm font-medium">{adm.applicantName}</p>
-                    <p className="text-xs text-gray-500">{new Date(adm.dateOfBirth).toLocaleDateString('en-IN')}</p>
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="text-sm font-medium">{adm.fatherName}</p>
-                    <p className="text-xs text-gray-500">{adm.fatherPhone}</p>
-                  </td>
-                  <td className="px-4 py-3 text-sm">{adm.classApplied}</td>
-                  <td className="px-4 py-3"><span className="badge badge-blue">{adm.casteCategory}</span></td>
-                  <td className="px-4 py-3 text-sm">{adm.applicantPhone}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-1 badge ${getStatusBadge(adm.status)}`}>
-                      {getStatusIcon(adm.status)} {adm.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      <button className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600" title="View"><Eye className="w-4 h-4" /></button>
-                      {adm.status === 'PENDING' && (
-                        <>
-                          <button onClick={() => handleStatusChange(adm.id, 'APPROVED')} className="p-1.5 rounded-lg hover:bg-green-50 text-green-600" title="Approve"><CheckCircle className="w-4 h-4" /></button>
-                          <button onClick={() => handleStatusChange(adm.id, 'REJECTED')} className="p-1.5 rounded-lg hover:bg-red-50 text-red-600" title="Reject"><XCircle className="w-4 h-4" /></button>
-                        </>
-                      )}
-                      {adm.status === 'APPROVED' && (
-                        <button 
-                          onClick={async () => {
-                            try {
-                              await admissionAPI.convertToStudent(adm.id);
-                              toast.success('Successfully converted to student!');
-                              fetchAdmissions();
-                            } catch (e) {
-                              toast.error(e.response?.data?.message || 'Conversion failed');
-                            }
-                          }} 
-                          className="btn btn-secondary text-xs py-1"
-                        >
-                          Enroll Now
-                        </button>
-                      )}
-                    </div>
-                  </td>
+      {loading ? <TableSkeleton cols={8} /> : (
+        <div className="card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">App ID</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Student Name</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Parent Name</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Class</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Category</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Phone</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase text-center">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {admissions.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" className="px-4 py-10 text-center text-gray-500 font-medium">
+                      No admission applications found matching the criteria.
+                    </td>
+                  </tr>
+                ) : admissions.map((adm) => (
+                  <tr key={adm.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-4 py-3 text-sm font-mono font-bold text-primary-700">{adm.admissionNumber}</td>
+                    <td className="px-4 py-3">
+                      <p className="text-sm font-bold text-gray-900">{adm.applicantName}</p>
+                      <p className="text-xs font-medium text-gray-600">{new Date(adm.dateOfBirth).toLocaleDateString('en-IN')}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="text-sm font-medium text-gray-900">{adm.fatherName}</p>
+                      <p className="text-xs font-medium text-gray-600">{adm.fatherPhone}</p>
+                    </td>
+                    <td className="px-4 py-3 text-sm font-medium text-gray-700">{adm.classApplied}</td>
+                    <td className="px-4 py-3"><span className="badge badge-blue">{adm.casteCategory}</span></td>
+                    <td className="px-4 py-3 text-sm font-medium text-gray-700">{adm.applicantPhone}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center gap-1 badge ${getStatusBadge(adm.status)}`}>
+                        {getStatusIcon(adm.status)} {adm.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-center gap-1">
+                        <button 
+                          aria-label="View Full Application Details"
+                          className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors" 
+                          title="View"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        {adm.status === 'PENDING' && (
+                          <>
+                            <button 
+                              aria-label="Approve Admission Application"
+                              onClick={() => handleStatusChange(adm.id, 'APPROVED')} 
+                              className="p-1.5 rounded-lg hover:bg-green-50 text-green-600 transition-colors" 
+                              title="Approve"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                            </button>
+                            <button 
+                              aria-label="Reject Admission Application"
+                              onClick={() => handleStatusChange(adm.id, 'REJECTED')} 
+                              className="p-1.5 rounded-lg hover:bg-red-50 text-red-600 transition-colors" 
+                              title="Reject"
+                            >
+                              <XCircle className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                        {adm.status === 'APPROVED' && (
+                          <button 
+                            aria-label="Enroll Approved Student"
+                            onClick={async () => {
+                              try {
+                                await admissionAPI.convertToStudent(adm.id);
+                                toast.success('Successfully converted to student!');
+                                fetchAdmissions();
+                              } catch (e) {
+                                toast.error(e.response?.data?.message || 'Conversion failed');
+                              }
+                            }} 
+                            className="bg-primary-600 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md hover:bg-primary-700 transition-all active:scale-95 flex items-center gap-1"
+                          >
+                            <UserPlus className="w-3 h-3" /> Enroll Now
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Admission Form Modal */}
       {showForm && (
@@ -437,8 +487,12 @@ export default function Admissions() {
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t">
-                <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary">Cancel</button>
-                <button type="submit" className="btn btn-primary">Submit Application</button>
+                <button type="button" onClick={() => setShowForm(false)} className="btn btn-secondary flex items-center gap-2">
+                  <X className="w-4 h-4" /> Cancel
+                </button>
+                <button type="submit" className="btn btn-primary flex items-center gap-2">
+                  <Save className="w-4 h-4" /> Submit Application
+                </button>
               </div>
             </form>
           </div>

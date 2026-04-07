@@ -1,0 +1,248 @@
+﻿
+Running 1 test using 1 worker
+
+node.exe :   
+[38;5;45;1mpw:api [0m=> 
+browserType.launch started 
+[38;5;45m+0ms[0m
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (    
+  [38;5;45;1mp...8;5;45m   
+ +0ms[0m:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  [38;5;45;1mpw:api 
+[0m<= browserType.launch 
+succeeded 
+[38;5;45m+81ms[0m
+  [38;5;45;1mpw:api 
+[0m=> browser.newContext 
+started [38;5;45m+3ms[0m
+  [38;5;45;1mpw:api 
+[0m<= browser.newContext 
+succeeded 
+[38;5;45m+7ms[0m
+  [38;5;45;1mpw:api 
+[0m=> 
+browserContext.newPage 
+started [38;5;45m+3ms[0m
+  [38;5;45;1mpw:api 
+[0m<= 
+browserContext.newPage 
+succeeded 
+[38;5;45m+74ms[0m
+  [38;5;45;1mpw:api 
+[0m=> page.goto started 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mnavigating to "https://
+smarterpsolution.duckdns.or
+g/", waiting until "load" 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+"commit" event fired 
+[38;5;45m+23ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/" 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+"domcontentloaded" event 
+fired [38;5;45m+103ms[0m
+  [38;5;45;1mpw:api [0m  
+"load" event fired 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.goto succeeded 
+[38;5;45m+1ms[0m
+Starting at URL: https://smarterpsolution.duckdns.org/
+  [38;5;45;1mpw:api 
+[0m=> page.title started 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/" 
+[38;5;45m+5ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.title 
+succeeded 
+[38;5;45m+105ms[0m
+Page Title: SmartERP | World-Class School Management Solution
+  [38;5;45;1mpw:api 
+[0m=> locator.isVisible 
+started [38;5;45m+4ms[0m
+  [38;5;45;1mpw:api [0m  
+checking visibility of loca
+tor('a:has-text("Login")') 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m<= locator.isVisible 
+succeeded 
+[38;5;45m+19ms[0m
+  [38;5;45;1mpw:api 
+[0m=> page.goto started 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mnavigating to "https://
+smarterpsolution.duckdns.or
+g/login", waiting until 
+"load" [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+"commit" event fired 
+[38;5;45m+16ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/log
+in" [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+"domcontentloaded" event 
+fired [38;5;45m+6ms[0m
+  [38;5;45;1mpw:api [0m  
+"load" event fired 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/log
+in" [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.goto succeeded 
+[38;5;45m+0ms[0m
+Logging in...
+  [38;5;45;1mpw:api 
+[0m=> 
+page.waitForSelector 
+started [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for locator('in
+put[name="email"], 
+input[type="email"], input[
+placeholder*="Email"]') to 
+be visible 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+"networkidle" event fired 
+[38;5;45m+514ms[0m
+  [38;5;45;1mpw:api 
+[0m<= 
+page.waitForSelector 
+failed [38;5;45m+14s[0m
+Login selector not found. 
+Current URL: https://smarte
+rpsolution.duckdns.org/logi
+n
+  [38;5;45;1mpw:api 
+[0m=> page.content 
+started [38;5;45m+2ms[0m
+--- Page Contents ---
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Smarterp: The next-generation Indian School ERP. A world-class SaaS platform for comprehensive school automation including Admissions, Fees, Examinations, and Reporting.">
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="SmartERP - World Class Indian School ERP Solution">
+    <meta property="og:description" content="Automate your institution with the smartest ERP built for modern education. Trusted by leading schools globally.">
+    <meta property="og:image" content="/favicon.png">
+    <meta property="og:type" content="website">
+    <!-- Structured Data for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "SmartERP",
+      "operatingSystem": "Web",
+      "applicationCategory": "EducationalSoftware",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "INR"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "1250"
+      }
+    }
+    </script>
+    <title>SmartERP | World-Class School Management Solution</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <script type="module" crossorigin="" src="/assets/index-DHV0qa6d.js"></script>
+    <link rel="stylesheet" crossorigin="" href="/assets/index-Cni-ATTB.css">
+  <style id="_goober"> @keyframes go2264125279{from{transform:scale(0) rotate(45deg);opacity:0;}to{transform:scale(1) rotate(45deg);opacity:1;}}@keyframes go3020080000{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}@keyframes go463499852{from{transform:scale(0) rotate(90deg);opacity:0;}to{transform:scale(1) rotate(90deg);opacity:1;}}@keyframes go1268368563{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}@keyframes go1310225428{from{transform:scale(0) rotate(45deg);opacity:0;}to{transform:scale(1) rotate(45deg);opacity:1;}}@keyframes go651618207{0%{height:0;width:0;opacity:0;}40%{height:0;width:6px;opacity:1;}100%{opacity:1;height:10px;}}@keyframes go901347462{from{transform:scale(0.6);opacity:0.4;}to{transform:scale(1);opacity:1;}}.go4109123758{z-index:9999;}.go4109123758 > *{pointer-events:auto;}</style></head>
+  <body>
+    <div id="root"><div data-rht-toaster="" style="position: fixed; z-index: 9999; inset: 16px; pointer-events: none;"></div><div class="min-h-screen bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 flex items-center justify-center p-4"><div class="w-full max-w-md"><div class="text-center mb-8"><div class="inline-flex items-center justify-center w-16 h-16 bg-white bg-opacity-20 rounded-2xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-graduation-cap w-8 h-8 text-white"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path><path d="M22 10v6"></path><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path></svg></div><h1 class="text-3xl font-bold text-white">Smarterp</h1><p class="text-primary-100 mt-1">Indian School ERP System</p></div><div class="bg-white rounded-2xl shadow-xl p-8"><h2 class="text-2xl font-bold text-gray-900 mb-6">Sign In</h2><form class="space-y-5"><div><label class="label">Email or Phone</label><input type="text" class="input" placeholder="admin@smarterp.in" required="" value=""></div><div><label class="label">Password</label><input type="password" class="input" placeholder="Enter your password" required="" value=""></div><button type="submit" class="w-full btn btn-primary py-3 text-lg">Sign In</button></form><div class="mt-6 p-4 bg-gray-50 rounded-lg"><p class="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</p><p class="text-xs text-gray-500">Admin: admin@smarterp.in / admin123</p><p class="text-xs text-gray-500">Teacher: teacher@smarterp.in / admin123</p></div></div><div class="mt-6 grid grid-cols-2 gap-4"><div class="bg-white bg-opacity-10 rounded-lg p-4 text-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-6 h-6 text-white mx-auto mb-2"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg><p class="text-white text-sm font-medium">Complete ERP</p></div><div class="bg-white bg-opacity-10 rounded-lg p-4 text-center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users w-6 h-6 text-white mx-auto mb-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg><p class="text-white text-sm font-medium">5 User Roles</p></div></div></div></div></div>
+  
+
+</body></html>
+--- End Page Contents ---
+  [38;5;45;1mpw:api 
+[0m<= page.content 
+succeeded 
+[38;5;45m+9ms[0m
+  [38;5;45;1mpw:api 
+[0m=> page.screenshot 
+started [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mtaking page screenshot 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for fonts to 
+load... [38;5;45m+8ms[0m
+  [38;5;45;1mpw:api 
+[0mfonts loaded 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.screenshot 
+succeeded 
+[38;5;45m+156ms[0m
+  [38;5;45;1mpw:api 
+[0m=> 
+browserContext.close 
+started [38;5;45m+15ms[0m
+  [38;5;45;1mpw:api 
+[0m<= 
+browserContext.close 
+succeeded 
+[38;5;45m+9ms[0m
+  [38;5;45;1mpw:api 
+[0m=> browser.close 
+started [38;5;45m+12ms[0m
+  [38;5;45;1mpw:api 
+[0m<= browser.close 
+succeeded 
+[38;5;45m+50ms[0m
+  Γ£ÿ  1 tests\e2e\smarterp.spec.js:12:3 ΓÇ║ SmarterP E2E Journey ΓÇ║ Main Journey: Login, Dashboard, and Settings (15.6s)
+
+
+  1) tests\e2e\smarterp.spec.js:12:3 ΓÇ║ SmarterP E2E Journey ΓÇ║ Main Journey: Login, Dashboard, and Settings 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[name="email"], input[type="email"], input[placeholder*="Email"]') to be visible[22m
+
+
+      31 |       console.log('Logging in...');
+      32 |       try {
+    > 33 |         await page.waitForSelector('input[name="email"], input[type="email"], input[placeholder*="Email"]', { timeout: 15000 });
+         |                    ^
+      34 |         await page.fill('input[name="email"], input[type="email"], input[placeholder*="Email"]', 'admin@smarterp.in');
+      35 |         await page.fill('input[name="password"]', 'admin123');
+      36 |         await page.click('button[type="submit"]');
+        at C:\Users\Administrator\.gemini\antigravity\scratch\smarterp\client\tests\e2e\smarterp.spec.js:33:20
+
+    Error Context: test-results\tests-e2e-smarterp-Smarter-58f5d-ogin-Dashboard-and-Settings\error-context.md
+
+  1 failed
+    tests\e2e\smarterp.spec.js:12:3 ΓÇ║ SmarterP E2E Journey ΓÇ║ Main Journey: Login, Dashboard, and Settings 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { attendanceAPI, studentAPI, academicAPI } from '../services/api';
 import api from '../services/api';
-import { Calendar, UserCheck, UserX, Clock, AlertTriangle, Download } from 'lucide-react';
+import { Calendar, UserCheck, UserX, Clock, AlertTriangle, Download, Save, X, FileText, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Attendance() {
@@ -107,16 +107,24 @@ export default function Attendance() {
         <p className="text-gray-500 mt-1">Mark and track student attendance</p>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
-        {['mark', 'report', 'alerts', 'leaves'].map(tab => (
+      <div className="flex gap-2 p-1 bg-gray-100/50 rounded-xl w-fit mb-6">
+        {[
+          { id: 'mark', icon: UserCheck, label: 'Mark Attendance' },
+          { id: 'report', icon: FileText, label: 'Monthly Report' },
+          { id: 'alerts', icon: AlertTriangle, label: 'Low Attendance' },
+          { id: 'leaves', icon: Clock, label: 'Leave Requests' },
+        ].map(tab => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors capitalize ${
-              activeTab === tab ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+              activeTab === tab.id
+                ? 'bg-white text-primary-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
-            {tab}
+            <tab.icon className="w-4 h-4" />
+            {tab.label}
           </button>
         ))}
       </div>
@@ -151,11 +159,11 @@ export default function Attendance() {
                 </select>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => handleSelectAll('PRESENT')} className="btn btn-success text-sm">
-                  All Present
+                <button onClick={() => handleSelectAll('PRESENT')} className="btn btn-success text-sm flex items-center gap-2">
+                  <UserCheck className="w-4 h-4" /> All Present
                 </button>
-                <button onClick={() => handleSelectAll('ABSENT')} className="btn btn-danger text-sm">
-                  All Absent
+                <button onClick={() => handleSelectAll('ABSENT')} className="btn btn-danger text-sm flex items-center gap-2">
+                  <UserX className="w-4 h-4" /> All Absent
                 </button>
               </div>
             </div>
@@ -250,9 +258,14 @@ export default function Attendance() {
                   <button
                     onClick={handleMarkAttendance}
                     disabled={saving}
-                    className="btn btn-primary"
+                    className="btn btn-primary flex items-center gap-2"
                   >
-                    {saving ? 'Saving...' : 'Save Attendance'}
+                    {saving ? 'Saving...' : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        Save Attendance
+                      </>
+                    )}
                   </button>
                 </div>
               </>

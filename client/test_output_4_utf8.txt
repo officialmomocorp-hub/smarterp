@@ -1,0 +1,466 @@
+﻿
+Running 1 test using 1 worker
+
+node.exe :   
+[38;5;45;1mpw:api [0m=> 
+browserType.launch started 
+[38;5;45m+0ms[0m
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (    
+  [38;5;45;1mp...8;5;45m   
+ +0ms[0m:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  [38;5;45;1mpw:api 
+[0m<= browserType.launch 
+succeeded 
+[38;5;45m+79ms[0m
+  [38;5;45;1mpw:api 
+[0m=> browser.newContext 
+started [38;5;45m+3ms[0m
+  [38;5;45;1mpw:api 
+[0m<= browser.newContext 
+succeeded 
+[38;5;45m+7ms[0m
+  [38;5;45;1mpw:api 
+[0m=> 
+browserContext.newPage 
+started [38;5;45m+3ms[0m
+  [38;5;45;1mpw:api 
+[0m<= 
+browserContext.newPage 
+succeeded 
+[38;5;45m+61ms[0m
+  [38;5;45;1mpw:api 
+[0m=> page.goto started 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mnavigating to "https://
+smarterpsolution.duckdns.or
+g/", waiting until "load" 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+"commit" event fired 
+[38;5;45m+39ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/" 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+"domcontentloaded" event 
+fired [38;5;45m+122ms[0m
+  [38;5;45;1mpw:api [0m  
+"load" event fired 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.goto succeeded 
+[38;5;45m+0ms[0m
+Starting at URL: https://smarterpsolution.duckdns.org/
+  [38;5;45;1mpw:api 
+[0m=> page.title started 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/" 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.title 
+succeeded 
+[38;5;45m+98ms[0m
+Page Title: SmartERP | World-Class School Management Solution
+  [38;5;45;1mpw:api 
+[0m=> locator.isVisible 
+started [38;5;45m+4ms[0m
+  [38;5;45;1mpw:api [0m  
+checking visibility of loca
+tor('a:has-text("Login")') 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m<= locator.isVisible 
+succeeded 
+[38;5;45m+26ms[0m
+  [38;5;45;1mpw:api 
+[0m=> page.goto started 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mnavigating to "https://
+smarterpsolution.duckdns.or
+g/login", waiting until 
+"load" [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+"commit" event fired 
+[38;5;45m+9ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/log
+in" [38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+"domcontentloaded" event 
+fired [38;5;45m+7ms[0m
+  [38;5;45;1mpw:api [0m  
+"load" event fired 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.goto succeeded 
+[38;5;45m+1ms[0m
+Logging in...
+  [38;5;45;1mpw:api 
+[0m=> locator.waitFor 
+started [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for locator('in
+put[placeholder*="admin@sma
+rterp.in"], input[type="tex
+t"]').first() to be 
+visible [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/log
+in" [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api [0m  
+locator resolved to 
+visible <input value="" 
+type="text" required="" 
+class="input" placeholder="
+admin@smarterp.in"/> 
+[38;5;45m+23ms[0m
+  [38;5;45;1mpw:api 
+[0m<= locator.waitFor 
+succeeded 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m=> locator.fill 
+started [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for locator('in
+put[placeholder*="admin@sma
+rterp.in"], input[type="tex
+t"]').first() 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+locator resolved to <input 
+value="" type="text" 
+required="" class="input" p
+laceholder="admin@smarterp.
+in"/> [38;5;45m+11ms[0m
+  [38;5;45;1mpw:api [0m  
+fill("admin@smarterp.in") 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mattempting fill action 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+waiting for element to be 
+visible, enabled and 
+editable [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m<= locator.fill 
+succeeded 
+[38;5;45m+18ms[0m
+  [38;5;45;1mpw:api 
+[0m=> locator.fill 
+started [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for locator('in
+put[type="password"]') 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+locator resolved to <input 
+value="" required="" 
+class="input" 
+type="password" 
+placeholder="Enter your 
+password"/> 
+[38;5;45m+4ms[0m
+  [38;5;45;1mpw:api [0m  
+fill("admin123") 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mattempting fill action 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+waiting for element to be 
+visible, enabled and 
+editable [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m<= locator.fill 
+succeeded 
+[38;5;45m+4ms[0m
+  [38;5;45;1mpw:api 
+[0m=> locator.click 
+started [38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for locator('bu
+tton:has-text("Sign In"), 
+button[type="submit"]') 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+locator resolved to 
+<button type="submit" 
+class="w-full btn 
+btn-primary py-3 
+text-lg">Sign In</button> 
+[38;5;45m+15ms[0m
+  [38;5;45;1mpw:api 
+[0mattempting click 
+action [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api [0m  
+waiting for element to be 
+visible, enabled and 
+stable [38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+element is visible, 
+enabled and stable 
+[38;5;45m+18ms[0m
+  [38;5;45;1mpw:api [0m  
+scrolling into view if 
+needed [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+done scrolling 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+performing click action 
+[38;5;45m+4ms[0m
+  [38;5;45;1mpw:api [0m  
+click action done 
+[38;5;45m+10ms[0m
+  [38;5;45;1mpw:api [0m  
+waiting for scheduled 
+navigations to finish 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+navigations have finished 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0m<= locator.click 
+succeeded 
+[38;5;45m+0ms[0m
+Verifying Dashboard...
+  [38;5;45;1mpw:api 
+[0m=> page.waitForURL 
+started [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/das
+hboard" 
+[38;5;45m+312ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.waitForURL 
+succeeded 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0m=> expect.toHaveURL 
+started [38;5;45m+6ms[0m
+  [38;5;45;1mpw:api 
+[0mExpect "toHaveURL" 
+with timeout 5000ms 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0m<= expect.toHaveURL 
+succeeded 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0m=> expect.toBeVisible 
+started [38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mExpect "toBeVisible" 
+with timeout 5000ms 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for locator('di
+v.bg-white.rounded-2xl.shad
+ow-sm').first() 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+locator resolved to <div 
+class="flex 
+justify-between 
+items-center bg-white p-6 
+rounded-2xl border 
+border-gray-100 
+shadow-sm">ΓÇª</div> 
+[38;5;45m+278ms[0m
+  [38;5;45;1mpw:api 
+[0m<= expect.toBeVisible 
+succeeded 
+[38;5;45m+0ms[0m
+Navigating to Settings...
+  [38;5;45;1mpw:api 
+[0m=> expect.toBeVisible 
+started [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0mExpect "toBeVisible" 
+with timeout 5000ms 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for 
+locator('nav 
+a:has-text("Settings"), 
+a[href="/settings"]') 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+locator resolved to <a 
+href="/settings" 
+data-discover="true" 
+class="flex items-center 
+gap-3 px-3 py-2.5 
+rounded-lg text-sm 
+font-medium 
+transition-colors 
+text-gray-600 
+hover:bg-gray-100">ΓÇª</a> 
+[38;5;45m+106ms[0m
+  [38;5;45;1mpw:api 
+[0m<= expect.toBeVisible 
+succeeded 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m=> locator.click 
+started [38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for 
+locator('nav 
+a:has-text("Settings"), 
+a[href="/settings"]') 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+locator resolved to <a 
+href="/settings" 
+data-discover="true" 
+class="flex items-center 
+gap-3 px-3 py-2.5 
+rounded-lg text-sm 
+font-medium 
+transition-colors 
+text-gray-600 
+hover:bg-gray-100">ΓÇª</a> 
+[38;5;45m+95ms[0m
+  [38;5;45;1mpw:api 
+[0mattempting click 
+action [38;5;45m+2ms[0m
+  [38;5;45;1mpw:api [0m  
+waiting for element to be 
+visible, enabled and 
+stable [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+element is visible, 
+enabled and stable 
+[38;5;45m+42ms[0m
+  [38;5;45;1mpw:api [0m  
+scrolling into view if 
+needed [38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+done scrolling 
+[38;5;45m+65ms[0m
+  [38;5;45;1mpw:api [0m  
+performing click action 
+[38;5;45m+6ms[0m
+  [38;5;45;1mpw:api [0m  
+navigated to "https://smart
+erpsolution.duckdns.org/set
+tings" [38;5;45m+3ms[0m
+  [38;5;45;1mpw:api [0m  
+click action done 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+waiting for scheduled 
+navigations to finish 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api [0m  
+navigations have finished 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m<= locator.click 
+succeeded 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0m=> page.waitForURL 
+started [38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0m<= page.waitForURL 
+succeeded 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m=> expect.toHaveURL 
+started [38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mExpect "toHaveURL" 
+with timeout 5000ms 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0m<= expect.toHaveURL 
+succeeded 
+[38;5;45m+2ms[0m
+  [38;5;45;1mpw:api 
+[0m=> expect.toBeVisible 
+started [38;5;45m+1ms[0m
+  [38;5;45;1mpw:api 
+[0mExpect "toBeVisible" 
+with timeout 5000ms 
+[38;5;45m+0ms[0m
+  [38;5;45;1mpw:api 
+[0mwaiting for locator('in
+put[type="text"]').first() 
+[38;5;45m+1ms[0m
+  [38;5;45;1mpw:api [0m  
+"networkidle" event fired 
+[38;5;45m+516ms[0m
+  [38;5;45;1mpw:api 
+[0m<= expect.toBeVisible 
+succeeded [38;5;45m+4s[0m
+  [38;5;45;1mpw:api 
+[0m=> 
+browserContext.close 
+started [38;5;45m+20ms[0m
+  [38;5;45;1mpw:api 
+[0m<= 
+browserContext.close 
+succeeded 
+[38;5;45m+8ms[0m
+  [38;5;45;1mpw:api 
+[0m=> browser.close 
+started [38;5;45m+9ms[0m
+  [38;5;45;1mpw:api 
+[0m<= browser.close 
+succeeded 
+[38;5;45m+138ms[0m
+  Γ£ÿ  1 tests\e2e\smarterp.spec.js:12:3 ΓÇ║ SmarterP E2E Journey ΓÇ║ Main Journey: Login, Dashboard, and Settings (6.5s)
+
+
+  1) tests\e2e\smarterp.spec.js:12:3 ΓÇ║ SmarterP E2E Journey ΓÇ║ Main Journey: Login, Dashboard, and Settings 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('input[type="text"]').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('input[type="text"]').first()[22m
+
+
+      67 |     // Check for setting input fields
+      68 |     const settingsInput = page.locator('input[type="text"]').first();
+    > 69 |     await expect(settingsInput).toBeVisible();
+         |                                 ^
+      70 |     
+      71 |     // Confirm Save button presence
+      72 |     const saveButton = page.locator('button:has-text("Save"), button[type="submit"]');
+        at C:\Users\Administrator\.gemini\antigravity\scratch\smarterp\client\tests\e2e\smarterp.spec.js:69:33
+
+    Error Context: test-results\tests-e2e-smarterp-Smarter-58f5d-ogin-Dashboard-and-Settings\error-context.md
+
+  1 failed
+    tests\e2e\smarterp.spec.js:12:3 ΓÇ║ SmarterP E2E Journey ΓÇ║ Main Journey: Login, Dashboard, and Settings 

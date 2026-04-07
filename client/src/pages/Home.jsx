@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Users, BarChart3, Clock, Zap, BookOpen, GraduationCap, Globe, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Shield, Users, BarChart3, Clock, Zap, BookOpen, GraduationCap, Globe, ChevronRight, CheckCircle2, ArrowRight, Play, ArrowUpRight, Mail, Info } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -48,10 +48,12 @@ export default function Home() {
                 Built for multi-tenancy, high performance, and total academic excellence.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/login" className="w-full sm:w-auto px-10 py-5 bg-[#1E293B] text-white rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all shadow-2xl shadow-slate-900/10 active:scale-95">
+              <Link to="/login" className="w-full sm:w-auto px-10 py-5 bg-[#1E293B] text-white rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all shadow-2xl shadow-slate-900/10 active:scale-95 flex items-center justify-center gap-2">
+                <ArrowRight className="w-5 h-5" />
                 Start Managing Today
               </Link>
-              <button className="w-full sm:w-auto px-10 py-5 bg-white border-2 border-slate-100 text-slate-600 rounded-2xl font-bold text-lg hover:border-blue-200 hover:text-blue-600 transition-all active:scale-95">
+              <button className="w-full sm:w-auto px-10 py-5 bg-white border-2 border-slate-100 text-slate-600 rounded-2xl font-bold text-lg hover:border-blue-200 hover:text-blue-600 transition-all active:scale-95 flex items-center justify-center gap-2">
+                <Play className="w-5 h-5 text-blue-500" />
                 Request Demo
               </button>
             </div>
@@ -126,7 +128,9 @@ export default function Home() {
                     <li>✓ Daily Automated Backups</li>
                     <li>✓ Multi-Campus Support Ready</li>
                   </ul>
-                  <button className="mt-10 bg-white text-blue-600 px-8 py-3 rounded-full font-bold hover:bg-blue-50 transition-colors">Learn More</button>
+                  <button className="mt-10 bg-white text-blue-600 px-8 py-3 rounded-full font-bold hover:bg-blue-50 transition-colors flex items-center gap-2">
+                    <Info className="w-4 h-4" /> Learn More
+                  </button>
                </div>
             </div>
           </div>
@@ -154,8 +158,18 @@ export default function Home() {
                 <ul className="space-y-4 text-sm text-left mb-10 opacity-80">
                   {p.features.map((f, fi) => <li key={fi} className="flex items-center gap-3"><CheckCircle2 className="w-4 h-4 shrink-0 text-blue-500" /> {f}</li>)}
                 </ul>
-                <button className={`w-full py-4 rounded-2xl font-bold transition-all ${p.highlight ? 'bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-500/20' : 'bg-slate-100 text-slate-900 hover:bg-blue-600 hover:text-white'}`}>
-                  {p.title === 'Enterprise' ? 'Contact Sales' : 'Get Started'}
+                <button className={`w-full py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 ${p.highlight ? 'bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-500/20' : 'bg-slate-100 text-slate-900 hover:bg-blue-600 hover:text-white'}`}>
+                  {p.title === 'Enterprise' ? (
+                    <>
+                      <Mail className="w-5 h-5" />
+                      Contact Sales
+                    </>
+                  ) : (
+                    <>
+                      <ArrowUpRight className="w-5 h-5" />
+                      Get Started
+                    </>
+                  )}
                 </button>
               </div>
             ))}

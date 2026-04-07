@@ -2,17 +2,17 @@ Connected!
 
 >>> cd /var/www/smarterp && git fetch origin && git reset --hard origin/main 2>&1
 OUT:
-HEAD is now at c434971 Added sitemap and robots.txt for Google indexing
+HEAD is now at efea0ac Fixed critical syntax error in Students page
 
 ERR:
 From https://github.com/officialmomocorp-hub/smarterp
-   5fb2353..c434971  main       -> origin/main
+   41cc25f..efea0ac  main       -> origin/main
 
 
 >>> cd /var/www/smarterp/server && npm install --no-color 2>&1
 OUT:
 
-up to date, audited 462 packages in 782ms
+up to date, audited 462 packages in 787ms
 
 99 packages are looking for funding
   run `npm fund` for details
@@ -30,18 +30,18 @@ OUT:
 Environment variables loaded from .env
 Prisma schema loaded from prisma/schema.prisma
 
-✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 438ms
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 417ms
 
 Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
 
-Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
 
 
 
 >>> cd /var/www/smarterp/client && npm install --no-color 2>&1
 OUT:
 
-up to date, audited 256 packages in 715ms
+up to date, audited 256 packages in 749ms
 
 54 packages are looking for funding
   run `npm fund` for details
@@ -68,13 +68,13 @@ rendering chunks...
 computing gzip size...
 dist/index.html                   1.90 kB │ gzip:   0.88 kB
 dist/assets/index-Cni-ATTB.css   47.67 kB │ gzip:   7.70 kB
-dist/assets/index-Cp85gsvG.js   684.20 kB │ gzip: 195.48 kB
+dist/assets/index-DHV0qa6d.js   687.08 kB │ gzip: 196.23 kB
 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 3.02s
+✓ built in 2.94s
 
 
 >>> pm2 restart smarterp-backend --no-color 2>&1
@@ -85,8 +85,8 @@ Use --update-env to update environment variables
 ┌────┬─────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
 │ id │ name                │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
 ├────┼─────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
-│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 230427   │ 32h    │ 8    │ online    │ 0%       │ 63.1mb   │ root     │ disabled │
-│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 296011   │ 0s     │ 36   │ online    │ 0%       │ 16.8mb   │ root     │ disabled │
+│ 0  │ school-erp          │ default     │ 0.39.7  │ fork    │ 230427   │ 33h    │ 8    │ online    │ 0%       │ 62.9mb   │ root     │ disabled │
+│ 1  │ smarterp-backend    │ default     │ 0.39.7  │ fork    │ 297048   │ 0s     │ 38   │ online    │ 0%       │ 16.9mb   │ root     │ disabled │
 └────┴─────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
 
 

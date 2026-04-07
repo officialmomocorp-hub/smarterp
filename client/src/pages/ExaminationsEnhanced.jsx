@@ -81,7 +81,7 @@ export default function ExaminationsEnhanced() {
         </div>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
+      <div className="flex gap-2 p-1 bg-gray-100/50 rounded-xl w-fit mb-6">
         {[
           { id: 'verification', title: 'Marks Entry', icon: CheckCircle },
           { id: 'hall-tickets', title: 'Hall Tickets', icon: FileText },
@@ -90,8 +90,10 @@ export default function ExaminationsEnhanced() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors capitalize ${
-              activeTab === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+              activeTab === tab.id
+                ? 'bg-white text-primary-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
             <tab.icon className="w-4 h-4" />

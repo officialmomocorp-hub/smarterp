@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { studentAPI } from '../services/api';
-import { Search, Plus, Edit, Trash2, Eye, Filter, FileOutput, User as UserIcon, FileUp } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, Filter, FileOutput, User as UserIcon, FileUp, ChevronLeft, ChevronRight, CloudUpload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { CLASSES, SECTIONS } from '../config/constants';
 import StudentForm from '../components/Students/StudentForm';
@@ -289,8 +289,12 @@ export default function Students() {
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
             <p className="text-sm text-gray-500">Page {pagination.page} of {pagination.pages} ({pagination.total} total)</p>
             <div className="flex gap-2">
-              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn btn-secondary text-sm">Previous</button>
-              <button onClick={() => setPage(p => Math.min(pagination.pages, p + 1))} disabled={page === pagination.pages} className="btn btn-secondary text-sm">Next</button>
+              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn btn-secondary text-sm flex items-center gap-1">
+                <ChevronLeft className="w-3 h-3" /> Previous
+              </button>
+              <button onClick={() => setPage(p => Math.min(pagination.pages, p + 1))} disabled={page === pagination.pages} className="btn btn-secondary text-sm flex items-center gap-1">
+                Next <ChevronRight className="w-3 h-3" />
+              </button>
             </div>
           </div>
         )}
@@ -324,9 +328,16 @@ export default function Students() {
                 <p>Columns: firstName*, lastName, class*, section*, fatherPhone, motherPhone, dateOfBirth...</p>
               </div>
               <div className="flex justify-end gap-3 mt-6">
-                <button type="button" onClick={() => setShowImportModal(false)} className="btn btn-outline">Cancel</button>
-                <button type="submit" disabled={importLoading} className="btn btn-primary">
-                  {importLoading ? 'Importing...' : 'Upload & Process'}
+                <button type="button" onClick={() => setShowImportModal(false)} className="btn btn-outline flex items-center gap-2">
+                  <X className="w-4 h-4" /> Cancel
+                </button>
+                <button type="submit" disabled={importLoading} className="btn btn-primary flex items-center gap-2">
+                  {importLoading ? 'Importing...' : (
+                    <>
+                      <CloudUpload className="w-4 h-4" />
+                      Upload & Process
+                    </>
+                  )}
                 </button>
               </div>
             </form>

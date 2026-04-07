@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate, authorize, schoolScoped } = require('../middleware/auth');
+const { validate } = require('../middleware/validate');
+const admissionValidation = require('../validations/admission.validation');
 const prisma = require('../config/database');
 const { AppError } = require('../utils/appError');
 
 router.use(authenticate, schoolScoped);
 
-router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), validate(admissionValidation.createAdmission), async (req, res, next) => {
   try {
     let yearId = req.body.academicYearId;
     if (!yearId) {
@@ -62,7 +64,7 @@ router.get('/:id', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.put('/:id/status', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+router.put('/:id/status', authorize('SUPER_ADMIN', 'ADMIN'), validate(admissionValidation.updateStatus), async (req, res, next) => {
   try {
     const { status, remarks } = req.body;
     

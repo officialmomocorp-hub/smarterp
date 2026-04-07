@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { feeAPI, academicAPI } from '../services/api';
 import { useAuthStore } from '../store';
-import { IndianRupee, Plus, Search, Download, AlertTriangle, CheckCircle, Clock, XCircle, X } from 'lucide-react';
+import { IndianRupee, Plus, Search, Download, AlertTriangle, CheckCircle, Clock, XCircle, X, Printer, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { TableSkeleton, StatsSkeleton } from '../components/Skeleton';
 
 function formatINR(amount) {
   return `₹${parseFloat(amount).toLocaleString('en-IN')}`;
@@ -114,20 +115,22 @@ export default function FeeManagement() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <IndianRupee className="w-6 h-6 text-gray-900" />
+          <IndianRupee className="w-6 h-6 text-primary-600" aria-hidden="true" />
           Fee Management
         </h2>
-        <p className="text-gray-500 mt-1">Manage fee collection, concessions, and reports</p>
+        <p className="text-gray-600 mt-1">Manage fee collection, concessions, and reports</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
+      <div role="tablist" className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
         {['collect', 'structure', 'defaulters', 'reports'].map(tab => (
           <button
             key={tab}
+            role="tab"
+            aria-selected={activeTab === tab}
             onClick={() => handleTabChange(tab)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors capitalize ${
-              activeTab === tab ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all capitalize ${
+              activeTab === tab ? 'bg-white text-primary-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
             }`}
           >
             {tab === 'collect' ? 'Collect Fee' : tab}
@@ -139,10 +142,11 @@ export default function FeeManagement() {
       {activeTab === 'collect' && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Search Student</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Search Student</h3>
             <div className="flex gap-3">
               <div className="flex-1">
                 <input
+                  aria-label="Student ID or Aadhar number"
                   className="input"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -150,61 +154,79 @@ export default function FeeManagement() {
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                 />
               </div>
-              <button onClick={handleSearch} className="btn btn-primary" disabled={loading}>
-                <Search className="w-4 h-4 mr-2" /> Search
+              <button 
+                aria-label="Search student info"
+                onClick={handleSearch} 
+                className="btn btn-primary" 
+                disabled={loading}
+              >
+                {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Search className="w-4 h-4 mr-2" />} 
+                Search
               </button>
             </div>
           </div>
 
-          {feeStatus && (
+          {loading && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="card h-48 animate-pulse bg-gray-50"></div>
+              <div className="card h-48 animate-pulse bg-gray-50"></div>
+              <div className="card h-48 animate-pulse bg-gray-50"></div>
+            </div>
+          )}
+
+          {!loading && feeStatus && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Student Info */}
-              <div className="card">
-                <h4 className="font-medium text-gray-900 mb-4">Student Details</h4>
-                <div className="space-y-3">
+              <div className="card border-l-4 border-l-primary-500">
+                <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-primary-500"></div> Student Details
+                </h4>
+                <div className="space-y-4">
                   <div>
-                    <p className="text-sm text-gray-500">Name</p>
-                    <p className="font-medium">{feeStatus.student?.profile?.firstName} {feeStatus.student?.profile?.lastName}</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Name</p>
+                    <p className="font-bold text-gray-900">{feeStatus.student?.profile?.firstName} {feeStatus.student?.profile?.lastName}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Class</p>
-                    <p className="font-medium">{feeStatus.student?.class?.name} - {feeStatus.student?.section?.name}</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Class</p>
+                    <p className="font-bold text-gray-900">{feeStatus.student?.class?.name} - {feeStatus.student?.section?.name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Student ID</p>
-                    <p className="font-mono text-sm">{feeStatus.student?.studentId}</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Student ID</p>
+                    <p className="font-mono text-sm font-bold text-primary-700">{feeStatus.student?.studentId}</p>
                   </div>
                 </div>
               </div>
 
               {/* Fee Summary */}
-              <div className="card">
-                <h4 className="font-medium text-gray-900 mb-4">Fee Summary</h4>
+              <div className="card border-l-4 border-l-green-500">
+                <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div> Fee Summary
+                </h4>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Total Due</span>
-                    <span className="font-bold" data-testid="fee-amount">{formatINR(feeStatus.summary?.totalDue || 0)}</span>
+                    <span className="text-gray-600 font-medium">Total Due</span>
+                    <span className="font-bold text-gray-900" data-testid="fee-amount">{formatINR(feeStatus.summary?.totalDue || 0)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Total Paid</span>
+                    <span className="text-gray-600 font-medium">Total Paid</span>
                     <span className="font-bold text-green-600" data-testid="fee-amount">{formatINR(feeStatus.summary?.totalPaid || 0)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Balance</span>
+                    <span className="text-gray-600 font-medium">Balance</span>
                     <span className="font-bold text-red-600" data-testid="fee-amount">{formatINR(feeStatus.summary?.totalBalance || 0)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Late Fine</span>
+                    <span className="text-gray-600 font-medium">Late Fine</span>
                     <span className="font-bold text-amber-600" data-testid="fee-amount">{formatINR(feeStatus.summary?.totalLateFine || 0)}</span>
                   </div>
                   <div className="pt-2 border-t">
-                    <div className="flex justify-between">
-                      <span className="font-medium">Payment %</span>
-                      <span className="font-bold">{feeStatus.summary?.paymentPercentage}%</span>
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-gray-700">Payment Progress</span>
+                      <span className="font-bold text-primary-600">{feeStatus.summary?.paymentPercentage}%</span>
                     </div>
-                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                    <div className="mt-2 w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
                       <div
-                        className="bg-green-500 h-2 rounded-full transition-all"
+                        className="bg-green-500 h-full rounded-full transition-all duration-1000 ease-out"
                         style={{ width: `${Math.min(100, parseFloat(feeStatus.summary?.paymentPercentage || 0))}%` }}
                       />
                     </div>
@@ -213,39 +235,46 @@ export default function FeeManagement() {
               </div>
 
               {/* Payment Form */}
-              <div className="card">
-                <h4 className="font-medium text-gray-900 mb-4">Record Payment</h4>
+              <div className="card border-l-4 border-l-purple-500">
+                <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-purple-500"></div> Record Payment
+                </h4>
                 <form onSubmit={handlePayment} className="space-y-4">
-                  <div>
-                    <label className="label">Installment</label>
-                    <select
-                      className="input"
-                      value={paymentForm.installmentNumber}
-                      onChange={(e) => setPaymentForm({ ...paymentForm, installmentNumber: parseInt(e.target.value) })}
-                    >
-                      <option value={1}>Q1 (Apr-Jun)</option>
-                      <option value={2}>Q2 (Jul-Sep)</option>
-                      <option value={3}>Q3 (Oct-Dec)</option>
-                      <option value={4}>Q4 (Jan-Mar)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="label">Payment Mode</label>
-                    <select
-                      className="input"
-                      value={paymentForm.paymentMode}
-                      onChange={(e) => setPaymentForm({ ...paymentForm, paymentMode: e.target.value })}
-                    >
-                      <option value="CASH">Cash</option>
-                      <option value="CHEQUE">Cheque</option>
-                      <option value="ONLINE">Online Transfer</option>
-                      <option value="UPI">UPI</option>
-                      <option value="DD">Demand Draft</option>
-                    </select>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="label">Installment</label>
+                      <select
+                        aria-label="Select Installment"
+                        className="input"
+                        value={paymentForm.installmentNumber}
+                        onChange={(e) => setPaymentForm({ ...paymentForm, installmentNumber: parseInt(e.target.value) })}
+                      >
+                        <option value={1}>Q1 (Apr-Jun)</option>
+                        <option value={2}>Q2 (Jul-Sep)</option>
+                        <option value={3}>Q3 (Oct-Dec)</option>
+                        <option value={4}>Q4 (Jan-Mar)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="label">Mode</label>
+                      <select
+                        aria-label="Select Payment Mode"
+                        className="input"
+                        value={paymentForm.paymentMode}
+                        onChange={(e) => setPaymentForm({ ...paymentForm, paymentMode: e.target.value })}
+                      >
+                        <option value="CASH">Cash</option>
+                        <option value="CHEQUE">Cheque</option>
+                        <option value="ONLINE">Online</option>
+                        <option value="UPI">UPI</option>
+                        <option value="DD">DD</option>
+                      </select>
+                    </div>
                   </div>
                   <div>
                     <label className="label">Amount (₹)</label>
                     <input
+                      aria-label="Payment Amount"
                       type="number"
                       className="input"
                       value={paymentForm.amount}
@@ -257,14 +286,20 @@ export default function FeeManagement() {
                   <div>
                     <label className="label">Remarks</label>
                     <input
+                      aria-label="Payment Remarks"
                       className="input"
                       value={paymentForm.remarks}
                       onChange={(e) => setPaymentForm({ ...paymentForm, remarks: e.target.value })}
                       placeholder="Optional"
                     />
                   </div>
-                  <button type="submit" className="w-full btn btn-success flex items-center justify-center gap-2">
-                    <IndianRupee className="w-4 h-4" /> Record Payment
+                  <button 
+                    type="submit" 
+                    disabled={processing}
+                    className="w-full btn btn-success flex items-center justify-center gap-2 shadow-lg shadow-green-100"
+                  >
+                    {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <IndianRupee className="w-4 h-4" />} 
+                    Record Payment
                   </button>
                 </form>
               </div>
@@ -272,32 +307,41 @@ export default function FeeManagement() {
           )}
 
           {/* Payment History */}
-          {feeStatus?.payments && feeStatus.payments.length > 0 && (
+          {!loading && feeStatus?.payments && (
             <div className="card">
-              <h4 className="font-medium text-gray-900 mb-4">Payment History</h4>
+              <h4 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-gray-400" aria-hidden="true" /> Payment History
+              </h4>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50 border-b border-gray-100">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Receipt</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Installment</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Due Date</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paid</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Receipt</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Installment</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Date</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Total</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Paid</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Balance</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Status</th>
+                      <th className="px-4 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-widest">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {feeStatus.payments.map((payment) => (
-                      <tr key={payment.id}>
-                        <td className="px-4 py-3 text-sm font-mono">{payment.receiptNumber}</td>
-                        <td className="px-4 py-3 text-sm">#{payment.installmentNumber}</td>
-                        <td className="px-4 py-3 text-sm">{new Date(payment.dueDate).toLocaleDateString('en-IN')}</td>
-                        <td className="px-4 py-3 text-sm">{formatINR(payment.totalAmount)}</td>
-                        <td className="px-4 py-3 text-sm">{formatINR(payment.paidAmount)}</td>
-                        <td className="px-4 py-3 text-sm">{formatINR(payment.balanceAmount)}</td>
-                        <td className="px-4 py-3">
+                  <tbody className="divide-y divide-gray-100">
+                    {feeStatus.payments.length === 0 ? (
+                      <tr>
+                        <td colSpan="8" className="px-4 py-10 text-center text-gray-500 font-medium italic">
+                          No payment records found for this student.
+                        </td>
+                      </tr>
+                    ) : feeStatus.payments.map((payment) => (
+                      <tr key={payment.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-4 py-4 text-sm font-mono font-bold text-primary-700">{payment.receiptNumber}</td>
+                        <td className="px-4 py-4 text-sm font-bold text-gray-700">Q{payment.installmentNumber}</td>
+                        <td className="px-4 py-4 text-sm font-medium text-gray-600">{new Date(payment.createdAt).toLocaleDateString('en-IN')}</td>
+                        <td className="px-4 py-4 text-sm font-bold text-gray-900">{formatINR(payment.totalAmount)}</td>
+                        <td className="px-4 py-4 text-sm font-bold text-green-700">{formatINR(payment.paidAmount)}</td>
+                        <td className="px-4 py-4 text-sm font-bold text-red-700">{formatINR(payment.balanceAmount)}</td>
+                        <td className="px-4 py-4">
                           <span className={`badge ${
                             payment.status === 'PAID' ? 'badge-green' :
                             payment.status === 'PARTIAL' ? 'badge-yellow' :
@@ -306,16 +350,17 @@ export default function FeeManagement() {
                             {payment.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-4 text-center">
                           <button
-                            data-testid="print-receipt"
+                            aria-label={`Print receipt ${payment.receiptNumber}`}
                             onClick={() => {
                               const token = useAuthStore.getState().token;
                               window.open(`/api/v1/pdf/receipt/${payment.id}?token=${token}`, '_blank');
                             }}
-                            className="btn btn-secondary text-xs py-1 px-2"
+                            className="p-2 rounded-lg bg-gray-100 hover:bg-primary-50 text-gray-600 hover:text-primary-600 transition-all active:scale-95"
+                            title="Print Receipt"
                           >
-                            Print
+                            <Printer className="w-4 h-4" />
                           </button>
                         </td>
                       </tr>
@@ -331,15 +376,29 @@ export default function FeeManagement() {
       {/* Fee Structure Tab */}
       {activeTab === 'structure' && (
         <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Fee Structure</h3>
-            <button onClick={openCreateModal} className="btn btn-primary flex items-center gap-2">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-xl font-bold text-gray-900">Fee Structure Management</h3>
+            <button 
+              aria-label="Create new fee structure"
+              onClick={openCreateModal} 
+              className="btn btn-primary flex items-center gap-2 shadow-lg shadow-primary-100"
+            >
               <Plus className="w-4 h-4" /> Create Structure
             </button>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-medium text-blue-900">Class 5 Fee Structure 2025-2026</h4>
-            <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-gradient-to-br from-primary-50 to-white border border-primary-100 rounded-2xl p-6 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+               <div>
+                  <h4 className="text-lg font-bold text-primary-900">Class 5 Fee Structure</h4>
+                  <p className="text-primary-700 font-medium">Academic Session 2025-2026</p>
+               </div>
+               <div className="bg-white px-4 py-2 rounded-xl border border-primary-100">
+                  <span className="text-xs font-bold text-primary-500 uppercase block tracking-wider">Total Package</span>
+                  <span className="text-2xl font-black text-primary-900" data-testid="fee-amount">{formatINR(31000)}</span>
+               </div>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { name: 'Tuition Fee', amount: 15000 },
                 { name: 'Development Fee', amount: 5000 },
@@ -350,18 +409,17 @@ export default function FeeManagement() {
                 { name: 'Annual Charges', amount: 3000 },
                 { name: 'Exam Fee', amount: 1500 },
               ].map((head) => (
-                <div key={head.name} className="bg-white rounded-lg p-3">
-                  <p className="text-sm text-gray-500">{head.name}</p>
-                  <p className="font-bold text-gray-900" data-testid="fee-amount">{formatINR(head.amount)}</p>
+                <div key={head.name} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white hover:border-primary-200 transition-all">
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-1">{head.name}</p>
+                  <p className="font-bold text-gray-900 text-lg" data-testid="fee-amount">{formatINR(head.amount)}</p>
                 </div>
               ))}
             </div>
-            <div className="mt-4 pt-3 border-t border-blue-200 flex justify-between items-center">
-              <span className="font-medium text-blue-900">Total Annual Fee</span>
-              <span className="text-xl font-bold text-blue-900" data-testid="fee-amount">{formatINR(31000)}</span>
-            </div>
-            <div className="mt-3 text-sm text-blue-700">
-              <p>Installment Type: Quarterly | Late Fine: ₹5/day | Due Dates: 15th of Apr, Jul, Oct, Jan</p>
+            
+            <div className="mt-6 pt-5 border-t border-primary-100 flex flex-wrap gap-4 text-sm font-bold text-primary-800">
+              <span className="bg-primary-100 px-3 py-1 rounded-full">Installments: Quarterly</span>
+              <span className="bg-primary-100 px-3 py-1 rounded-full">Late Fine: ₹5/day</span>
+              <span className="bg-primary-100 px-3 py-1 rounded-full">Due Window: 1st-15th</span>
             </div>
           </div>
         </div>
@@ -371,14 +429,20 @@ export default function FeeManagement() {
       {activeTab === 'defaulters' && (
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Fee Defaulters</h3>
-            <button className="btn btn-secondary flex items-center gap-2">
-              <Download className="w-4 h-4" /> Export
+            <h3 className="text-lg font-bold text-gray-900">Fee Defaulters List</h3>
+            <button 
+              aria-label="Export defaulters report"
+              className="btn btn-secondary flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" /> Export Excel
             </button>
           </div>
-          <div className="text-center py-12 text-gray-500">
-            <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>Search for a student to view their defaulter status</p>
+          <div className="text-center py-20">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-10 h-10 text-gray-300" aria-hidden="true" />
+            </div>
+            <p className="text-gray-600 font-medium">Search for a student to view their payment and defaulter status</p>
+            <p className="text-gray-400 text-sm mt-1">Full class reports can be generated from the Reports tab</p>
           </div>
         </div>
       )}
@@ -386,19 +450,24 @@ export default function FeeManagement() {
       {/* Reports Tab */}
       {activeTab === 'reports' && (
         <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Collection Reports</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <p className="text-sm text-green-600">Today's Collection</p>
-              <p className="text-2xl font-bold text-green-700">₹0</p>
+          <h3 className="text-lg font-bold text-gray-900 mb-6">Real-time Collection Insights</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg shadow-green-100 text-white">
+              <p className="text-sm font-bold text-green-100 uppercase tracking-widest mb-1">Today's Collection</p>
+              <p className="text-3xl font-black">₹0</p>
+              <div className="mt-4 flex items-center gap-2 text-xs font-bold text-green-100">
+                 <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div> Live Updates
+              </div>
             </div>
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-sm text-blue-600">This Month</p>
-              <p className="text-2xl font-bold text-blue-700">₹0</p>
+            <div className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg shadow-blue-100 text-white">
+              <p className="text-sm font-bold text-blue-100 uppercase tracking-widest mb-1">Monthly Peak</p>
+              <p className="text-3xl font-black">₹0</p>
+              <p className="mt-4 text-xs font-bold text-blue-100">Across all classes</p>
             </div>
-            <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-              <p className="text-sm text-purple-600">This Year</p>
-              <p className="text-2xl font-bold text-purple-700">₹0</p>
+            <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg shadow-purple-100 text-white">
+              <p className="text-sm font-bold text-purple-100 uppercase tracking-widest mb-1">Expected Revenue</p>
+              <p className="text-3xl font-black">₹0</p>
+              <p className="mt-4 text-xs font-bold text-purple-100 font-mono">EY 2025-26 Target</p>
             </div>
           </div>
         </div>
@@ -406,63 +475,78 @@ export default function FeeManagement() {
 
       {/* Create Structure Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Create Fee Structure</h3>
-              <button onClick={() => setIsCreateModalOpen(false)} className="text-gray-400 hover:text-gray-500">
+        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 font-sans">
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+              <h3 className="text-lg font-bold text-gray-900">Configure New Structure</h3>
+              <button 
+                aria-label="Close modal"
+                onClick={() => setIsCreateModalOpen(false)} 
+                className="p-1 rounded-lg hover:bg-gray-200 text-gray-400 transition-colors"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleCreateStructure} className="p-6 space-y-4">
+            <form onSubmit={handleCreateStructure} className="p-6 space-y-5">
               <div>
-                <label className="label">Structure Name</label>
+                <label className="label">Structure Title</label>
                 <input 
+                  aria-label="Structure Title"
                   className="input" 
                   required 
-                  placeholder="e.g. Class 1 Annual Fee"
+                  placeholder="e.g. Class 1 Primary Annual"
                   value={structureForm.name} 
                   onChange={e => setStructureForm({...structureForm, name: e.target.value})} 
                 />
               </div>
-              <div>
-                <label className="label">Select Class</label>
-                <select 
-                  className="input" 
-                  required 
-                  value={structureForm.classId} 
-                  onChange={e => setStructureForm({...structureForm, classId: e.target.value})}
-                >
-                  <option value="">Select a class</option>
-                  {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="label">Class</label>
+                  <select 
+                    aria-label="Select Class"
+                    className="input" 
+                    required 
+                    value={structureForm.classId} 
+                    onChange={e => setStructureForm({...structureForm, classId: e.target.value})}
+                  >
+                    <option value="">Select</option>
+                    {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="label">Year</label>
+                  <select 
+                    aria-label="Select Academic Year"
+                    className="input" 
+                    required 
+                    value={structureForm.academicYearId} 
+                    onChange={e => setStructureForm({...structureForm, academicYearId: e.target.value})}
+                  >
+                    <option value="">Select</option>
+                    {academicYears.map(ay => <option key={ay.id} value={ay.id}>{ay.name}</option>)}
+                  </select>
+                </div>
               </div>
               <div>
-                <label className="label">Academic Year</label>
-                <select 
-                  className="input" 
-                  required 
-                  value={structureForm.academicYearId} 
-                  onChange={e => setStructureForm({...structureForm, academicYearId: e.target.value})}
-                >
-                  <option value="">Select an academic year</option>
-                  {academicYears.map(ay => <option key={ay.id} value={ay.id}>{ay.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="label">Total Amount (₹)</label>
+                <label className="label">Lump Sum Amount (₹)</label>
                 <input 
+                  aria-label="Total Amount"
                   type="number" 
-                  className="input" 
+                  className="input font-bold text-lg" 
                   required 
-                  placeholder="e.g. 50000"
+                  placeholder="50,000"
                   value={structureForm.totalAmount} 
                   onChange={e => setStructureForm({...structureForm, totalAmount: e.target.value})} 
                 />
               </div>
               <div className="pt-4">
-                <button type="submit" className="w-full btn btn-primary flex justify-center items-center gap-2">
-                  <Plus className="w-4 h-4"/> Save Structure
+                <button 
+                  type="submit" 
+                  disabled={processing}
+                  className="w-full btn btn-primary flex justify-center items-center gap-2 py-3 font-bold shadow-lg shadow-primary-200"
+                >
+                  {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5"/>} 
+                  Generate Structure
                 </button>
               </div>
             </form>
