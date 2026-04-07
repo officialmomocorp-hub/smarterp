@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store';
 import Layout from './components/Layout';
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Students from './pages/Students';
@@ -17,7 +18,6 @@ import Admissions from './pages/Admissions';
 import Timetable from './pages/Timetable';
 import Library from './pages/Library';
 import Reports from './pages/Reports';
-import Placeholder from './pages/Placeholder';
 import ManageSchools from './pages/ManageSchools';
 import Subscriptions from './pages/Subscriptions';
 import Settings from './pages/Settings';
@@ -39,6 +39,7 @@ export default function App() {
       <Toaster position="top-right" />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/manage-schools" element={<ProtectedRoute><ManageSchools /></ProtectedRoute>} />
