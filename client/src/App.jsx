@@ -28,6 +28,7 @@ const PlatformReports = lazy(() => import('./pages/PlatformReports'));
 const Academics = lazy(() => import('./pages/Academics'));
 const Subscriptions = lazy(() => import('./pages/Subscriptions'));
 const Settings = lazy(() => import('./pages/Settings'));
+const AuditLogs = lazy(() => import('./pages/AuditLogs'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function LoadingFallback() {
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="/academic" element={<ProtectedRoute><Academics /></ProtectedRoute>} />
           <Route path="/billing" element={<ProtectedRoute><Subscriptions /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

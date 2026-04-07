@@ -82,11 +82,11 @@ export default function Login() {
             </p>
             <div className="grid grid-cols-2 gap-2">
               <button 
-                onClick={() => { setEmailOrPhone('admin@smarterp.in'); setPassword('admin123'); }}
+                onClick={() => { setEmailOrPhone('info@dpsdemo.edu.in'); setPassword('admin123'); }}
                 className="text-left p-2 bg-gray-50 hover:bg-primary-50 border border-gray-100 rounded-lg transition-colors group"
               >
                 <p className="text-[10px] font-bold text-primary-700 uppercase tracking-wider">School Admin</p>
-                <p className="text-[11px] text-gray-500 group-hover:text-primary-600 truncate">admin@smarterp.in</p>
+                <p className="text-[11px] text-gray-500 group-hover:text-primary-600 truncate">info@dpsdemo.edu.in</p>
               </button>
               <button 
                 onClick={() => { setEmailOrPhone('teacher@smarterp.in'); setPassword('admin123'); }}

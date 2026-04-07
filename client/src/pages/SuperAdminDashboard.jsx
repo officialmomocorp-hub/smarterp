@@ -65,8 +65,8 @@ export default function SuperAdminDashboard() {
     <div className="space-y-6">
       <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Platform Overview</h2>
-          <p className="text-gray-600 mt-1">Hello Super Admin, here is the global view of Smarterp.</p>
+          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">ERP Seller Dashboard</h2>
+          <p className="text-gray-600 mt-1">Hello ERP Seller, here is the global view of Smarterp.</p>
         </div>
         <div className="hidden md:flex gap-4">
            <button 

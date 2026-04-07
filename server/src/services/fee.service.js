@@ -3,7 +3,7 @@ const { AppError } = require('../utils/appError');
 const { logAction, Actions, Resources } = require('../utils/auditLogger');
 
 class FeeService {
-  async createFeeStructure(data, schoolId) {
+  async createFeeStructure(data, schoolId, userId, req = null) {
     const { class: className, academicYear, feeHeads, installmentType, dueDates, lateFinePerDay, gstPercentage, classId, academicYearId } = data;
 
     let classRecord;
@@ -68,7 +68,7 @@ class FeeService {
     return feeStructure;
   }
 
-  async createConcession(data, schoolId) {
+  async createConcession(data, schoolId, userId, req = null) {
     // Security Fix: Verify fee structure ownership
     const feeStructure = await prisma.feeStructure.findFirst({
       where: { id: data.feeStructureId, schoolId }
@@ -92,10 +92,20 @@ class FeeService {
       },
     });
 
+    await logAction({
+      schoolId,
+      userId,
+      action: Actions.CREATE,
+      resource: Resources.FEE,
+      resourceId: concession.id,
+      newValue: concession,
+      req,
+    });
+
     return concession;
   }
 
-  async processPayment(data, schoolId) {
+  async processPayment(data, schoolId, userId, req = null) {
     const { 
       studentId, 
       feeStructureId, 
@@ -254,7 +264,7 @@ class FeeService {
       // Audit Log for Payment
       await logAction({
         schoolId,
-        userId: 'system', // TODO: Pass req.userId from controller
+        userId: userId || 'system',
         action: Actions.CREATE,
         resource: Resources.FEE,
         resourceId: feePayment.id,

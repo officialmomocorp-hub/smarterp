@@ -4,7 +4,7 @@ const { AppError } = require('../utils/appError');
 class StudentController {
   async create(req, res, next) {
     try {
-      const student = await studentService.create(req.body, req.schoolId);
+      const student = await studentService.create(req.body, req.schoolId, req.userId, req);
       res.status(201).json({ success: true, data: student });
     } catch (error) {
       next(error);
@@ -31,7 +31,7 @@ class StudentController {
 
   async update(req, res, next) {
     try {
-      const student = await studentService.update(req.params.id, req.schoolId, req.body, req);
+      const student = await studentService.update(req.params.id, req.schoolId, req.body, req.userId, req);
       res.json({ success: true, data: student });
     } catch (error) {
       next(error);
@@ -40,7 +40,7 @@ class StudentController {
 
   async delete(req, res, next) {
     try {
-      const result = await studentService.delete(req.params.id, req.schoolId, req);
+      const result = await studentService.delete(req.params.id, req.schoolId, req.userId, req);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);

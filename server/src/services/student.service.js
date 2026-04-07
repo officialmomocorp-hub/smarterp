@@ -61,7 +61,7 @@ class StudentService {
     return { count, total: data.length };
   }
 
-  async create(data, schoolId) {
+  async create(data, schoolId, userId, req = null) {
     const { profile, parentData, class: className, section, ...studentData } = data;
 
     if (profile && profile.dateOfBirth) {
@@ -251,7 +251,7 @@ class StudentService {
     return student;
   }
 
-  async update(id, schoolId, data, req = null) {
+  async update(id, schoolId, data, userId = 'system', req = null) {
     const student = await prisma.student.findFirst({
       where: { id, schoolId },
     });
@@ -306,7 +306,7 @@ class StudentService {
       // Audit Log for Student Update
       await logAction({
         schoolId,
-        userId: 'system',
+        userId,
         action: Actions.UPDATE,
         resource: Resources.STUDENT,
         resourceId: id,
@@ -319,7 +319,7 @@ class StudentService {
     });
   }
 
-  async delete(id, schoolId, req = null) {
+  async delete(id, schoolId, userId = 'system', req = null) {
     const student = await prisma.student.findFirst({
       where: { id, schoolId },
     });
@@ -336,7 +336,7 @@ class StudentService {
     // Audit Log for Student Withdrawal
     await logAction({
       schoolId,
-      userId: 'system',
+      userId,
       action: Actions.DELETE,
       resource: Resources.STUDENT,
       resourceId: id,
@@ -401,7 +401,7 @@ class StudentService {
     return defaulters;
   }
 
-  async convertFromAdmission(admissionId, schoolId) {
+  async convertFromAdmission(admissionId, schoolId, userId = 'system', req = null) {
     const admission = await prisma.admission.findFirst({
       where: { id: admissionId, schoolId, status: 'APPROVED' },
     });
@@ -439,7 +439,7 @@ class StudentService {
       dateOfAdmission: new Date(),
     };
 
-    const student = await this.create(data, schoolId);
+    const student = await this.create(data, schoolId, userId, req);
 
     // Update admission record
     await prisma.admission.update({

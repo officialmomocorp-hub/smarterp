@@ -1,5 +1,6 @@
 const authService = require('../services/auth.service');
 const { AppError } = require('../utils/appError');
+const { logAction, Actions, Resources } = require('../utils/auditLogger');
 
 class AuthController {
   async register(req, res, next) {
@@ -38,6 +39,15 @@ class AuthController {
       };
 
       res.cookie('token', result.token, cookieOptions);
+      
+      await logAction({
+        schoolId: result.user.schoolId,
+        userId: result.user.id,
+        action: Actions.LOGIN,
+        resource: 'AUTH',
+        req,
+      });
+
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -62,6 +72,17 @@ class AuthController {
       }
 
       const result = await authService.changePassword(req.userId, currentPassword, newPassword);
+      
+      await logAction({
+        schoolId: req.schoolId,
+        userId: req.userId,
+        action: Actions.UPDATE,
+        resource: 'AUTH',
+        resourceId: req.userId,
+        newValue: { action: 'PASSWORD_CHANGE' },
+        req,
+      });
+
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -110,6 +131,15 @@ class AuthController {
       };
 
       res.clearCookie('token', cookieOptions);
+      
+      await logAction({
+        schoolId: req.schoolId,
+        userId: req.userId,
+        action: 'LOGOUT',
+        resource: 'AUTH',
+        req,
+      });
+
       res.json({ success: true, ...result });
     } catch (error) {
       next(error);

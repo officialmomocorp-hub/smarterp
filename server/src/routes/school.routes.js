@@ -8,7 +8,9 @@ router.use(authenticate);
 
 router.post('/', authorize('SUPER_ADMIN'), schoolController.createSchool);
 router.get('/', authorize('SUPER_ADMIN'), schoolController.getSchools);
+router.put('/:id/toggle-status', authorize('SUPER_ADMIN'), schoolController.toggleSchoolStatus);
 router.put('/:id/reset-password', authorize('SUPER_ADMIN'), schoolController.resetAdminPassword);
+router.delete('/:id', authorize('SUPER_ADMIN'), schoolController.deleteSchool);
 
 // School Specific Settings (Admin only)
 router.get('/settings', schoolScoped, schoolController.getSchoolSettings);

@@ -34,7 +34,7 @@ export default function Settings() {
         if (data.success && data.data) setSchoolData(data.data);
       } catch (err) { 
         if (err.response?.status === 403) {
-           toast.error('Global Super Admins must select a school to manage settings.');
+           toast.error('Global ERP Sellers must select a school to manage settings.');
         } else {
            console.error('Failed to fetch settings', err); 
         }

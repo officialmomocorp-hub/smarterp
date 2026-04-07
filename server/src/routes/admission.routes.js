@@ -5,6 +5,7 @@ const { validate } = require('../middleware/validate');
 const admissionValidation = require('../validations/admission.validation');
 const prisma = require('../config/database');
 const { AppError } = require('../utils/appError');
+const { logAction, Actions, Resources } = require('../utils/auditLogger');
 
 router.use(authenticate, schoolScoped);
 
@@ -31,6 +32,15 @@ router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), validate(admissionValidation
         tcDate: req.body.tcDate ? new Date(req.body.tcDate) : null,
         annualIncome: req.body.annualIncome ? parseFloat(req.body.annualIncome) : null,
       },
+    });
+    await logAction({
+      schoolId: req.schoolId,
+      userId: req.userId,
+      action: Actions.CREATE,
+      resource: Resources.ADMISSION,
+      resourceId: admission.id,
+      newValue: admission,
+      req,
     });
     res.status(201).json({ success: true, data: admission });
   } catch (error) { next(error); }
@@ -81,6 +91,16 @@ router.put('/:id/status', authorize('SUPER_ADMIN', 'ADMIN'), validate(admissionV
       where: { id: req.params.id },
       data: { status, remarks, processedAt: new Date(), processedBy: req.userId },
     });
+    await logAction({
+      schoolId: req.schoolId,
+      userId: req.userId,
+      action: Actions.UPDATE,
+      resource: Resources.ADMISSION,
+      resourceId: req.params.id,
+      oldValue: existing,
+      newValue: admission,
+      req,
+    });
     res.json({ success: true, data: admission });
   } catch (error) { next(error); }
 });
@@ -89,7 +109,18 @@ const studentService = require('../services/student.service');
 
 router.post('/:id/convert-to-student', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
-    const student = await studentService.convertFromAdmission(req.params.id, req.schoolId);
+    const student = await studentService.convertFromAdmission(req.params.id, req.schoolId, req.userId, req);
+    
+    await logAction({
+        schoolId: req.schoolId,
+        userId: req.userId,
+        action: Actions.UPDATE,
+        resource: Resources.ADMISSION,
+        resourceId: req.params.id,
+        newValue: { status: 'CONVERTED' },
+        req,
+      });
+
     res.json({ success: true, data: student, message: 'Converted to student successfully' });
   } catch (error) { next(error); }
 });

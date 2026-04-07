@@ -5,6 +5,7 @@ const prisma = require('../config/database');
 const { AppError } = require('../utils/appError');
 const { validate } = require('../middleware/validate');
 const staffValidation = require('../validations/staff.validation');
+const { logAction, Actions, Resources } = require('../utils/auditLogger');
 
 router.use(authenticate, schoolScoped);
 
@@ -64,6 +65,15 @@ router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), validate(staffValidation.cre
       });
     });
 
+    await logAction({
+      schoolId: req.schoolId,
+      userId: req.userId,
+      action: Actions.CREATE,
+      resource: Resources.STAFF,
+      resourceId: result.id,
+      newValue: result,
+      req,
+    });
     res.status(201).json({ success: true, data: result });
   } catch (error) { next(error); }
 });
@@ -115,6 +125,16 @@ router.put('/:id', authorize('SUPER_ADMIN', 'ADMIN'), validate(staffValidation.u
     const staff = await prisma.staff.update({
       where: { id: req.params.id },
       data: req.body,
+    });
+    await logAction({
+      schoolId: req.schoolId,
+      userId: req.userId,
+      action: Actions.UPDATE,
+      resource: Resources.STAFF,
+      resourceId: req.params.id,
+      oldValue: existing,
+      newValue: staff,
+      req,
     });
     res.json({ success: true, data: staff });
   } catch (error) { next(error); }

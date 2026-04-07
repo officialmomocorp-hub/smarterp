@@ -7,7 +7,7 @@ import {
   Bus, BedDouble, FileText, MessageSquare, GraduationCap,
   Library, UserCheck, ClipboardList, Settings, LogOut,
   Menu, ChevronDown, ChevronRight, Receipt, BarChart3,
-  School, Award, FileSpreadsheet, Bell, Building2, X
+  School, Award, FileSpreadsheet, Bell, Building2, X, Shield
 } from 'lucide-react';
 
 const commonMenu = [
@@ -16,6 +16,12 @@ const commonMenu = [
     icon: LayoutDashboard,
     path: '/dashboard',
     roles: ['SUPER_ADMIN', 'ADMIN', 'TEACHER', 'PARENT', 'STUDENT'],
+  },
+  {
+    title: 'Audit Logs',
+    icon: Shield,
+    path: '/audit-logs',
+    roles: ['SUPER_ADMIN', 'ADMIN'],
   },
   {
     title: 'Settings',
@@ -320,7 +326,9 @@ export default function Layout({ children }) {
               <p className="text-sm font-medium text-gray-900">
                 {user?.profile?.firstName} {user?.profile?.lastName}
               </p>
-              <p className="text-xs text-gray-500">{user?.role}</p>
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">
+                {user?.role === 'SUPER_ADMIN' ? 'ERP Seller' : user?.role === 'ADMIN' ? 'School Admin' : user?.role}
+              </p>
             </div>
             <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
               <span className="text-primary-700 font-medium">

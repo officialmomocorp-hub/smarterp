@@ -4,6 +4,7 @@ const { authenticate, authorize, schoolScoped } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
 const academicValidation = require('../validations/academic.validation');
 const prisma = require('../config/database');
+const { logAction, Actions, Resources } = require('../utils/auditLogger');
 
 router.use(authenticate, schoolScoped);
 
@@ -22,6 +23,15 @@ router.get('/classes', async (req, res, next) => {
 router.post('/classes', authorize('SUPER_ADMIN', 'ADMIN'), validate(academicValidation.createClass), async (req, res, next) => {
   try {
     const cls = await prisma.class.create({ data: { schoolId: req.schoolId, ...req.body } });
+    await logAction({
+      schoolId: req.schoolId,
+      userId: req.userId,
+      action: Actions.CREATE,
+      resource: 'CLASS',
+      resourceId: cls.id,
+      newValue: cls,
+      req,
+    });
     res.status(201).json({ success: true, data: cls });
   } catch (error) { next(error); }
 });
@@ -42,6 +52,15 @@ router.post('/sections', authorize('SUPER_ADMIN', 'ADMIN'), validate(academicVal
       return res.status(400).json({ success: false, message: `Section ${name} already exists for this class.` });
     }
     const section = await prisma.section.create({ data: { ...req.body, name: name.trim().toUpperCase() } });
+    await logAction({
+      schoolId: req.schoolId,
+      userId: req.userId,
+      action: Actions.CREATE,
+      resource: 'SECTION',
+      resourceId: section.id,
+      newValue: section,
+      req,
+    });
     res.status(201).json({ success: true, data: section });
   } catch (error) { next(error); }
 });
@@ -89,6 +108,15 @@ router.post('/academic-years', authorize('SUPER_ADMIN', 'ADMIN'), validate(acade
         startDate: new Date(req.body.startDate),
         endDate: new Date(req.body.endDate),
       }
+    });
+    await logAction({
+      schoolId: req.schoolId,
+      userId: req.userId,
+      action: Actions.CREATE,
+      resource: 'ACADEMIC_YEAR',
+      resourceId: year.id,
+      newValue: year,
+      req,
     });
     res.status(201).json({ success: true, data: year });
   } catch (error) { next(error); }

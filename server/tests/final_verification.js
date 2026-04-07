@@ -1,6 +1,6 @@
-const https = require('https');
+const http = require('http');
 
-const BASE = 'https://smarterpsolution.duckdns.org';
+const BASE = 'http://localhost:5000';
 let TOKEN = '';
 let passed = 0;
 let failed = 0;
@@ -17,7 +17,7 @@ function request(method, path, body) {
     };
     if (TOKEN) options.headers['Authorization'] = `Bearer ${TOKEN}`;
     
-    const req = https.request(options, (res) => {
+    const req = http.request(options, (res) => {
       let data = '';
       res.on('data', (c) => (data += c));
       res.on('end', () => {

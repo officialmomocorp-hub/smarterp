@@ -4,7 +4,7 @@ const { AppError } = require('../utils/appError');
 class FeeController {
   async createFeeStructure(req, res, next) {
     try {
-      const feeStructure = await feeService.createFeeStructure(req.body, req.schoolId);
+      const feeStructure = await feeService.createFeeStructure(req.body, req.schoolId, req.user?.id, req);
       res.status(201).json({ success: true, data: feeStructure });
     } catch (error) {
       next(error);
@@ -23,7 +23,7 @@ class FeeController {
 
   async createConcession(req, res, next) {
     try {
-      const concession = await feeService.createConcession(req.body, req.schoolId);
+      const concession = await feeService.createConcession(req.body, req.schoolId, req.user?.id, req);
       res.status(201).json({ success: true, data: concession });
     } catch (error) {
       next(error);
@@ -32,7 +32,7 @@ class FeeController {
 
   async processPayment(req, res, next) {
     try {
-      const payment = await feeService.processPayment(req.body, req.schoolId);
+      const payment = await feeService.processPayment(req.body, req.schoolId, req.userId, req);
       res.status(201).json({ success: true, data: payment });
     } catch (error) {
       next(error);
