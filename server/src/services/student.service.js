@@ -2,6 +2,7 @@ const prisma = require('../config/database');
 const { AppError } = require('../utils/appError');
 const xlsx = require('xlsx');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 const { logAction, Actions, Resources } = require('../utils/auditLogger');
 
 class StudentService {
@@ -104,17 +105,21 @@ class StudentService {
     const rollNumber = lastStudent ? lastStudent.rollNumber + 1 : 1;
     const studentId = this.generateStudentId(schoolId, classRecord.name, section, rollNumber);
 
+    const defaultPassword = await bcrypt.hash('admin123', 12);
+
     const student = await prisma.$transaction(async (tx) => {
+      // 1. Create User for Student
       const user = await tx.user.create({
         data: {
           schoolId,
-          phone: parentData?.fatherPhone || parentData?.motherPhone || '',
-          email: null,
-          password: '',
+          phone: studentData.phone || parentData?.fatherPhone || parentData?.motherPhone || '',
+          email: studentData.email || null,
+          password: defaultPassword,
           role: 'STUDENT',
         },
       });
 
+      // 2. Create Student record
       const newStudent = await tx.student.create({
         data: {
           schoolId,
@@ -128,6 +133,7 @@ class StudentService {
         },
       });
 
+      // 3. Create Student Profile
       await tx.studentProfile.create({
         data: {
           studentId: newStudent.id,
@@ -135,6 +141,7 @@ class StudentService {
         },
       });
 
+      // Handle Parent logic
       if (parentData && parentData.annualIncome !== undefined) {
         if (parentData.annualIncome === null || parentData.annualIncome === '') {
           parentData.annualIncome = 0;
@@ -149,19 +156,44 @@ class StudentService {
           OR: [
             { fatherPhone: parentData?.fatherPhone },
             { motherPhone: parentData?.motherPhone },
-          ],
+          ].filter(p => p.fatherPhone || p.motherPhone),
         },
       });
 
       if (!parent) {
+        // 4. Create User for Parent if not exists
+        const parentPhone = parentData?.fatherPhone || parentData?.motherPhone || '';
+        let parentUserId = null;
+        
+        if (parentPhone) {
+          const existingUser = await tx.user.findFirst({ where: { phone: parentPhone, role: 'PARENT' } });
+          if (!existingUser) {
+            const parentUser = await tx.user.create({
+              data: {
+                schoolId,
+                phone: parentPhone,
+                email: parentData?.fatherEmail || parentData?.motherEmail || null,
+                password: defaultPassword,
+                role: 'PARENT',
+              },
+            });
+            parentUserId = parentUser.id;
+          } else {
+            parentUserId = existingUser.id;
+          }
+        }
+
+        // 5. Create Parent profile linked to user
         parent = await tx.parent.create({
           data: {
             schoolId,
+            userId: parentUserId,
             ...parentData,
           },
         });
       }
 
+      // 6. Link Parent and Student
       await tx.parentStudent.create({
         data: {
           parentId: parent.id,
