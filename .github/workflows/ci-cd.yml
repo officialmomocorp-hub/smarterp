@@ -54,6 +54,6 @@ jobs:
             git pull origin main
             cd server && npm ci --production
             npx prisma migrate deploy
-            npx prisma db seed
+            node prisma/demo-seed.js
             pm2 restart all
             echo "Deployed successfully at $(date)"

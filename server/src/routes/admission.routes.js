@@ -66,6 +66,30 @@ router.get('/', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, res, n
   } catch (error) { next(error); }
 });
 
+router.get('/stats', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+  try {
+    const stats = await prisma.admission.groupBy({
+      by: ['status'],
+      where: { schoolId: req.schoolId },
+      _count: true
+    });
+    
+    const formattedStats = {
+      PENDING: 0,
+      APPROVED: 0,
+      REJECTED: 0,
+      WAITLISTED: 0,
+      CONVERTED: 0,
+    };
+    
+    stats.forEach(s => {
+      formattedStats[s.status] = s._count;
+    });
+    
+    res.json({ success: true, data: formattedStats });
+  } catch (error) { next(error); }
+});
+
 router.get('/:id', async (req, res, next) => {
   try {
     const admission = await prisma.admission.findFirst({ where: { id: req.params.id, schoolId: req.schoolId } });
