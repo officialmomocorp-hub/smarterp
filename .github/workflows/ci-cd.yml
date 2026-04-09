@@ -1,4 +1,4 @@
-﻿name: SmartERP CI/CD Pipeline
+name: SmartERP CI/CD Pipeline
 
 on:
   push:
@@ -86,6 +86,7 @@ jobs:
             git pull origin main
             cd server && npm ci --production
             npx prisma migrate deploy
+            npx prisma db seed
             pm2 restart all
             echo "Deployed successfully at $(date)"
 
