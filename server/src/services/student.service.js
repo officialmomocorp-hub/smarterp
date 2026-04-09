@@ -135,6 +135,14 @@ class StudentService {
         },
       });
 
+      if (parentData && parentData.annualIncome !== undefined) {
+        if (parentData.annualIncome === null || parentData.annualIncome === '') {
+          parentData.annualIncome = 0;
+        } else {
+          parentData.annualIncome = parseFloat(parentData.annualIncome) || 0;
+        }
+      }
+
       let parent = await tx.parent.findFirst({
         where: {
           schoolId,
@@ -429,13 +437,13 @@ class StudentService {
         motherOccupation: admission.motherOccupation,
         motherPhone: admission.motherPhone,
         annualIncome: admission.annualIncome,
+        address: admission.address,
+        city: admission.city,
+        state: admission.state,
+        pincode: admission.pincode,
       },
       class: admission.classApplied,
       section: admission.sectionPreferred || 'A',
-      address: admission.address,
-      city: admission.city,
-      state: admission.state,
-      pincode: admission.pincode,
       dateOfAdmission: new Date(),
     };
 

@@ -30,7 +30,9 @@ export default function Admissions() {
   });
 
   const [admissions, setAdmissions] = useState([]);
+  const [stats, setStats] = useState({ PENDING: 0, APPROVED: 0, REJECTED: 0, WAITLISTED: 0 });
   const [loading, setLoading] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(false);
 
   const fetchAdmissions = async () => {
     setLoading(true);
@@ -44,8 +46,21 @@ export default function Admissions() {
     }
   };
 
+  const fetchStats = async () => {
+    setStatsLoading(true);
+    try {
+      const { data } = await admissionAPI.getStats();
+      setStats(data.data);
+    } catch (e) {
+      console.error('Failed to load stats');
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchAdmissions();
+    fetchStats();
   }, [searchQuery, filterStatus]);
 
   const handleSubmit = async (e) => {
@@ -80,6 +95,7 @@ export default function Admissions() {
       await admissionAPI.updateStatus(id, { status });
       toast.success(`Admission ${status.toLowerCase()}`);
       fetchAdmissions();
+      fetchStats();
     } catch (e) {
       toast.error('Failed to update status');
     }
@@ -123,30 +139,30 @@ export default function Admissions() {
       </div>
 
       {/* Stats */}
-      {loading ? <StatsSkeleton count={4} /> : (
+      {statsLoading ? <StatsSkeleton count={4} /> : (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="card">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-yellow-100 rounded-lg"><Clock className="w-6 h-6 text-yellow-600" aria-hidden="true" /></div>
-              <div><p className="text-sm font-bold text-gray-600">Pending</p><p className="text-xl font-bold text-yellow-700">2</p></div>
+              <div><p className="text-sm font-bold text-gray-600">Pending</p><p className="text-xl font-bold text-yellow-700">{stats.PENDING}</p></div>
             </div>
           </div>
           <div className="card">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-green-100 rounded-lg"><CheckCircle className="w-6 h-6 text-green-600" aria-hidden="true" /></div>
-              <div><p className="text-sm font-bold text-gray-600">Approved</p><p className="text-xl font-bold text-green-700">1</p></div>
+              <div><p className="text-sm font-bold text-gray-600">Approved</p><p className="text-xl font-bold text-green-700">{stats.APPROVED}</p></div>
             </div>
           </div>
           <div className="card">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-blue-100 rounded-lg"><FileText className="w-6 h-6 text-blue-600" aria-hidden="true" /></div>
-              <div><p className="text-sm font-bold text-gray-600">Waitlisted</p><p className="text-xl font-bold text-blue-700">1</p></div>
+              <div><p className="text-sm font-bold text-gray-600">Waitlisted</p><p className="text-xl font-bold text-blue-700">{stats.WAITLISTED}</p></div>
             </div>
           </div>
           <div className="card">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-red-100 rounded-lg"><XCircle className="w-6 h-6 text-red-600" aria-hidden="true" /></div>
-              <div><p className="text-sm font-bold text-gray-600">Rejected</p><p className="text-xl font-bold text-red-700">1</p></div>
+              <div><p className="text-sm font-bold text-gray-600">Rejected</p><p className="text-xl font-bold text-red-700">{stats.REJECTED}</p></div>
             </div>
           </div>
         </div>

@@ -86,6 +86,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/v1/health', healthRoutes);
 app.get('/health', (req, res) => res.json({ status: 'OK', uptime: process.uptime() }));
 
+
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
