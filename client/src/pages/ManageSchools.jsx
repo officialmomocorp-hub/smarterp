@@ -110,9 +110,19 @@ export default function ManageSchools() {
                   {school.isActive ? 'Active' : 'Inactive'}
                 </span>
                 <button 
-                  onClick={() => setDeleteConfirmSchool(school)}
-                  className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                  title="Delete School"
+                  onClick={() => {
+                    if (school.isActive) {
+                      toast.error('Active schools cannot be deleted. Deactivate first.');
+                      return;
+                    }
+                    setDeleteConfirmSchool(school);
+                  }}
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    school.isActive 
+                    ? 'text-gray-300 cursor-not-allowed grayscale' 
+                    : 'text-gray-400 hover:text-rose-600 hover:bg-rose-50'
+                  }`}
+                  title={school.isActive ? "Deactivate school before deleting" : "Delete School"}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -126,6 +136,10 @@ export default function ManageSchools() {
               <div className="flex justify-between"><span>Code:</span> <span className="font-medium text-gray-900">{school.code}</span></div>
               <div className="flex justify-between"><span>Admin:</span> <span className="font-medium text-gray-900 truncate ml-4" title={school.users?.[0]?.email}>{school.users?.[0]?.email || 'N/A'}</span></div>
               <div className="flex justify-between"><span>Phone:</span> <span className="font-medium text-gray-900">{school.phone}</span></div>
+              <div className="flex justify-between pt-2 border-t border-gray-50 mt-2 text-[10px] uppercase tracking-tighter text-gray-400 font-bold">
+                 <span>Registered On</span>
+                 <span>{new Date(school.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">

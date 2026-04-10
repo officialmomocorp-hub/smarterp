@@ -5,7 +5,7 @@ const createClass = {
     name: Joi.string().required(),
     sortOrder: Joi.number().integer().optional(),
     academicYearId: Joi.string().required()
-  }).unknown(false)
+  }).unknown(true)
 };
 
 const createSection = {
@@ -14,7 +14,7 @@ const createSection = {
     name: Joi.string().required(),
     roomNumber: Joi.string().optional(),
     capacity: Joi.number().integer().optional()
-  }).unknown(false)
+  }).unknown(true)
 };
 
 const createSubject = {
@@ -25,7 +25,7 @@ const createSubject = {
     description: Joi.string().optional(),
     isElective: Joi.boolean().optional(),
     creditHours: Joi.number().optional()
-  }).unknown(false)
+  }).unknown(true)
 };
 
 const createAcademicYear = {
@@ -34,7 +34,7 @@ const createAcademicYear = {
     startDate: Joi.date().required(),
     endDate: Joi.date().min(Joi.ref('startDate')).required(),
     isCurrent: Joi.boolean().optional()
-  }).unknown(false)
+  }).unknown(true)
 };
 
 const createHomework = {
@@ -46,7 +46,7 @@ const createHomework = {
     description: Joi.string().required(),
     dueDate: Joi.date().min('now').required(),
     maxMarks: Joi.number().optional()
-  }).unknown(false)
+  }).unknown(true)
 };
 
 module.exports = {

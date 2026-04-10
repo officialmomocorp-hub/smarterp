@@ -22,8 +22,14 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
+    const data = { ...req.body };
+    if (!data.teacherId && data.staffId) {
+      data.teacherId = data.staffId;
+      delete data.staffId;
+    }
+
     const entry = await prisma.timetable.create({
-      data: { schoolId: req.schoolId, ...req.body },
+      data: { schoolId: req.schoolId, ...data },
     });
     res.status(201).json({ success: true, data: entry });
   } catch (error) { next(error); }

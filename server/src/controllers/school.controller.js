@@ -176,6 +176,10 @@ exports.deleteSchool = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'School not found' });
     }
 
+    if (school.isActive) {
+      return res.status(400).json({ success: false, message: 'Active schools cannot be deleted. Please deactivate the school first from the status toggle.' });
+    }
+
     // We use a transaction to ensure all related data is cleaned up if needed
     // However, in a real system, we might prefer soft-delete or keeping audit logs.
     // Given the request, we will perform a delete. 

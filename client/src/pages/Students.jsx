@@ -18,6 +18,7 @@ export default function Students() {
   const [viewStudentModal, setViewStudentModal] = useState(null);
   const [showImportModal, setShowImportModal] = useState(false);
   const [importLoading, setImportLoading] = useState(false);
+  const [editStudentId, setEditStudentId] = useState(null);
   const [formData, setFormData] = useState({
     profile: {
       firstName: '', middleName: '', lastName: '', dateOfBirth: '',

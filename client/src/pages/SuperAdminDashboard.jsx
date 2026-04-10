@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { 
   Building2, Users, CreditCard, Box, TrendingUp, 
@@ -15,6 +16,7 @@ import { DashboardSkeleton } from '../components/Skeleton';
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend);
 
 export default function SuperAdminDashboard() {
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -70,12 +72,14 @@ export default function SuperAdminDashboard() {
         </div>
         <div className="hidden md:flex gap-4">
            <button 
+             onClick={() => navigate('/manage-schools')}
              aria-label="Add New School Record"
              className="px-4 py-2 bg-primary-600 text-white rounded-xl shadow-lg shadow-primary-200 hover:bg-primary-700 transition-all font-medium"
            >
              Add New School
            </button>
            <button 
+             onClick={() => navigate('/platform-reports')}
              aria-label="Export Platform Reports to CSV"
              className="px-4 py-2 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-all font-medium"
            >
@@ -138,6 +142,7 @@ export default function SuperAdminDashboard() {
                   </div>
                 ))}
                 <button 
+                  onClick={() => navigate('/manage-schools')}
                   aria-label="Clear View of All Registered Schools"
                   className="w-full mt-4 py-3 text-sm font-bold text-primary-600 bg-primary-50 rounded-xl hover:bg-primary-100 transition-colors"
                 >
