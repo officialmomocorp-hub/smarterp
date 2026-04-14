@@ -29,6 +29,7 @@ const Academics = lazy(() => import('./pages/Academics'));
 const Subscriptions = lazy(() => import('./pages/Subscriptions'));
 const Settings = lazy(() => import('./pages/Settings'));
 const AuditLogs = lazy(() => import('./pages/AuditLogs'));
+const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function LoadingFallback() {
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/manage-schools" element={<ProtectedRoute><ManageSchools /></ProtectedRoute>} />
           <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />

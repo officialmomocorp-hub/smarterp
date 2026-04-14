@@ -1,269 +1,102 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const prisma = require('../config/database');
-const { AppError } = require('../utils/appError');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 class AuthService {
-  async register(data) {
-    const { email, phone, password, role, schoolId, profile, ...additionalData } = data;
+  async login(emailOrPhone, password) {
+    console.log('--- Login Attempt ---');
+    console.log('Input:', emailOrPhone);
 
-    const existingUser = await prisma.user.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
         OR: [
-          email ? { email } : {},
-          { phone },
-        ].filter(Boolean),
+          { email: emailOrPhone },
+          { phone: emailOrPhone }
+        ]
       },
-    });
-
-    if (existingUser) {
-      throw new AppError('User already exists with this email or phone', 409);
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    const user = await prisma.$transaction(async (tx) => {
-      const newUser = await tx.user.create({
-        data: {
-          email,
-          phone,
-          password: hashedPassword,
-          role,
-          schoolId,
-        },
-      });
-
-      if (profile) {
-        await tx.profile.create({
-          data: {
-            userId: newUser.id,
-            ...profile,
-          },
-        });
-      }
-
-      if (role === 'STUDENT' && additionalData.studentData) {
-        await tx.student.create({
-          data: {
-            userId: newUser.id,
-            schoolId,
-            ...additionalData.studentData,
-          },
-        });
-      }
-
-      if (role === 'PARENT' && additionalData.parentData) {
-        await tx.parent.create({
-          data: {
-            userId: newUser.id,
-            schoolId,
-            ...additionalData.parentData,
-          },
-        });
-      }
-
-      if (role === 'TEACHER' && additionalData.staffData) {
-        await tx.staff.create({
-          data: {
-            userId: newUser.id,
-            schoolId,
-            ...additionalData.staffData,
-          },
-        });
-      }
-
-      return newUser;
-    });
-
-    const token = this.generateToken(user);
-    return { user: this.sanitizeUser(user), token };
-  }
-
-  async login(emailOrPhone, password) {
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [{ email: emailOrPhone }, { phone: emailOrPhone }],
-      },
-      include: { profile: true, student: true, staff: true, parent: true },
+      include: { school: true }
     });
 
     if (!user) {
-      throw new AppError('Invalid credentials', 401);
+      console.log('Result: User not found');
+      throw new Error('Invalid credentials');
     }
 
-    if (!user.isActive) {
-      throw new AppError('Account is deactivated', 403);
+    if (!user.isActive || (user.school && !user.school.isActive)) {
+      console.log('Result: Account/School disabled');
+      throw new Error('Invalid credentials or account disabled');
     }
 
-    if (user.lockedUntil && user.lockedUntil > new Date()) {
-      throw new AppError('Account is temporarily locked. Try again later', 403);
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      console.log('Result: Password mismatch');
+      throw new Error('Invalid credentials');
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      const failedAttempts = user.failedLoginAttempts + 1;
-
-      if (failedAttempts >= 5) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            failedLoginAttempts: 0,
-            lockedUntil: new Date(Date.now() + 30 * 60 * 1000),
-          },
-        });
-        throw new AppError('Too many failed attempts. Account locked for 30 minutes', 403);
-      }
-
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { failedLoginAttempts: failedAttempts },
-      });
-
-      throw new AppError('Invalid credentials', 401);
-    }
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        failedLoginAttempts: 0,
-        lastLogin: new Date(),
-      },
-    });
-
-    const token = this.generateToken(user);
-
-    return { user: this.sanitizeUser(user), token };
-  }
-
-  async refreshToken(userId) {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user || !user.isActive) {
-      throw new AppError('Invalid user', 401);
-    }
-
-    const token = this.generateToken(user);
-    return { token };
-  }
-
-  async changePassword(userId, currentPassword, newPassword) {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-
-    if (!user) {
-      throw new AppError('User not found', 404);
-    }
-
-    const isValid = await bcrypt.compare(currentPassword, user.password);
-
-    if (!isValid) {
-      throw new AppError('Current password is incorrect', 400);
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
-    
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: userId },
-        data: { 
-          password: hashedPassword,
-          tokenVersion: { increment: 1 }
-        },
-      }),
-      prisma.passwordHistory.create({
-        data: {
-          userId,
-          hashedPassword
-        }
-      })
-    ]);
-
-    return { message: 'Password changed successfully' };
-  }
-
-  async forgotPassword(emailOrPhone) {
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [{ email: emailOrPhone }, { phone: emailOrPhone }],
-      },
-    });
-
-    if (!user) {
-      // Security: Do not reveal if user exists. Return generic success message.
-      return { message: 'If an account exists with this email/phone, a reset link will be sent.' };
-    }
-
-    const resetToken = jwt.sign(
-      { userId: user.id, type: 'password_reset' },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    // In a real app, send the email here. For now, we return the token (standard demo behavior).
-    return { resetToken, message: 'If an account exists with this email/phone, a reset link will be sent.' };
-  }
-
-  async resetPassword(resetToken, newPassword) {
-    const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
-
-    if (decoded.type !== 'password_reset') {
-      throw new AppError('Invalid reset token', 400);
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
-    
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: decoded.userId },
-        data: { 
-          password: hashedPassword,
-          tokenVersion: { increment: 1 }
-        },
-      }),
-      prisma.passwordHistory.create({
-        data: {
-          userId: decoded.userId,
-          hashedPassword
-        }
-      })
-    ]);
-
-    return { message: 'Password reset successfully' };
-  }
-
-  async logout(token, userId) {
-    const decoded = jwt.decode(token);
-    const expiry = new Date(decoded.exp * 1000);
-
-    await prisma.tokenBlacklist.create({
-      data: {
-        token,
-        userId,
-        expiry,
-      },
-    });
-
-    return { message: 'Logged out successfully' };
-  }
-
-  generateToken(user) {
-    return jwt.sign(
-      {
+    const token = jwt.sign(
+      { 
+        id: user.id, 
         userId: user.id,
-        role: user.role,
+        role: user.role, 
         schoolId: user.schoolId,
-        version: user.tokenVersion,
+        tokenVersion: user.tokenVersion || 0,
+        version: user.tokenVersion || 0 
       },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      { expiresIn: '24h' }
     );
+
+    console.log('Result: Login Success for', user.email);
+    const { password: _, ...sanitized } = user;
+    return { user: sanitized, token };
   }
 
-  sanitizeUser(user) {
-    const { password, ...sanitized } = user;
-    return sanitized;
+  async registerSchool(data) {
+    const { 
+      schoolName, adminEmail, adminPassword, adminName, plan, phone, 
+      address, city, state, pincode, udiseCode, schoolCode
+    } = data;
+
+    const existingUser = await prisma.user.findUnique({ where: { email: adminEmail } });
+    if (existingUser) throw new Error('Email already registered');
+
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+
+    return await prisma.$transaction(async (tx) => {
+      const school = await tx.school.create({
+        data: {
+          name: schoolName,
+          code: schoolCode || ('SCH-' + Date.now()),
+          plan: plan || 'STARTER',
+          phone: phone || 'N/A',
+          email: adminEmail,
+          address: address || 'N/A',
+          city: city || 'N/A',
+          state: state || 'N/A',
+          pincode: pincode || 'N/A',
+          udiseCode: udiseCode || ('UD-' + Date.now()),
+          isActive: true
+        }
+      });
+
+      const user = await tx.user.create({
+        data: {
+          email: adminEmail,
+          password: hashedPassword,
+          name: adminName,
+          role: 'SCHOOL_ADMIN',
+          schoolId: school.id,
+          phone: phone
+        }
+      });
+
+      return { school, user: { id: user.id, email: user.email, name: user.name, role: user.role } };
+    });
+  }
+
+  async logout(userId) {
+    return true;
   }
 }
 

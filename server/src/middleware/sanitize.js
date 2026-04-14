@@ -1,17 +1,15 @@
 const sanitizeHtml = require('sanitize-html');
-const { body, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 
-/**
- * Global input sanitization middleware.
- * Recursively sanitizes string fields in req.body, req.query, and req.params using sanitize-html.
- * These sanitization rules are safe and robust for general input fields.
- */
-const cleanInput = (obj) => {
+const cleanInput = (obj, keyName) => {
+  // Skip sanitization for passwords
+  if (keyName === 'password') return obj;
+
   if (typeof obj !== 'object' || obj === null) {
     if (typeof obj === 'string') {
       return sanitizeHtml(obj, {
-        allowedTags: [], // Strip all HTML tags
-        allowedAttributes: {}, // Strip all attributes
+        allowedTags: [],
+        allowedAttributes: {},
         disallowedTagsMode: 'recursiveEscape'
       }).trim();
     }
@@ -20,7 +18,7 @@ const cleanInput = (obj) => {
 
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
-      obj[key] = cleanInput(obj[key]);
+      obj[key] = cleanInput(obj[key], key);
     }
   }
   return obj;
@@ -33,9 +31,6 @@ const xssSanitizer = (req, res, next) => {
   next();
 };
 
-/**
- * Validation Result handler to be used after individual route validations.
- */
 const validateResults = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -47,5 +42,5 @@ const validateResults = (req, res, next) => {
 module.exports = {
   xssSanitizer,
   validateResults,
-  sanitizeHtml // Exported to use for fine-grained control in specific routes
+  sanitizeHtml
 };

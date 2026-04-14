@@ -91,7 +91,7 @@ export default function ManageSchools() {
             <Building2 className="w-6 h-6 text-primary-600" />
             Manage Schools
           </h2>
-          <p className="text-gray-500 mt-1">ERP Seller Dashboard: Oversee school status and access</p>
+          <p className="text-gray-500 mt-1">Super Admin Dashboard: Oversee school status and access</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn btn-primary flex items-center gap-2">
           <Plus className="w-4 h-4" /> Add New School

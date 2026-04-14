@@ -9,24 +9,50 @@ router.get('/super-admin', authenticate, async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Forbidden' });
     }
 
-    const [totalSchools, totalStudents, totalStaff, recentSchools] = await Promise.all([
+    const [totalSchools, totalStudents, totalStaff, recentSchools, inactiveSchools, allSchools] = await Promise.all([
       prisma.school.count(),
       prisma.student.count(),
       prisma.staff.count(),
       prisma.school.findMany({
         orderBy: { createdAt: 'desc' },
         take: 5,
-        select: { id: true, name: true, city: true, createdAt: true }
-      })
+        select: { id: true, name: true, city: true, createdAt: true, isActive: true }
+      }),
+      prisma.school.count({ where: { isActive: false } }),
+      prisma.school.findMany({ select: { createdAt: true } })
     ]);
+
+    // Calculate real revenue trend based on school creation dates
+    // Assume MRR of ₹15,000 per school
+    const MRR_PER_SCHOOL = 15000;
+    
+    // Initialize last 6 months
+    const months = [];
+    const revenueTrend = [];
+    const now = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push(d.toLocaleString('default', { month: 'short' }));
+        
+        // Count schools created on or before this month
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
+        const schoolsUpToMonth = allSchools.filter(s => new Date(s.createdAt) <= endOfMonth).length;
+        revenueTrend.push(schoolsUpToMonth * MRR_PER_SCHOOL);
+    }
 
     res.json({
       success: true,
       data: {
         totalSchools,
+        activeSchools: totalSchools - inactiveSchools,
+        unpaidSchoolsCount: inactiveSchools,
         totalStudentsAcross: totalStudents,
         totalStaffAcross: totalStaff,
-        recentSchools
+        recentSchools,
+        totalRevenue: (totalSchools - inactiveSchools) * MRR_PER_SCHOOL,
+        revenueTrend,
+        trendLabels: months
       }
     });
   } catch (error) { next(error); }

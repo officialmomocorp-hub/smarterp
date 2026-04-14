@@ -327,7 +327,7 @@ export default function Layout({ children }) {
                 {user?.profile?.firstName} {user?.profile?.lastName}
               </p>
               <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">
-                {user?.role === 'SUPER_ADMIN' ? 'ERP Seller' : user?.role === 'ADMIN' ? 'School Admin' : user?.role}
+                {user?.role === 'SUPER_ADMIN' ? 'Super Admin' : user?.role === 'ADMIN' ? 'School Admin' : user?.role}
               </p>
             </div>
             <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">

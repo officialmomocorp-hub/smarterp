@@ -1,148 +1,52 @@
 const authService = require('../services/auth.service');
-const { AppError } = require('../utils/appError');
-const { logAction, Actions, Resources } = require('../utils/auditLogger');
 
 class AuthController {
-  async register(req, res, next) {
+  async login(req, res) {
     try {
-      const result = await authService.register(req.body);
-
-      const cookieOptions = {
+      const { emailOrPhone, email, password } = req.body;
+      const result = await authService.login(emailOrPhone || email, password);
+      
+      res.cookie('token', result.token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-      };
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000
+      });
 
-      res.cookie('token', result.token, cookieOptions);
-      res.status(201).json({ success: true, data: result });
+      res.json({
+        success: true,
+        message: 'Login successful',
+        data: result
+      });
     } catch (error) {
-      next(error);
+      console.error('Login controller error:', error.message);
+      res.status(401).json({ success: false, message: error.message });
     }
   }
 
-  async login(req, res, next) {
+  async registerSchool(req, res) {
     try {
-      const { emailOrPhone, password } = req.body;
+      const result = await authService.registerSchool(req.body);
+      res.status(201).json({
+        success: true,
+        message: 'Institution registered successfully! You can now log in.',
+        data: result
+      });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
 
-      if (!emailOrPhone || !password) {
-        throw new AppError('Email/phone and password are required', 400);
+  async logout(req, res) {
+    try {
+      if (req.user && req.user.id) {
+        await authService.logout(req.user.id);
       }
-
-      const result = await authService.login(emailOrPhone, password);
-
-      const cookieOptions = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-      };
-
-      res.cookie('token', result.token, cookieOptions);
-      
-      await logAction({
-        schoolId: result.user.schoolId,
-        userId: result.user.id,
-        action: Actions.LOGIN,
-        resource: 'AUTH',
-        req,
-      });
-
-      res.json({ success: true, data: result });
+      res.clearCookie('token');
+      res.json({ success: true, message: 'Logged out successfully' });
     } catch (error) {
-      next(error);
-    }
-  }
-
-  async refreshToken(req, res, next) {
-    try {
-      const result = await authService.refreshToken(req.userId);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async changePassword(req, res, next) {
-    try {
-      const { currentPassword, newPassword } = req.body;
-
-      if (!currentPassword || !newPassword) {
-        throw new AppError('Current password and new password are required', 400);
-      }
-
-      const result = await authService.changePassword(req.userId, currentPassword, newPassword);
-      
-      await logAction({
-        schoolId: req.schoolId,
-        userId: req.userId,
-        action: Actions.UPDATE,
-        resource: 'AUTH',
-        resourceId: req.userId,
-        newValue: { action: 'PASSWORD_CHANGE' },
-        req,
-      });
-
-      res.json({ success: true, data: result });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async forgotPassword(req, res, next) {
-    try {
-      const { emailOrPhone } = req.body;
-      const result = await authService.forgotPassword(emailOrPhone);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async resetPassword(req, res, next) {
-    try {
-      const { resetToken, newPassword } = req.body;
-      const result = await authService.resetPassword(resetToken, newPassword);
-      res.json({ success: true, data: result });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async getProfile(req, res, next) {
-    try {
-      const user = await authService.sanitizeUser(req.user);
-      res.json({ success: true, data: user });
-    } catch (error) {
-      next(error);
-    }
-  }
-  async logout(req, res, next) {
-    try {
-      const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
-      if (!token) throw new AppError('Token not provided', 400);
-
-      const result = await authService.logout(token, req.userId);
-
-      const cookieOptions = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict'
-      };
-
-      res.clearCookie('token', cookieOptions);
-      
-      await logAction({
-        schoolId: req.schoolId,
-        userId: req.userId,
-        action: 'LOGOUT',
-        resource: 'AUTH',
-        req,
-      });
-
-      res.json({ success: true, ...result });
-    } catch (error) {
-      next(error);
+      res.clearCookie('token');
+      res.status(500).json({ success: false, message: error.message });
     }
   }
 }
