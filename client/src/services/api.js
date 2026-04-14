@@ -48,6 +48,7 @@ export const studentAPI = {
   import: (formData) => api.post('/students/import', formData, { 
     headers: { 'Content-Type': 'multipart/form-data' } 
   }),
+  resetPassword: (id) => api.put(`/students/${id}/reset-password`),
 };
 
 export const admissionAPI = {
@@ -103,6 +104,7 @@ export const staffAPI = {
   getById: (id) => api.get(`/staff/${id}`),
   create: (data) => api.post('/staff', data),
   update: (id, data) => api.put(`/staff/${id}`, data),
+  resetPassword: (id) => api.put(`/staff/${id}/reset-password`),
 };
 
 export const noticeAPI = {

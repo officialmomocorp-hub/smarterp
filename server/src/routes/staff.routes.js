@@ -143,6 +143,37 @@ router.put('/:id', authorize('SUPER_ADMIN', 'ADMIN'), validate(staffValidation.u
   } catch (error) { next(error); }
 });
 
+router.put('/:id/reset-password', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+  try {
+    const existing = await prisma.staff.findFirst({
+      where: { id: req.params.id, schoolId: req.schoolId }
+    });
+    
+    if (!existing || !existing.userId) {
+      return res.status(404).json({ success: false, message: 'Staff record or linked User account not found.' });
+    }
+
+    const defaultPassword = await bcrypt.hash('admin123', 12);
+    await prisma.user.update({
+      where: { id: existing.userId },
+      data: { password: defaultPassword }
+    });
+
+    await logAction({
+      schoolId: req.schoolId,
+      userId: req.userId,
+      action: Actions.UPDATE,
+      resource: Resources.STAFF,
+      resourceId: req.params.id,
+      oldValue: { action: 'password_reset_initiated' },
+      newValue: { result: 'reset_to_admin123' },
+      req,
+    });
+
+    res.json({ success: true, message: 'Password reset to default (admin123) successfully' });
+  } catch (error) { next(error); }
+});
+
 router.delete('/:id', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
     const existing = await prisma.staff.findFirst({

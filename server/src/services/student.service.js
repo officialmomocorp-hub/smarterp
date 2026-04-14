@@ -3,6 +3,7 @@ const { AppError } = require('../utils/appError');
 const xlsx = require('xlsx');
 const fs = require('fs');
 const { logAction, Actions, Resources } = require('../utils/auditLogger');
+const bcrypt = require('bcryptjs');
 
 class StudentService {
   async importStudents(filePath, schoolId) {
@@ -104,13 +105,15 @@ class StudentService {
     const rollNumber = lastStudent ? lastStudent.rollNumber + 1 : 1;
     const studentId = this.generateStudentId(schoolId, classRecord.name, section, rollNumber);
 
+    const defaultPassword = await bcrypt.hash('student123', 10);
+
     const student = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
           schoolId,
           phone: parentData?.fatherPhone || parentData?.motherPhone || '',
           email: null,
-          password: '',
+          password: defaultPassword,
           role: 'STUDENT',
         },
       });
@@ -353,6 +356,24 @@ class StudentService {
     });
 
     return { message: 'Student deleted successfully' };
+  }
+
+  async resetPassword(id, schoolId) {
+    const student = await prisma.student.findFirst({
+      where: { id, schoolId },
+    });
+
+    if (!student || !student.userId) {
+      throw new AppError('Student or linked User account not found', 404);
+    }
+
+    const defaultPassword = await bcrypt.hash('student123', 10);
+    await prisma.user.update({
+      where: { id: student.userId },
+      data: { password: defaultPassword }
+    });
+
+    return { message: 'Password reset to default (student123) successfully' };
   }
 
   async getStatistics(schoolId, academicYearId) {

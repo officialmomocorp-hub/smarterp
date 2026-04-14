@@ -17,6 +17,7 @@ router.get('/statistics', studentController.getStatistics);
 router.get('/defaulters', studentController.getDefaulterList);
 router.get('/:id', studentController.findById);
 router.put('/:id', authorize('SUPER_ADMIN', 'ADMIN'), validate(studentValidation.updateStudent), studentController.update);
+router.put('/:id/reset-password', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), studentController.resetPassword);
 router.delete('/:id', authorize('SUPER_ADMIN', 'ADMIN'), studentController.delete);
 
 module.exports = router;

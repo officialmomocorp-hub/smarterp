@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { staffAPI, salaryAPI } from '../services/api';
-import { Plus, Search, X, FileText, Download } from 'lucide-react';
+import { Plus, Search, X, FileText, Download, Key } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const INITIAL_FORM = {
@@ -128,6 +128,19 @@ export default function Staff() {
                     <p className="font-medium">{new Date(s.dateOfJoining).toLocaleDateString('en-IN')}</p>
                   </div>
                   <div>
+                    <button 
+                      onClick={async () => {
+                         if(!window.confirm(`Are you sure you want to reset the password for ${getName(s)} back to completely default (admin123)?`)) return;
+                         try {
+                           await staffAPI.resetPassword(s.id);
+                           toast.success(`Password securely reset to admin123 for ${getName(s)}`);
+                         } catch (err) { toast.error(err.response?.data?.message || 'Failed to reset password'); }
+                      }}
+                      className="p-2 bg-amber-50 rounded-lg text-amber-600 hover:bg-amber-100 mr-2" 
+                      title="Reset Password to admin123"
+                    >
+                       <Key className="w-4 h-4" />
+                    </button>
                     <button 
                       onClick={async () => {
                          try {

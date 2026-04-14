@@ -47,6 +47,15 @@ class StudentController {
     }
   }
 
+  async resetPassword(req, res, next) {
+    try {
+      const result = await studentService.resetPassword(req.params.id, req.schoolId);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getStatistics(req, res, next) {
     try {
       const academicYearId = req.query.academicYearId;

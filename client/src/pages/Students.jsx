@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { studentAPI } from '../services/api';
-import { Search, Plus, Edit, Trash2, Eye, Filter, FileOutput, User as UserIcon, FileUp, ChevronLeft, ChevronRight, CloudUpload, X } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, Filter, FileOutput, User as UserIcon, FileUp, ChevronLeft, ChevronRight, CloudUpload, X, Key } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { CLASSES, SECTIONS } from '../config/constants';
 import StudentForm from '../components/Students/StudentForm';
@@ -250,6 +250,19 @@ export default function Students() {
                     <td className="px-4 py-3 text-sm">{student.parents?.[0]?.parent?.fatherName || '-'}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
+                        <button 
+                          onClick={async () => {
+                             if(!window.confirm(`Are you sure you want to reset password for ${student.profile?.firstName} back to default (student123)?`)) return;
+                             try {
+                               await studentAPI.resetPassword(student.id);
+                               toast.success(`Password securely reset to student123 for ${student.profile?.firstName}`);
+                             } catch (err) { toast.error(err.response?.data?.message || 'Failed to reset password'); }
+                          }}
+                          className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600" 
+                          title="Reset Password to default"
+                        >
+                          <Key className="w-4 h-4" />
+                        </button>
                         <button onClick={() => setViewStudentModal(student)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600" title="View"><Eye className="w-4 h-4" /></button>
                         <button 
                           onClick={async () => {
