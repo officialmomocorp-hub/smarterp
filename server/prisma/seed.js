@@ -33,8 +33,8 @@ async function main() {
   console.log('School created:', school.name);
 
   // Create Super Admin
-  const existingAdmin = await prisma.user.findFirst({ where: { phone: '9876543210' } });
-  const superAdmin = existingAdmin || await prisma.user.create({
+  const existingSuperAdmin = await prisma.user.findFirst({ where: { email: 'admin@smarterp.in' } });
+  const superAdmin = existingSuperAdmin || await prisma.user.create({
       data: {
       schoolId: school.id,
       email: 'admin@smarterp.in',
@@ -43,8 +43,8 @@ async function main() {
       role: 'SUPER_ADMIN',
       profile: {
         create: {
-          firstName: 'Admin',
-          lastName: 'User',
+          firstName: 'Super',
+          lastName: 'Admin',
           dateOfBirth: new Date('1980-01-01'),
           gender: 'MALE',
         },
@@ -52,7 +52,27 @@ async function main() {
     },
   });
 
-  console.log('Super Admin created:', superAdmin.email);
+  // Create School Admin (requested by user)
+  const existingSchoolAdmin = await prisma.user.findFirst({ where: { email: 'info@dpsdemo.edu.in' } });
+  const schoolAdmin = existingSchoolAdmin || await prisma.user.create({
+      data: {
+      schoolId: school.id,
+      email: 'info@dpsdemo.edu.in',
+      phone: '9988776655',
+      password: hashedPassword,
+      role: 'ADMIN',
+      profile: {
+        create: {
+          firstName: 'DPS',
+          lastName: 'Admin',
+          dateOfBirth: new Date('1985-06-15'),
+          gender: 'MALE',
+        },
+      },
+    },
+  });
+
+  console.log('Admins created:', superAdmin.email, schoolAdmin.email);
 
   // Create Academic Year
   const academicYear = await prisma.academicYear.upsert({

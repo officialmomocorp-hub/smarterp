@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { authenticate, authorize, schoolScoped } = require('../middleware/auth');
 const prisma = require('../config/database');
+const bcrypt = require('bcryptjs');
 const { AppError } = require('../utils/appError');
 const { validate } = require('../middleware/validate');
 const staffValidation = require('../validations/staff.validation');
@@ -18,13 +19,15 @@ router.post('/', authorize('SUPER_ADMIN', 'ADMIN'), validate(staffValidation.cre
     const staffId = `STF${new Date().getFullYear().toString().slice(-2)}${(staffCount + 1).toString().padStart(4, '0')}`;
     const employeeCode = `EMP${Date.now().toString().slice(-6)}`;
 
+    const defaultPassword = await bcrypt.hash('admin123', 12);
+
     const result = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
           schoolId: req.schoolId,
           phone: phone || '0000000000',
           email: email || null,
-          password: '',
+          password: defaultPassword,
           role: 'TEACHER',
         },
       });
@@ -137,6 +140,36 @@ router.put('/:id', authorize('SUPER_ADMIN', 'ADMIN'), validate(staffValidation.u
       req,
     });
     res.json({ success: true, data: staff });
+  } catch (error) { next(error); }
+});
+
+router.delete('/:id', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
+  try {
+    const existing = await prisma.staff.findFirst({
+      where: { id: req.params.id, schoolId: req.schoolId }
+    });
+    
+    if (!existing) {
+      throw new AppError('Staff not found', 404);
+    }
+
+    await prisma.staff.update({
+      where: { id: req.params.id },
+      data: { status: 'Inactive' }
+    });
+
+    await logAction({
+      schoolId: req.schoolId,
+      userId: req.userId,
+      action: Actions.DELETE,
+      resource: Resources.STAFF,
+      resourceId: req.params.id,
+      oldValue: existing,
+      newValue: { status: 'Inactive' },
+      req,
+    });
+
+    res.json({ success: true, message: 'Staff deactivated successfully' });
   } catch (error) { next(error); }
 });
 

@@ -18,6 +18,7 @@ export default function FeeManagement() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [feeStatus, setFeeStatus] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -59,20 +60,25 @@ export default function FeeManagement() {
 
   const handleCreateStructure = async (e) => {
     e.preventDefault();
+    setProcessing(true);
     try {
       await feeAPI.createStructure({
         ...structureForm,
+        class: structureForm.classId,
+        academicYear: structureForm.academicYearId,
         totalAmount: parseFloat(structureForm.totalAmount),
         feeHeads: JSON.stringify([{ name: 'General Fee', amount: parseFloat(structureForm.totalAmount) }]),
-        installmentType: 'YEARLY',
+        installmentType: 'ANNUALLY',
         dueDates: JSON.stringify([{ installment: 1, amount: parseFloat(structureForm.totalAmount), date: new Date().toISOString() }]),
         lateFinePerDay: 0,
         gstPercentage: 0
       });
-      toast.success('Fee structure created specifically required');
+      toast.success('Fee structure created successfully');
       setIsCreateModalOpen(false);
     } catch (err) {
       toast.error('Failed to create fee structure');
+    } finally {
+      setProcessing(false);
     }
   };
   const [paymentForm, setPaymentForm] = useState({
@@ -98,6 +104,7 @@ export default function FeeManagement() {
 
   const handlePayment = async (e) => {
     e.preventDefault();
+    setProcessing(true);
     try {
       await feeAPI.processPayment({
         studentId: searchQuery,
@@ -106,8 +113,11 @@ export default function FeeManagement() {
       });
       toast.success('Payment recorded successfully');
       setPaymentForm({ installmentNumber: 1, paymentMode: 'CASH', amount: '', remarks: '' });
+      handleSearch(); // Refresh fee status after payment
     } catch (error) {
       toast.error(error.response?.data?.message || 'Payment failed');
+    } finally {
+      setProcessing(false);
     }
   };
 

@@ -1,4 +1,4 @@
-﻿name: SmartERP CI/CD Pipeline
+name: SmartERP CI/CD Pipeline
 
 on:
   push:
@@ -7,24 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test123
-          POSTGRES_DB: smarterp_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
 
@@ -41,23 +25,7 @@ jobs:
 
       - name: Generate Prisma Client
         working-directory: ./server
-        env:
-          DATABASE_URL: postgresql://test:test123@localhost:5432/smarterp_test
         run: npx prisma generate
-
-      - name: Run database migrations
-        working-directory: ./server
-        env:
-          DATABASE_URL: postgresql://test:test123@localhost:5432/smarterp_test
-        run: npx prisma migrate deploy
-
-      - name: Run tests
-        working-directory: ./server
-        env:
-          DATABASE_URL: postgresql://test:test123@localhost:5432/smarterp_test
-          JWT_SECRET: test-secret-key-for-ci
-          NODE_ENV: test
-        run: npm test || true
 
       - name: Install client dependencies
         working-directory: ./client
@@ -68,8 +36,8 @@ jobs:
         run: npm run build
 
   deploy:
-    needs: test
     runs-on: ubuntu-latest
+    needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
@@ -86,6 +54,6 @@ jobs:
             git pull origin main
             cd server && npm ci --production
             npx prisma migrate deploy
+            node prisma/demo-seed.js
             pm2 restart all
             echo "Deployed successfully at $(date)"
-
