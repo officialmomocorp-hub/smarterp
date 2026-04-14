@@ -4,7 +4,8 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    background-color: #0B1121;
+    @apply text-gray-100;
     font-family: 'Inter', system-ui, sans-serif;
   }
 }
@@ -26,31 +27,37 @@
     @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
   }
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-3 py-2 border border-slate-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-500;
+    background: rgba(15, 23, 42, 0.6);
   }
   .label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-medium text-gray-300 mb-1;
   }
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+    @apply rounded-xl p-6 relative overflow-hidden;
+    background: rgba(30, 41, 59, 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   }
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
   .badge-green {
-    @apply bg-green-100 text-green-800;
+    @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
   }
   .badge-red {
-    @apply bg-red-100 text-red-800;
+    @apply bg-rose-500/10 text-rose-400 border border-rose-500/20;
   }
   .badge-yellow {
-    @apply bg-yellow-100 text-yellow-800;
+    @apply bg-amber-500/10 text-amber-400 border border-amber-500/20;
   }
   .badge-blue {
-    @apply bg-blue-100 text-blue-800;
+    @apply bg-blue-500/10 text-blue-400 border border-blue-500/20;
   }
   .badge-gray {
-    @apply bg-gray-100 text-gray-800;
+    @apply bg-slate-500/10 text-slate-400 border border-slate-500/20;
   }
 }
 

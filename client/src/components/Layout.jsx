@@ -184,7 +184,10 @@ export default function Layout({ children }) {
   const filteredMenu = getMenuItems(user?.role, impersonateId);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex overflow-x-hidden">
+    <div className="min-h-screen flex overflow-x-hidden relative">
+      {/* Dynamic Background */}
+      <div className="fixed inset-0 pointer-events-none z-[-1] mesh-gradient-blob mix-blend-screen opacity-40"></div>
+      
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div 
@@ -194,20 +197,20 @@ export default function Layout({ children }) {
       )}
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-transform duration-300 ${
+        className={`fixed inset-y-0 left-0 z-50 bg-[#0B1121]/80 backdrop-blur-xl border-r border-white/10 transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-20'
         }`}
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-white/10">
           {sidebarOpen && (
             <Link to="/dashboard" className="flex items-center gap-2">
-              <GraduationCap className="w-8 h-8 text-primary-600" />
-              <span className="text-xl font-bold text-gray-900">Smarterp</span>
+              <GraduationCap className="w-8 h-8 text-blue-400" />
+              <span className="text-xl font-bold text-white">Smarterp</span>
             </Link>
           )}
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded-lg hover:bg-gray-100 lg:block"
+            className="p-2 rounded-lg hover:bg-white/10 text-gray-300 lg:block"
           >
             {sidebarOpen ? <X className="w-5 h-5 text-gray-500 lg:hidden" /> : <Menu className="w-5 h-5" />}
             {!sidebarOpen && <Menu className="w-5 h-5 hidden lg:block" />}
@@ -215,12 +218,12 @@ export default function Layout({ children }) {
           </button>
         </div>
 
-        <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+        <div className="p-4 border-b border-white/5 bg-transparent">
           {user?.role === 'SUPER_ADMIN' && sidebarOpen && (
             <div className="space-y-2">
               <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Active School Context</label>
               <select 
-                className="w-full bg-white border border-gray-200 rounded-lg text-xs p-2 focus:ring-1 focus:ring-primary-500"
+                className="w-full bg-[#0f172a] border border-white/10 rounded-lg text-xs p-2 text-white outline-none"
                 value={impersonateId || ''}
                 onChange={(e) => setImpersonateId(e.target.value)}
               >
@@ -242,8 +245,8 @@ export default function Layout({ children }) {
                     onClick={() => toggleMenu(item.title)}
                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       location.pathname.startsWith(item.path)
-                        ? 'bg-primary-50 text-primary-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'bg-blue-500/10 text-blue-400'
+                        : 'text-gray-400 hover:bg-white/5 hover:text-white'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -266,8 +269,8 @@ export default function Layout({ children }) {
                           to={child.path}
                           className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
                             location.pathname === child.path
-                              ? 'bg-primary-50 text-primary-700 font-medium'
-                              : 'text-gray-500 hover:bg-gray-50'
+                              ? 'bg-blue-500/10 text-blue-400 font-medium'
+                              : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'
                           }`}
                         >
                           {child.title}
@@ -281,8 +284,8 @@ export default function Layout({ children }) {
                   to={item.path}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     location.pathname === item.path
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      ? 'bg-blue-500/10 text-blue-400'
+                      : 'text-gray-400 hover:bg-white/5 hover:text-white'
                   }`}
                 >
                   <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -310,12 +313,12 @@ export default function Layout({ children }) {
           sidebarOpen ? 'ml-0 lg:ml-64' : 'ml-0 lg:ml-20'
         }`}
       >
-        <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-40">
+        <header className="bg-[#0B1121]/80 backdrop-blur-xl border-b border-white/10 h-16 flex items-center justify-between px-6 sticky top-0 z-40">
           <div>
              {impersonateId && (
                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-600 animate-gradient-x" />
              )}
-            <h1 className="text-lg font-black text-gray-900 tracking-tight flex items-center gap-2">
+            <h1 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
               {impersonateId && <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />}
               {filteredMenu.find(item => location.pathname === item.path)?.title || 'SmartERP'}
               {impersonateId && <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold uppercase">Impersonating {schools.find(s=>s.id===impersonateId)?.name}</span>}
@@ -323,15 +326,15 @@ export default function Layout({ children }) {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-sm font-medium text-white">
                 {user?.profile?.firstName} {user?.profile?.lastName}
               </p>
-              <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">
+              <p className="text-xs text-blue-400 font-bold uppercase tracking-wider">
                 {user?.role === 'SUPER_ADMIN' ? 'Super Admin' : user?.role === 'ADMIN' ? 'School Admin' : user?.role}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-              <span className="text-primary-700 font-medium">
+            <div className="w-10 h-10 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+              <span className="text-blue-400 font-bold">
                 {user?.profile?.firstName?.charAt(0)}
               </span>
             </div>

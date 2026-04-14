@@ -57,16 +57,16 @@ export default function SuperAdminDashboard() {
       fill: true,
       backgroundColor: (ctx) => {
         const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 280);
-        g.addColorStop(0, 'rgba(59, 130, 246, 0.08)');
-        g.addColorStop(1, 'rgba(59, 130, 246, 0)');
+        g.addColorStop(0, 'rgba(56, 189, 248, 0.4)');
+        g.addColorStop(1, 'rgba(56, 189, 248, 0)');
         return g;
       },
-      borderColor: '#3b82f6',
-      borderWidth: 2,
-      tension: 0.35,
+      borderColor: '#38bdf8', // Neon Sky Blue
+      borderWidth: 3,
+      tension: 0.4,
       pointRadius: 0,
-      pointHoverRadius: 5,
-      pointHoverBackgroundColor: '#3b82f6',
+      pointHoverRadius: 6,
+      pointHoverBackgroundColor: '#38bdf8',
       pointHoverBorderColor: '#fff',
       pointHoverBorderWidth: 2,
     }]
@@ -94,7 +94,7 @@ export default function SuperAdminDashboard() {
     scales: {
       y: {
         beginAtZero: false,
-        grid: { color: '#f3f4f6', drawBorder: false },
+        grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
         border: { display: false },
         ticks: { font: { size: 11 }, color: '#9ca3af', padding: 8, callback: (v) => `₹${(v/1000)}K` }
       },
@@ -110,25 +110,25 @@ export default function SuperAdminDashboard() {
     <div className="space-y-8 max-w-[1400px]">
 
       {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 relative z-10">
         <div>
-          <p className="text-sm text-gray-400 mb-1">{dateStr}</p>
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
+          <p className="text-sm text-sky-400 mb-1">{dateStr}</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">
             {greeting}, Super Admin
           </h1>
-          <p className="text-sm text-gray-500 mt-1">Here's what's happening across SmartERP today.</p>
+          <p className="text-sm text-gray-400 mt-1">Here's what's happening across SmartERP today.</p>
         </div>
         <div className="flex gap-2">
           <button 
             onClick={() => navigate('/manage-schools')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-[0_0_15px_rgba(37,99,235,0.5)] hover:bg-blue-500 transition-all hover:scale-105"
           >
             <Plus className="w-3.5 h-3.5" />
             Add School
           </button>
           <button 
             onClick={() => navigate('/platform-reports')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-white/10 border border-white/20 backdrop-blur-md rounded-lg hover:bg-white/20 transition-all hover:scale-105"
           >
             <Download className="w-3.5 h-3.5" />
             Export
@@ -137,76 +137,76 @@ export default function SuperAdminDashboard() {
       </div>
 
       {/* ── Metrics ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
         {metrics.map((m, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors">
+          <div key={i} className="card hover:shadow-[0_0_25px_rgba(56,189,248,0.15)] hover:border-sky-500/30 transition-all duration-300 transform hover:-translate-y-1">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: m.accent + '10' }}>
-                <m.icon className="w-[18px] h-[18px]" style={{ color: m.accent }} />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10" style={{ backgroundColor: m.accent + '20', boxShadow: `0 0 15px ${m.accent}40` }}>
+                <m.icon className="w-5 h-5" style={{ color: m.accent }} />
               </div>
-              <span className="inline-flex items-center gap-0.5 text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold text-sky-400 bg-sky-400/10 border border-sky-400/20 px-2 py-0.5 rounded-md">
                 <ArrowUpRight className="w-3 h-3" />
                 {m.change}
               </span>
             </div>
-            <div className="text-2xl font-semibold text-gray-900 tabular-nums">{m.value}</div>
-            <div className="text-xs text-gray-500 mt-0.5 font-medium">{m.label}</div>
+            <div className="text-3xl font-bold text-white tabular-nums drop-shadow-md">{m.value}</div>
+            <div className="text-sm text-gray-400 mt-1 font-medium">{m.label}</div>
           </div>
         ))}
       </div>
 
       {/* ── Main Content ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 relative z-10">
 
         {/* Chart */}
-        <div className="lg:col-span-3 bg-white border border-gray-200 rounded-xl p-5">
+        <div className="lg:col-span-3 card">
           <div className="flex items-center justify-between mb-1">
             <div>
-              <h2 className="text-sm font-semibold text-gray-900">Revenue</h2>
-              <p className="text-xs text-gray-400 mt-0.5">Monthly platform revenue</p>
+              <h2 className="text-base font-bold text-white">Revenue Overview</h2>
+              <p className="text-sm text-gray-400 mt-0.5">Monthly platform revenue trajectory</p>
             </div>
-            <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-              <TrendingUp className="w-3.5 h-3.5" />
-              +18.5% from last month
+            <div className="flex items-center gap-1 text-sm font-bold text-orange-400 bg-orange-400/10 px-3 py-1 rounded-full border border-orange-400/20 shadow-[0_0_10px_rgba(251,146,60,0.2)]">
+              <TrendingUp className="w-4 h-4" />
+              +18.5%
             </div>
           </div>
-          <div className="h-64 mt-4">
+          <div className="h-64 mt-6">
             <Line data={chartData} options={chartOptions} />
           </div>
         </div>
 
         {/* Recent Schools */}
-        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-5">
+        <div className="lg:col-span-2 card flex flex-col">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-gray-900">Recent Schools</h2>
+            <h2 className="text-base font-bold text-white">Recent Schools</h2>
             <button 
               onClick={() => navigate('/manage-schools')}
-              className="text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors flex items-center gap-1"
+              className="text-xs font-bold text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1 hover:underline"
             >
               View all <ArrowRight className="w-3 h-3" />
             </button>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-2 flex-1">
             {data.recentSchools.map((school, i) => {
-              const colors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
+              const colors = ['#38bdf8', '#fb923c', '#a78bfa', '#34d399', '#f87171'];
               const c = colors[i % colors.length];
               return (
-                <div key={school.id} className="flex items-center gap-3 px-3 py-2.5 -mx-1 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group">
+                <div key={school.id} className="flex items-center gap-3 px-3 py-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all cursor-pointer group">
                   <div 
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
-                    style={{ backgroundColor: c }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-900 text-sm font-black flex-shrink-0"
+                    style={{ backgroundColor: c, boxShadow: `0 0 10px ${c}60` }}
                   >
                     {school.name.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition-colors">{school.name}</p>
-                    <p className="text-xs text-gray-400">{school.city}</p>
+                    <p className="text-sm font-bold text-white truncate group-hover:text-blue-400 transition-colors">{school.name}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{school.city}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="text-[11px] text-gray-400 font-medium">
+                    <p className="text-[11px] text-gray-400 font-medium tracking-wider">
                       {new Date(school.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                     </p>
-                    <span className="inline-block mt-0.5 text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-px rounded">Active</span>
+                    <span className="inline-block mt-1 text-[10px] font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.3)]">ACTIVE</span>
                   </div>
                 </div>
               );
@@ -216,17 +216,17 @@ export default function SuperAdminDashboard() {
       </div>
 
       {/* ── Bottom Row ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
 
         {/* Maintenance */}
-        <div className="bg-gray-900 text-white rounded-xl p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -translate-y-1/2 translate-x-1/4" />
+        <div className="card border-blue-500/20 bg-gradient-to-br from-[#1e293b]/80 to-blue-900/40 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/20 rounded-full -translate-y-1/2 translate-x-1/4 blur-3xl" />
           <div className="relative">
             <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-4 h-4 text-blue-400" />
-              <h3 className="text-sm font-semibold">Platform Maintenance</h3>
+              <Zap className="w-5 h-5 text-sky-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
+              <h3 className="text-base font-bold text-white">Platform Maintenance</h3>
             </div>
-            <p className="text-sm text-gray-400 leading-relaxed mb-5 max-w-md">
+            <p className="text-sm text-blue-200/70 leading-relaxed mb-5 max-w-md">
               Schedule system-wide maintenance. All school logins will be temporarily disabled during the window.
             </p>
             <button 
@@ -235,7 +235,7 @@ export default function SuperAdminDashboard() {
                   toast.success('Maintenance scheduled. All schools notified.');
                 }
               }}
-              className="px-4 py-2 text-sm font-medium bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+              className="px-5 py-2.5 text-sm font-bold bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors border border-white/20 backdrop-blur-md"
             >
               Schedule Maintenance
             </button>
@@ -243,17 +243,17 @@ export default function SuperAdminDashboard() {
         </div>
 
         {/* Alerts */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <div className="flex items-start gap-3">
-            <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <AlertCircle className="w-[18px] h-[18px] text-amber-500" />
+        <div className="card border-orange-500/20 bg-gradient-to-br from-[#1e293b]/80 to-orange-900/20">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-orange-500/10 border border-orange-500/30 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
+              <AlertCircle className="w-6 h-6 text-orange-400" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-gray-900">Unpaid Subscriptions</h3>
-                <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-md">{data.unpaidSchoolsCount || 0} schools</span>
+                <h3 className="text-base font-bold text-white">Unpaid Subscriptions</h3>
+                <span className="text-[10px] font-bold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded-full border border-orange-400/20">{data.unpaidSchoolsCount || 0} schools</span>
               </div>
-              <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+              <p className="text-sm text-gray-400 mt-1.5 leading-relaxed">
                 {data.unpaidSchoolsCount > 0 
                   ? "Schools with expired subscriptions running on grace period need attention."
                   : "All schools are currently active and running smoothly."}
@@ -261,7 +261,7 @@ export default function SuperAdminDashboard() {
               {data.unpaidSchoolsCount > 0 && (
                 <button 
                   onClick={() => navigate('/manage-schools')}
-                  className="mt-4 text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors inline-flex items-center gap-1"
+                  className="mt-4 text-sm font-bold text-sky-400 hover:text-sky-300 transition-colors inline-flex items-center gap-1 hover:underline"
                 >
                   Review details <ArrowRight className="w-3.5 h-3.5" />
                 </button>
