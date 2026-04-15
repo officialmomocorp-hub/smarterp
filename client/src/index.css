@@ -323,7 +323,7 @@
 .skeleton-shimmer {
   position: relative;
   overflow: hidden;
-  background: rgba(30, 41, 59, 0.5) !important;
+  background: rgba(30, 41, 59, 0.6) !important;
   border-radius: 12px;
 }
 .skeleton-shimmer::after {
@@ -559,8 +559,8 @@ canvas:hover {
    🌟 AMBIENT GLOW — Subtle background lighting effects
    ═══════════════════════════════════════════════════════════════ */
 
-/* Ambient orb top-right */
-body::before {
+/* Ambient orb top-right — only inside the app layout, not login */
+body:has(.mesh-gradient-blob)::before {
   content: '';
   position: fixed;
   top: -20%;
@@ -574,7 +574,7 @@ body::before {
 }
 
 /* Ambient orb bottom-left */
-body::after {
+body:has(.mesh-gradient-blob)::after {
   content: '';
   position: fixed;
   bottom: -20%;
@@ -603,19 +603,12 @@ body::after {
    ✅ GLOBAL POLISH — Final touches
    ═══════════════════════════════════════════════════════════════ */
 
-/* Smooth all transitions */
-* {
-  transition-property: color, background-color, border-color, box-shadow, opacity, transform, filter;
-  transition-duration: 0.15s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+/* Smooth transitions on interactive elements only */
+button, a, input, select, textarea, .card, .badge, .btn {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Exclude animations from the global transition */
-*, *::before, *::after {
-  transition-property: color, background-color, border-color, box-shadow, opacity;
-}
-
-/* Make images and charts not affected by base transition */
+/* Charts and media should never transition */
 img, canvas, svg, video {
   transition: none !important;
 }
