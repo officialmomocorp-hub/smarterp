@@ -87,13 +87,13 @@ export default function ManageSchools() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Building2 className="w-6 h-6 text-primary-600" />
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Building2 className="w-6 h-6 text-blue-400" />
             Manage Schools
           </h2>
-          <p className="text-gray-500 mt-1">Super Admin Dashboard: Oversee school status and access</p>
+          <p className="text-gray-400 mt-1">Super Admin Dashboard: Oversee school status and access</p>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn btn-primary flex items-center gap-2">
+        <button onClick={() => setShowModal(true)} className="btn btn-primary bg-blue-600 hover:bg-blue-500 border border-blue-500/50 flex items-center gap-2 shadow-[0_0_15px_rgba(37,99,235,0.5)]">
           <Plus className="w-4 h-4" /> Add New School
         </button>
       </div>
@@ -102,11 +102,11 @@ export default function ManageSchools() {
         {schools.map(school => (
           <div key={school.id} className={`card hover:shadow-lg transition-all relative border-t-4 ${school.isActive ? 'border-emerald-500' : 'border-rose-500'}`}>
             <div className="flex items-start justify-between mb-4">
-              <div className={`p-3 rounded-lg ${school.isActive ? 'bg-emerald-50' : 'bg-rose-50'}`}>
-                <Building2 className={`w-6 h-6 ${school.isActive ? 'text-emerald-600' : 'text-rose-600'}`} />
+              <div className={`p-3 rounded-lg ${school.isActive ? 'bg-emerald-500/10' : 'bg-rose-500/10'}`}>
+                <Building2 className={`w-6 h-6 ${school.isActive ? 'text-emerald-400' : 'text-rose-400'}`} />
               </div>
               <div className="flex gap-2">
-                <span className={`badge ${school.isActive ? 'badge-success' : 'badge-error'}`}>
+                <span className={`badge ${school.isActive ? 'badge-green' : 'badge-red'}`}>
                   {school.isActive ? 'Active' : 'Inactive'}
                 </span>
                 <button 
@@ -119,8 +119,8 @@ export default function ManageSchools() {
                   }}
                   className={`p-1.5 rounded-lg transition-colors ${
                     school.isActive 
-                    ? 'text-gray-300 cursor-not-allowed grayscale' 
-                    : 'text-gray-400 hover:text-rose-600 hover:bg-rose-50'
+                    ? 'text-gray-600 cursor-not-allowed grayscale' 
+                    : 'text-gray-400 hover:text-rose-400 hover:bg-rose-500/10'
                   }`}
                   title={school.isActive ? "Deactivate school before deleting" : "Delete School"}
                 >
@@ -129,14 +129,14 @@ export default function ManageSchools() {
               </div>
             </div>
             
-            <h3 className="text-xl font-bold text-gray-900">{school.name}</h3>
-            <p className="text-sm text-gray-500 mb-4 flex gap-1 items-center"><MapPin className="w-4 h-4"/> {school.city}, {school.state}</p>
+            <h3 className="text-xl font-bold text-white">{school.name}</h3>
+            <p className="text-sm text-gray-400 mb-4 flex gap-1 items-center"><MapPin className="w-4 h-4"/> {school.city}, {school.state}</p>
             
-            <div className="space-y-2 text-sm text-gray-600 mb-6">
-              <div className="flex justify-between"><span>Code:</span> <span className="font-medium text-gray-900">{school.code}</span></div>
-              <div className="flex justify-between"><span>Admin:</span> <span className="font-medium text-gray-900 truncate ml-4" title={school.users?.[0]?.email}>{school.users?.[0]?.email || 'N/A'}</span></div>
-              <div className="flex justify-between"><span>Phone:</span> <span className="font-medium text-gray-900">{school.phone}</span></div>
-              <div className="flex justify-between pt-2 border-t border-gray-50 mt-2 text-[10px] uppercase tracking-tighter text-gray-400 font-bold">
+            <div className="space-y-2 text-sm text-gray-400 mb-6">
+              <div className="flex justify-between"><span>Code:</span> <span className="font-medium text-white">{school.code}</span></div>
+              <div className="flex justify-between"><span>Admin:</span> <span className="font-medium text-white truncate ml-4" title={school.users?.[0]?.email}>{school.users?.[0]?.email || 'N/A'}</span></div>
+              <div className="flex justify-between"><span>Phone:</span> <span className="font-medium text-white">{school.phone}</span></div>
+              <div className="flex justify-between pt-2 border-t border-white/10 mt-2 text-[10px] uppercase tracking-tighter text-gray-500 font-bold">
                  <span>Registered On</span>
                  <span>{new Date(school.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
               </div>
@@ -145,7 +145,7 @@ export default function ManageSchools() {
             <div className="grid grid-cols-2 gap-3">
               <button 
                   onClick={() => setResetModalSchool(school)}
-                  className="py-2 px-3 border border-gray-200 text-gray-700 rounded-lg text-xs font-bold hover:bg-gray-50 transition-colors"
+                  className="py-2 px-3 border border-white/10 text-gray-300 rounded-lg text-xs font-bold hover:bg-white/5 hover:text-white transition-colors"
               >
                 Password
               </button>
@@ -153,8 +153,8 @@ export default function ManageSchools() {
                   onClick={() => handleToggleStatus(school)}
                   className={`py-2 px-3 flex items-center justify-center gap-2 rounded-lg text-xs font-bold transition-colors ${
                     school.isActive 
-                    ? 'border border-rose-200 text-rose-600 hover:bg-rose-50' 
-                    : 'border border-emerald-200 text-emerald-600 hover:bg-emerald-50'
+                    ? 'border border-rose-500/30 text-rose-400 hover:bg-rose-500/10' 
+                    : 'border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
                   }`}
               >
                 {school.isActive ? <PowerOff className="w-3 h-3" /> : <Power className="w-3 h-3" />}
@@ -167,10 +167,10 @@ export default function ManageSchools() {
 
       {/* Reset Password Modal */}
       {resetModalSchool && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Reset Admin Password</h3>
-            <p className="text-sm text-gray-500 mb-6">Changing password for <strong>{resetModalSchool.name}</strong> admin account.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-white mb-2">Reset Admin Password</h3>
+            <p className="text-sm text-gray-400 mb-6">Changing password for <strong className="text-white">{resetModalSchool.name}</strong> admin account.</p>
             <form onSubmit={handleResetPassword}>
               <div className="space-y-4">
                 <div>
@@ -179,8 +179,8 @@ export default function ManageSchools() {
                 </div>
               </div>
               <div className="flex justify-end gap-3 mt-8">
-                <button type="button" onClick={() => setResetModalSchool(null)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-700">Cancel</button>
-                <button type="submit" disabled={loading} className="btn bg-primary-600 text-white hover:bg-primary-700 min-w-[120px]">{loading ? 'Saving...' : 'Update Password'}</button>
+                <button type="button" onClick={() => setResetModalSchool(null)} className="px-4 py-2 text-sm font-bold text-gray-400 hover:text-white transition-colors">Cancel</button>
+                <button type="submit" disabled={loading} className="btn bg-blue-600 text-white hover:bg-blue-500 min-w-[120px] shadow-[0_0_15px_rgba(37,99,235,0.4)]">{loading ? 'Saving...' : 'Update Password'}</button>
               </div>
             </form>
           </div>
@@ -189,27 +189,29 @@ export default function ManageSchools() {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmSchool && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 animate-in zoom-in-95 duration-200 text-center">
-            <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6 text-rose-600">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-[#0f172a] border border-rose-500/20 rounded-2xl shadow-2xl max-w-md w-full p-8 animate-in zoom-in-95 duration-200 text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full filter blur-2xl"></div>
+            
+            <div className="relative w-20 h-20 bg-rose-500/10 border border-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
               <ShieldAlert className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Delete School?</h3>
-            <p className="text-gray-500 mb-8">
-              This will permanently delete <strong>{deleteConfirmSchool.name}</strong> and all associated data including students, staff, and records. This action cannot be undone.
+            <h3 className="text-2xl font-bold text-white mb-2 relative">Delete School?</h3>
+            <p className="text-gray-400 mb-8 relative">
+              This will permanently delete <strong className="text-white">{deleteConfirmSchool.name}</strong> and all associated data including students, staff, and records. This action cannot be undone.
             </p>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 relative">
               <button 
                 onClick={handleDeleteSchool} 
                 disabled={loading}
-                className="w-full py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-colors disabled:opacity-50"
+                className="w-full py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.4)] transition-colors disabled:opacity-50"
               >
                 {loading ? 'Deleting...' : 'Yes, Delete Permanently'}
               </button>
               <button 
                 type="button" 
                 onClick={() => setDeleteConfirmSchool(null)} 
-                className="w-full py-3 text-gray-500 font-bold hover:text-gray-700"
+                className="w-full py-3 text-gray-400 font-bold hover:text-white transition-colors"
               >
                 Cancel
               </button>
@@ -220,16 +222,16 @@ export default function ManageSchools() {
 
       {/* Add School Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto overflow-x-hidden p-8 animate-in slide-in-from-bottom-4 duration-300">
             <div className="flex justify-between items-center mb-8">
-              <h3 className="text-2xl font-bold text-gray-900">Add New School</h3>
-              <button onClick={() => setShowModal(false)} className="p-2 text-gray-400 hover:text-gray-900 rounded-lg">✕</button>
+              <h3 className="text-2xl font-bold text-white">Add New School</h3>
+              <button onClick={() => setShowModal(false)} className="p-2 text-gray-400 hover:text-white rounded-lg transition-colors">✕</button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-2">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                <div className="md:col-span-2"><h4 className="text-xs font-black text-primary-600 uppercase tracking-widest mb-2">School Information</h4><hr className="mb-4" /></div>
+                <div className="md:col-span-2"><h4 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-2">School Information</h4><hr className="mb-4 border-white/10" /></div>
                 <div>
                   <label className="label">School Name</label>
                   <input type="text" className="input" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
@@ -267,7 +269,7 @@ export default function ManageSchools() {
                   <input type="text" className="input" required value={formData.udiseCode} onChange={e => setFormData({...formData, udiseCode: e.target.value})} />
                 </div>
 
-                <div className="md:col-span-2 mt-8"><h4 className="text-xs font-black text-rose-600 uppercase tracking-widest mb-2">Initial Admin Account</h4><hr className="mb-4" /></div>
+                <div className="md:col-span-2 mt-8"><h4 className="text-xs font-black text-rose-400 uppercase tracking-widest mb-2">Initial Admin Account</h4><hr className="mb-4 border-white/10" /></div>
                 <div>
                   <label className="label">Admin Email</label>
                   <input type="email" className="input" required value={formData.adminEmail} onChange={e => setFormData({...formData, adminEmail: e.target.value})} />
@@ -279,8 +281,8 @@ export default function ManageSchools() {
               </div>
 
               <div className="flex justify-end gap-3 mt-10">
-                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 font-bold text-gray-500 hover:text-gray-700 transition-colors">Cancel</button>
-                <button type="submit" disabled={loading} className="btn btn-primary px-8 py-3 shadow-lg shadow-primary-200">{loading ? 'Creating...' : 'Register School'}</button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-6 py-3 font-bold text-gray-400 hover:text-white transition-colors">Cancel</button>
+                <button type="submit" disabled={loading} className="btn bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all">{loading ? 'Creating...' : 'Register School'}</button>
               </div>
             </form>
           </div>
