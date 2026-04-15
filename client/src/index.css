@@ -5,16 +5,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* ═══════════════════════════════════════════════════════════════
-   🌃 SMARTERP - DARK GLASSMORPHISM GLOBAL THEME
-   All light-mode Tailwind classes are overridden here so that
-   EVERY page in the system automatically gets the dark treatment.
+   🌃 SMARTERP — 10/10 PREMIUM DARK GLASSMORPHISM THEME
    ═══════════════════════════════════════════════════════════════ */
 
 @layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+  }
+
   body {
     background-color: #0B1121;
     color: #e2e8f0;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* ── Global Text Color Overrides ── */
@@ -36,7 +41,7 @@
   .border-gray-300 { border-color: rgba(255, 255, 255, 0.1) !important; }
   .border-gray-50 { border-color: rgba(255, 255, 255, 0.03) !important; }
 
-  /* ── Colored Background Overrides (light pastel → dark glow) ── */
+  /* ── Colored Background Overrides ── */
   .bg-blue-50 { background-color: rgba(59, 130, 246, 0.1) !important; }
   .bg-blue-100 { background-color: rgba(59, 130, 246, 0.15) !important; }
   .bg-green-50 { background-color: rgba(16, 185, 129, 0.1) !important; }
@@ -64,7 +69,7 @@
   .bg-pink-50 { background-color: rgba(236, 72, 153, 0.1) !important; }
   .bg-pink-100 { background-color: rgba(236, 72, 153, 0.15) !important; }
 
-  /* ── Colored Text Overrides (dark shades → bright neon) ── */
+  /* ── Colored Text Overrides ── */
   .text-blue-600 { color: #60a5fa !important; }
   .text-blue-700 { color: #93c5fd !important; }
   .text-blue-800 { color: #bfdbfe !important; }
@@ -109,22 +114,18 @@
   .hover\:text-blue-600:hover { color: #60a5fa !important; }
   .hover\:border-gray-300:hover { border-color: rgba(255, 255, 255, 0.15) !important; }
 
-  /* ── Focus Ring Overrides ── */
   .focus\:ring-offset-2:focus { --tw-ring-offset-color: #0B1121 !important; }
   .ring-offset-white { --tw-ring-offset-color: #0B1121 !important; }
 
-  /* ── Divide Overrides ── */
   .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255, 255, 255, 0.08) !important; }
   .divide-gray-100 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(255, 255, 255, 0.05) !important; }
 
-  /* ── Shadow Overrides (light shadows → dark glow) ── */
   .shadow-sm { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important; }
   .shadow-md { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important; }
   .shadow-lg { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important; }
   .shadow-xl { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important; }
   .shadow-primary-200 { --tw-shadow-color: rgba(59, 130, 246, 0.2) !important; }
 
-  /* ── Select / Dropdown Overrides ── */
   select {
     background-color: rgba(15, 23, 42, 0.8) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
@@ -135,29 +136,47 @@
     color: #e2e8f0 !important;
   }
 
-  /* ── Table Header / Row Overrides ── */
   th { color: #94a3b8 !important; }
   thead { border-color: rgba(255, 255, 255, 0.05) !important; }
-  tbody tr { border-color: rgba(255, 255, 255, 0.05) !important; }
-  tbody tr:hover { background-color: rgba(255, 255, 255, 0.03) !important; }
+  tbody tr { border-color: rgba(255, 255, 255, 0.05) !important; transition: all 0.2s ease; }
+  tbody tr:hover { background-color: rgba(56, 189, 248, 0.04) !important; }
 
-  /* ── HR Overrides ── */
   hr { border-color: rgba(255, 255, 255, 0.08) !important; }
 
-  /* ── Scrollbar ── */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+  /* Fix white modals globally */
+  .bg-white.rounded-2xl, .bg-white.rounded-xl {
+    background-color: rgba(15, 23, 42, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(24px);
+  }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   📦 COMPONENT LAYER — Premium reusable components
+   ═══════════════════════════════════════════════════════════════ */
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply px-4 py-2 rounded-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    transform: translateY(0);
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+  .btn:active {
+    transform: translateY(0) scale(0.98);
   }
   .btn-primary {
     @apply bg-blue-600 text-white hover:bg-blue-500 focus:ring-blue-500;
-    box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.4), 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 30px rgba(37, 99, 235, 0.6), 0 8px 20px rgba(0,0,0,0.4);
   }
   .btn-secondary {
     background: rgba(255, 255, 255, 0.05) !important;
@@ -167,6 +186,7 @@
   .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.1) !important;
     color: #f1f5f9 !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
   }
   .btn-danger {
     @apply bg-red-600 text-white hover:bg-red-500 focus:ring-red-500;
@@ -176,68 +196,307 @@
     @apply bg-emerald-600 text-white hover:bg-emerald-500 focus:ring-emerald-500;
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
   }
+
   .input {
-    @apply w-full px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-gray-500;
+    @apply w-full px-4 py-2.5 rounded-xl focus:outline-none text-white placeholder-gray-500;
     background: rgba(15, 23, 42, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .input:focus {
     border-color: rgba(56, 189, 248, 0.5) !important;
-    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2), 0 0 15px rgba(56, 189, 248, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15), 0 0 20px rgba(56, 189, 248, 0.08) !important;
   }
+  .input:hover:not(:focus) {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+
   .label {
-    @apply block text-sm font-medium text-gray-300 mb-1;
+    @apply block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5;
   }
+
   .card {
-    @apply rounded-xl p-6 relative overflow-hidden;
+    @apply rounded-2xl p-6 relative overflow-hidden;
     background: rgba(30, 41, 59, 0.5);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .card:hover {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(56, 189, 248, 0.15);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(56, 189, 248, 0.05);
+    transform: translateY(-2px);
   }
+
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider;
   }
   .badge-green, .badge-success {
-    @apply bg-emerald-500/10 text-emerald-400;
+    @apply text-emerald-400;
+    background: rgba(16, 185, 129, 0.1);
     border: 1px solid rgba(16, 185, 129, 0.2);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.15);
   }
   .badge-red, .badge-error {
-    @apply bg-rose-500/10 text-rose-400;
+    @apply text-rose-400;
+    background: rgba(244, 63, 94, 0.1);
     border: 1px solid rgba(244, 63, 94, 0.2);
+    box-shadow: 0 0 8px rgba(244, 63, 94, 0.15);
   }
   .badge-yellow, .badge-warning {
-    @apply bg-amber-500/10 text-amber-400;
+    @apply text-amber-400;
+    background: rgba(245, 158, 11, 0.1);
     border: 1px solid rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.15);
   }
   .badge-blue, .badge-info {
-    @apply bg-blue-500/10 text-blue-400;
+    @apply text-blue-400;
+    background: rgba(59, 130, 246, 0.1);
     border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.15);
   }
   .badge-gray {
-    @apply bg-slate-500/10 text-slate-400;
+    @apply text-slate-400;
+    background: rgba(100, 116, 139, 0.1);
     border: 1px solid rgba(100, 116, 139, 0.2);
   }
 }
 
-/* ═══════════════════════════════════════
-   ✨ Premium Visual Effects
-   ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   ✨ PREMIUM ANIMATIONS — The "Wow" Factor
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Staggered Card Entrance ── */
+.space-y-6 > *, .space-y-8 > *, .grid > * {
+  animation: cardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.grid > *:nth-child(1) { animation-delay: 0.05s; }
+.grid > *:nth-child(2) { animation-delay: 0.1s; }
+.grid > *:nth-child(3) { animation-delay: 0.15s; }
+.grid > *:nth-child(4) { animation-delay: 0.2s; }
+.grid > *:nth-child(5) { animation-delay: 0.25s; }
+.grid > *:nth-child(6) { animation-delay: 0.3s; }
+.grid > *:nth-child(7) { animation-delay: 0.35s; }
+.grid > *:nth-child(8) { animation-delay: 0.4s; }
+
+.space-y-6 > *:nth-child(1), .space-y-8 > *:nth-child(1) { animation-delay: 0.0s; }
+.space-y-6 > *:nth-child(2), .space-y-8 > *:nth-child(2) { animation-delay: 0.08s; }
+.space-y-6 > *:nth-child(3), .space-y-8 > *:nth-child(3) { animation-delay: 0.16s; }
+.space-y-6 > *:nth-child(4), .space-y-8 > *:nth-child(4) { animation-delay: 0.24s; }
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* ── Smooth Page Transition ── */
+.animate-in {
+  animation: pageSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pageSlideIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Skeleton Shimmer for Loading States ── */
+.animate-pulse {
+  animation: shimmerPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+
+@keyframes shimmerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* More realistic skeleton shimmer */
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: rgba(30, 41, 59, 0.5) !important;
+  border-radius: 12px;
+}
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(56, 189, 248, 0.06) 40%,
+    rgba(56, 189, 248, 0.12) 50%,
+    rgba(56, 189, 248, 0.06) 60%,
+    transparent 100%
+  );
+  animation: shimmerSlide 1.8s ease-in-out infinite;
+}
+
+@keyframes shimmerSlide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+/* ── Floating Background Orbs ── */
+.mesh-gradient-blob {
+  background: radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.18) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 10% 80%, rgba(20, 184, 166, 0.12) 0%, transparent 50%),
+              radial-gradient(circle at 90% 20%, rgba(244, 63, 94, 0.08) 0%, transparent 40%);
+  animation: orbFloat 20s ease-in-out infinite alternate;
+}
+
+@keyframes orbFloat {
+  0% { transform: scale(1) rotate(0deg); }
+  33% { transform: scale(1.05) rotate(2deg); }
+  66% { transform: scale(0.98) rotate(-1deg); }
+  100% { transform: scale(1.02) rotate(1deg); }
+}
+
+/* ── Gradient Animation ── */
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.animate-gradient-x {
+  background-size: 200% 200%;
+  animation: gradient-x 3s ease infinite;
+}
+
+/* ── Floating Animation ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ── Spin Glow (for loading) ── */
+.animate-spin {
+  animation: spinGlow 1s linear infinite !important;
+}
+@keyframes spinGlow {
+  from { transform: rotate(0deg); filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.5)); }
+  to { transform: rotate(360deg); filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.5)); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🖱️ MICRO-INTERACTIONS — Button, Link, & Element Polish
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── All clickable elements get a smooth press effect ── */
+button, a, [role="button"] {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ── Table Row Smooth Transitions ── */
+table tbody tr {
+  transition: all 0.25s ease !important;
+}
+table tbody tr:hover {
+  background-color: rgba(56, 189, 248, 0.04) !important;
+}
+table tbody tr:hover td {
+  color: #f1f5f9 !important;
+}
+
+/* ── Badge Glow on Hover ── */
+.badge:hover {
+  filter: brightness(1.2);
+}
+
+/* ── Card Inner Glow Effect ── */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.card:hover::before {
+  opacity: 1;
+}
+
+/* ── Neon Focus Ring ── */
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(56, 189, 248, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15), 0 0 20px rgba(56, 189, 248, 0.08) !important;
+  outline: none !important;
+}
+
+/* ── Link Hover Underline Animation ── */
+a:not(.btn):not([class*="flex"]):not([class*="block"]) {
+  position: relative;
+  text-decoration: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   📐 TYPOGRAPHY SYSTEM — Consistent Premium Text
+   ═══════════════════════════════════════════════════════════════ */
+
+h1 { font-weight: 800 !important; letter-spacing: -0.025em; }
+h2 { font-weight: 700 !important; letter-spacing: -0.02em; }
+h3 { font-weight: 700 !important; letter-spacing: -0.01em; }
+
+/* ═══════════════════════════════════════════════════════════════
+   📊 CHART STYLING
+   ═══════════════════════════════════════════════════════════════ */
+
+canvas {
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.08));
+  transition: filter 0.3s ease;
+}
+canvas:hover {
+  filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.15));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   📱 MOBILE RESPONSIVE — Tables & Forms
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .card { @apply p-4 rounded-xl; }
+  
+  /* Make tables horizontally scrollable */
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+  
+  h1 { font-size: 1.25rem !important; }
+  h2 { font-size: 1.125rem !important; }
+  
+  .grid-cols-2 { grid-template-columns: 1fr !important; }
+  .grid-cols-3 { grid-template-columns: 1fr !important; }
+  .grid-cols-4 { grid-template-columns: repeat(2, 1fr) !important; }
+  .lg\:grid-cols-4 { grid-template-columns: repeat(2, 1fr) !important; }
+  .xl\:grid-cols-6 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+@media (max-width: 480px) {
+  .card { @apply p-3; }
+  .grid-cols-4, .lg\:grid-cols-4 { grid-template-columns: 1fr !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🎨 SPECIAL EFFECTS
+   ═══════════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&display=swap');
 
 .font-serif-elegant {
   font-family: 'Instrument Serif', serif;
-}
-
-.mesh-gradient-blob {
-  background: radial-gradient(circle at 30% 30%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
-              radial-gradient(circle at 70% 70%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-              radial-gradient(circle at 10% 90%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
 }
 
 .glass-card {
@@ -251,65 +510,118 @@
   position: relative;
   overflow: hidden;
 }
-
 .btn-shine::after {
   content: '';
   position: absolute;
   top: -50%;
-  left: -50%;
+  left: -200%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-  transform: rotate(45deg);
-  transition: 0.5s;
+  background: linear-gradient(60deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%);
+  transition: left 0.6s ease;
 }
-
 .btn-shine:hover::after {
-  left: 100%;
+  left: 200%;
 }
 
-/* ═══════════════════════════════════════
-   🎬 Animations
-   ═══════════════════════════════════════ */
-
-@keyframes gradient-x {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+/* ── Tooltip Styling ── */
+[title] {
+  position: relative;
 }
 
-.animate-gradient-x {
-  background-size: 200% 200%;
-  animation: gradient-x 3s ease infinite;
+/* ── Modal Backdrop Animation ── */
+.fixed.inset-0.z-50 {
+  animation: modalFadeIn 0.3s ease forwards;
+}
+.fixed.inset-0.z-50 > div {
+  animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+/* ── Notification/Toast Styling ── */
+[data-sonner-toast], div[role="status"] {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+  backdrop-filter: blur(16px);
+  border-radius: 12px !important;
 }
 
-/* ── Smooth Page Transitions ── */
-.animate-in {
-  animation: fadeSlideIn 0.5s ease-out forwards;
+/* ═══════════════════════════════════════════════════════════════
+   🌟 AMBIENT GLOW — Subtle background lighting effects
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Ambient orb top-right */
+body::before {
+  content: '';
+  position: fixed;
+  top: -20%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+  animation: ambientOrb1 15s ease-in-out infinite alternate;
 }
 
-@keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Ambient orb bottom-left */
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -20%;
+  left: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+  animation: ambientOrb2 18s ease-in-out infinite alternate;
 }
 
-/* ═══════════════════════════════════════
-   📊 Chart.js Dark Mode Compat
-   ═══════════════════════════════════════ */
-canvas {
-  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.1));
+@keyframes ambientOrb1 {
+  0% { transform: translate(0, 0); opacity: 0.6; }
+  50% { transform: translate(-30px, 20px); opacity: 1; }
+  100% { transform: translate(15px, -10px); opacity: 0.7; }
+}
+
+@keyframes ambientOrb2 {
+  0% { transform: translate(0, 0); opacity: 0.5; }
+  50% { transform: translate(25px, -15px); opacity: 0.8; }
+  100% { transform: translate(-20px, 10px); opacity: 0.6; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ✅ GLOBAL POLISH — Final touches
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Smooth all transitions */
+* {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform, filter;
+  transition-duration: 0.15s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Exclude animations from the global transition */
+*, *::before, *::after {
+  transition-property: color, background-color, border-color, box-shadow, opacity;
+}
+
+/* Make images and charts not affected by base transition */
+img, canvas, svg, video {
+  transition: none !important;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(56, 189, 248, 0.3);
+  color: #ffffff;
 }
