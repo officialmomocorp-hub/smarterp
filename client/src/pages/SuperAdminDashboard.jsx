@@ -14,6 +14,29 @@ import {
   Title, Tooltip, Legend, PointElement, LineElement, Filler
 } from 'chart.js';
 import { DashboardSkeleton } from '../components/Skeleton';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.02
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0, scale: 0.98, filter: 'blur(4px)' },
+  visible: {
+    y: 0,
+    opacity: 1,
+    scale: 1,
+    filter: 'blur(0px)',
+    transition: { type: 'spring', stiffness: 450, damping: 32 }
+  }
+};
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, Legend);
 
@@ -107,10 +130,15 @@ export default function SuperAdminDashboard() {
   };
 
   return (
-    <div className="space-y-8 max-w-[1400px]">
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="space-y-8 max-w-[1400px]"
+    >
 
       {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 relative z-10">
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 relative z-10">
         <div>
           <p className="text-sm text-sky-400 mb-1">{dateStr}</p>
           <h1 className="text-2xl font-bold text-white tracking-tight">
@@ -119,27 +147,40 @@ export default function SuperAdminDashboard() {
           <p className="text-sm text-gray-400 mt-1">Here's what's happening across SmartERP today.</p>
         </div>
         <div className="flex gap-2">
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/manage-schools')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-[0_0_15px_rgba(37,99,235,0.5)] hover:bg-blue-500 transition-all hover:scale-105"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-[0_0_15px_rgba(37,99,235,0.5)]"
           >
             <Plus className="w-3.5 h-3.5" />
             Add School
-          </button>
-          <button 
+          </motion.button>
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/platform-reports')}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-white/10 border border-white/20 backdrop-blur-md rounded-lg hover:bg-white/20 transition-all hover:scale-105"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-white/10 border border-white/20 backdrop-blur-md rounded-lg"
           >
             <Download className="w-3.5 h-3.5" />
             Export
-          </button>
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
       {/* ── Metrics ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
+      <motion.div variants={containerVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
         {metrics.map((m, i) => (
-          <div key={i} className="card hover:shadow-[0_0_25px_rgba(56,189,248,0.15)] hover:border-sky-500/30 transition-all duration-300 transform hover:-translate-y-1">
+          <motion.div 
+            key={i} 
+            variants={itemVariants}
+            whileHover={{ 
+              y: -8, 
+              scale: 1.02,
+              boxShadow: `0 20px 40px -10px ${m.accent}40, 0 0 20px ${m.accent}20` 
+            }}
+            className="card group cursor-pointer"
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10" style={{ backgroundColor: m.accent + '20', boxShadow: `0 0 15px ${m.accent}40` }}>
                 <m.icon className="w-5 h-5" style={{ color: m.accent }} />
@@ -151,15 +192,19 @@ export default function SuperAdminDashboard() {
             </div>
             <div className="text-3xl font-bold text-white tabular-nums drop-shadow-md">{m.value}</div>
             <div className="text-sm text-gray-400 mt-1 font-medium">{m.label}</div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* ── Main Content ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 relative z-10">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-5 gap-6 relative z-10">
 
         {/* Chart */}
-        <div className="lg:col-span-3 card">
+        <motion.div 
+          variants={itemVariants} 
+          whileHover={{ y: -4, scale: 1.005 }}
+          className="lg:col-span-3 card group"
+        >
           <div className="flex items-center justify-between mb-1">
             <div>
               <h2 className="text-base font-bold text-white">Revenue Overview</h2>
@@ -173,10 +218,14 @@ export default function SuperAdminDashboard() {
           <div className="h-64 mt-6">
             <Line data={chartData} options={chartOptions} />
           </div>
-        </div>
+        </motion.div>
 
         {/* Recent Schools */}
-        <div className="lg:col-span-2 card flex flex-col">
+        <motion.div 
+          variants={itemVariants} 
+          whileHover={{ y: -4, scale: 1.005 }}
+          className="lg:col-span-2 card flex flex-col group"
+        >
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-bold text-white">Recent Schools</h2>
             <button 
@@ -212,14 +261,18 @@ export default function SuperAdminDashboard() {
               );
             })}
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* ── Bottom Row ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+      <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
 
         {/* Maintenance */}
-        <div className="card border-blue-500/20 bg-gradient-to-br from-[#1e293b]/80 to-blue-900/40 relative overflow-hidden">
+        <motion.div 
+          variants={itemVariants} 
+          whileHover={{ y: -4, scale: 1.005 }}
+          className="card border-blue-500/20 bg-gradient-to-br from-[#1e293b]/80 to-blue-900/40 relative overflow-hidden group"
+        >
           <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/20 rounded-full -translate-y-1/2 translate-x-1/4 blur-3xl" />
           <div className="relative">
             <div className="flex items-center gap-2 mb-2">
@@ -240,10 +293,14 @@ export default function SuperAdminDashboard() {
               Schedule Maintenance
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Alerts */}
-        <div className="card border-orange-500/20 bg-gradient-to-br from-[#1e293b]/80 to-orange-900/20">
+        <motion.div 
+          variants={itemVariants} 
+          whileHover={{ y: -4, scale: 1.005 }}
+          className="card border-orange-500/20 bg-gradient-to-br from-[#1e293b]/80 to-orange-900/20 group"
+        >
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-orange-500/10 border border-orange-500/30 rounded-xl flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
               <AlertCircle className="w-6 h-6 text-orange-400" />
@@ -268,8 +325,8 @@ export default function SuperAdminDashboard() {
               )}
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 }

@@ -138,10 +138,10 @@ export default function Login() {
             </p>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { role: 'Super Admin', email: 'admin@smarterp.in', color: '#f59e0b', icon: Shield },
                 { role: 'School Admin', email: 'info@dpsdemo.edu.in', color: '#3b82f6', icon: Settings },
                 { role: 'Teacher', email: 'teacher@smarterp.in', color: '#10b981', icon: BookOpen },
                 { role: 'Student', email: '9999999999', color: '#8b5cf6', icon: Users },
+                { role: 'Parent', email: '9888888888', color: '#f59e0b', icon: Shield },
               ].map((demo, i) => (
                 <button 
                   key={i}

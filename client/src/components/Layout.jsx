@@ -9,6 +9,8 @@ import {
   Menu, ChevronDown, ChevronRight, Receipt, BarChart3,
   School, Award, FileSpreadsheet, Bell, Building2, X, Shield
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
 
 const commonMenu = [
   {
@@ -188,18 +190,27 @@ export default function Layout({ children }) {
       {/* Dynamic Background */}
       <div className="fixed inset-0 pointer-events-none z-[-1] mesh-gradient-blob mix-blend-screen opacity-40"></div>
       
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={toggleSidebar}
-        />
-      )}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            onClick={toggleSidebar}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-[#0B1121]/80 backdrop-blur-xl border-r border-white/10 transition-transform duration-300 ${
-          sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-20'
-        }`}
+      <motion.aside
+        initial={false}
+        animate={{ 
+          width: sidebarOpen ? 256 : (window.innerWidth >= 1024 ? 80 : 0),
+          x: sidebarOpen || window.innerWidth >= 1024 ? 0 : -256
+        }}
+        transition={{ type: 'spring', damping: 28, stiffness: 500 }}
+        className="fixed inset-y-0 left-0 z-50 bg-[#0B1121]/90 backdrop-blur-2xl border-r border-white/10 overflow-hidden"
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-white/10">
           {sidebarOpen && (
@@ -305,13 +316,16 @@ export default function Layout({ children }) {
             {sidebarOpen && <span>Logout</span>}
           </button>
         </nav>
-      </aside>
+      </motion.aside>
 
       {/* Main content */}
-      <main
-        className={`flex-1 transition-all duration-300 ${
-          sidebarOpen ? 'ml-0 lg:ml-64' : 'ml-0 lg:ml-20'
-        }`}
+      <motion.main
+        initial={false}
+        animate={{ 
+          marginLeft: window.innerWidth >= 1024 ? (sidebarOpen ? 256 : 80) : 0
+        }}
+        transition={{ type: 'spring', damping: 28, stiffness: 500 }}
+        className="flex-1 min-h-screen"
       >
         <header className="bg-[#0B1121]/80 backdrop-blur-xl border-b border-white/10 h-16 flex items-center justify-between px-6 sticky top-0 z-40">
           <div>
@@ -341,10 +355,16 @@ export default function Layout({ children }) {
           </div>
         </header>
 
-        <div className="p-6">
+        <motion.div 
+          key={location.pathname}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="p-6"
+        >
           {children}
-        </div>
-      </main>
+        </motion.div>
+      </motion.main>
     </div>
   );
 }

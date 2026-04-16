@@ -1,8 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* ═══════════════════════════════════════════════════════════════
    🌃 SMARTERP — 10/10 PREMIUM DARK GLASSMORPHISM THEME
@@ -150,9 +151,10 @@
 
   /* Fix white modals globally */
   .bg-white.rounded-2xl, .bg-white.rounded-xl {
-    background-color: rgba(15, 23, 42, 0.95) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(24px);
+    background-color: rgba(15, 23, 42, 0.98) !important;
+    border: 1px solid rgba(256, 256, 256, 0.12) !important;
+    backdrop-filter: blur(40px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(56, 189, 248, 0.05) !important;
   }
 }
 
@@ -173,7 +175,8 @@
   }
   .btn-primary {
     @apply bg-blue-600 text-white hover:bg-blue-500 focus:ring-blue-500;
-    box-shadow: 0 0 20px rgba(37, 99, 235, 0.4), 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 0 25px rgba(37, 99, 235, 0.5), 0 4px 12px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   .btn-primary:hover {
     box-shadow: 0 0 30px rgba(37, 99, 235, 0.6), 0 8px 20px rgba(0,0,0,0.4);
@@ -217,17 +220,19 @@
 
   .card {
     @apply rounded-2xl p-6 relative overflow-hidden;
-    background: rgba(30, 41, 59, 0.5);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255,255,255,0.02);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   .card:hover {
-    border-color: rgba(56, 189, 248, 0.15);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(56, 189, 248, 0.05);
-    transform: translateY(-2px);
+    border-color: rgba(56, 189, 248, 0.4);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 30px rgba(56, 189, 248, 0.15);
+    transform: translateY(-4px) scale(1.01);
   }
 
   .badge {
@@ -272,19 +277,19 @@
 .space-y-6 > *, .space-y-8 > *, .grid > * {
   animation: cardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
-.grid > *:nth-child(1) { animation-delay: 0.05s; }
-.grid > *:nth-child(2) { animation-delay: 0.1s; }
-.grid > *:nth-child(3) { animation-delay: 0.15s; }
-.grid > *:nth-child(4) { animation-delay: 0.2s; }
-.grid > *:nth-child(5) { animation-delay: 0.25s; }
-.grid > *:nth-child(6) { animation-delay: 0.3s; }
-.grid > *:nth-child(7) { animation-delay: 0.35s; }
-.grid > *:nth-child(8) { animation-delay: 0.4s; }
+.grid > *:nth-child(1) { animation-delay: 0.02s; }
+.grid > *:nth-child(2) { animation-delay: 0.04s; }
+.grid > *:nth-child(3) { animation-delay: 0.06s; }
+.grid > *:nth-child(4) { animation-delay: 0.08s; }
+.grid > *:nth-child(5) { animation-delay: 0.1s; }
+.grid > *:nth-child(6) { animation-delay: 0.12s; }
+.grid > *:nth-child(7) { animation-delay: 0.14s; }
+.grid > *:nth-child(8) { animation-delay: 0.16s; }
 
 .space-y-6 > *:nth-child(1), .space-y-8 > *:nth-child(1) { animation-delay: 0.0s; }
-.space-y-6 > *:nth-child(2), .space-y-8 > *:nth-child(2) { animation-delay: 0.08s; }
-.space-y-6 > *:nth-child(3), .space-y-8 > *:nth-child(3) { animation-delay: 0.16s; }
-.space-y-6 > *:nth-child(4), .space-y-8 > *:nth-child(4) { animation-delay: 0.24s; }
+.space-y-6 > *:nth-child(2), .space-y-8 > *:nth-child(2) { animation-delay: 0.04s; }
+.space-y-6 > *:nth-child(3), .space-y-8 > *:nth-child(3) { animation-delay: 0.08s; }
+.space-y-6 > *:nth-child(4), .space-y-8 > *:nth-child(4) { animation-delay: 0.12s; }
 
 @keyframes cardEntrance {
   from {
@@ -348,18 +353,17 @@
 
 /* ── Floating Background Orbs ── */
 .mesh-gradient-blob {
-  background: radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.18) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-              radial-gradient(circle at 10% 80%, rgba(20, 184, 166, 0.12) 0%, transparent 50%),
-              radial-gradient(circle at 90% 20%, rgba(244, 63, 94, 0.08) 0%, transparent 40%);
-  animation: orbFloat 20s ease-in-out infinite alternate;
+  background: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.25) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+              radial-gradient(circle at 10% 80%, rgba(34, 211, 238, 0.18) 0%, transparent 50%),
+              radial-gradient(circle at 90% 20%, rgba(244, 63, 94, 0.15) 0%, transparent 40%);
+  animation: orbFloat 12s ease-in-out infinite alternate;
 }
 
 @keyframes orbFloat {
-  0% { transform: scale(1) rotate(0deg); }
-  33% { transform: scale(1.05) rotate(2deg); }
-  66% { transform: scale(0.98) rotate(-1deg); }
-  100% { transform: scale(1.02) rotate(1deg); }
+  0% { transform: scale(1) rotate(0deg) translate(0, 0); }
+  50% { transform: scale(1.1) rotate(4deg) translate(20px, -20px); }
+  100% { transform: scale(0.95) rotate(-2deg) translate(-10px, 10px); }
 }
 
 /* ── Gradient Animation ── */
@@ -396,7 +400,7 @@
 
 /* ── All clickable elements get a smooth press effect ── */
 button, a, [role="button"] {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
 /* ── Table Row Smooth Transitions ── */
@@ -489,11 +493,7 @@ canvas:hover {
   .grid-cols-4, .lg\:grid-cols-4 { grid-template-columns: 1fr !important; }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   🎨 SPECIAL EFFECTS
-   ═══════════════════════════════════════════════════════════════ */
-
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&display=swap');
+/* ── Special Effects ── */
 
 .font-serif-elegant {
   font-family: 'Instrument Serif', serif;
@@ -605,7 +605,7 @@ body:has(.mesh-gradient-blob)::after {
 
 /* Smooth transitions on interactive elements only */
 button, a, input, select, textarea, .card, .badge, .btn {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* Charts and media should never transition */

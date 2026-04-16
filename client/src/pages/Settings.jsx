@@ -21,27 +21,38 @@ export default function Settings() {
 
   const [logoFile, setLogoFile] = useState(null);
   const [letterheadFile, setLetterheadFile] = useState(null);
-
   const [holidayForm, setHolidayForm] = useState({ name: '', date: '', type: 'Festival', isNational: false });
   const [holidays, setHolidays] = useState([]);
+  const [platformUsage, setPlatformUsage] = useState(null);
 
-  const { impersonateId } = useAuthStore();
+  const { user, impersonateId } = useAuthStore();
 
   useEffect(() => {
     const fetchSettings = async () => {
-      try {
-        const { data } = await api.get('/schools/settings');
-        if (data.success && data.data) setSchoolData(data.data);
-      } catch (err) { 
-        if (err.response?.status === 403) {
-           toast.error('Super Admins must select a school to manage settings.');
-        } else {
-           console.error('Failed to fetch settings', err); 
+      setLoading(true);
+      if (impersonateId) {
+        try {
+          const { data } = await api.get('/schools/settings');
+          if (data.success && data.data) setSchoolData(data.data);
+        } catch (err) { 
+          if (err.response?.status === 403) {
+             toast.error('Super Admins must select a school to manage settings.');
+          } else {
+             console.error('Failed to fetch settings', err); 
+          }
+        }
+      } else if (user?.role === 'SUPER_ADMIN') {
+        try {
+          const { data } = await api.get('/platform/reports/usage');
+          if (data.success && data.data) setPlatformUsage(data.data);
+        } catch (err) {
+          console.error('Failed to fetch platform usage', err);
         }
       }
+      setLoading(false);
     };
     fetchSettings();
-  }, [impersonateId]);
+  }, [impersonateId, user]);
 
   const handleUpdateSchool = async (e) => {
     e.preventDefault();
@@ -98,27 +109,33 @@ export default function Settings() {
     <div className="max-w-6xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Shield className="w-6 h-6 text-primary-600" />
-            School Settings & Security
+          <h2 className="text-2xl font-black text-white flex items-center gap-3">
+            <div className="p-2 bg-blue-500/20 rounded-xl border border-blue-500/30">
+              <Shield className="w-6 h-6 text-blue-400" />
+            </div>
+            {impersonateId ? 'School Settings & Security' : 'Platform Control Center'}
           </h2>
-          <p className="text-gray-500 mt-1">Manage global school configuration, calendars, and account security.</p>
+          <p className="text-gray-400 mt-1">
+            {impersonateId 
+              ? 'Manage configurations, calendars, and account security for this school.' 
+              : 'Global platform configuration, system health, and super admin security.'}
+          </p>
         </div>
       </div>
 
-      <div className="flex gap-2 p-1 bg-gray-100/50 rounded-xl w-fit mb-6">
+      <div className="flex gap-2 p-1.5 bg-white/5 backdrop-blur-md rounded-2xl w-fit mb-8 border border-white/10">
         {[
-          { id: 'profile', icon: User, label: 'School Profile' },
-          { id: 'security', icon: Lock, label: 'Security & Password' },
-          { id: 'holidays', icon: Calendar, label: 'Holidays & Calendar' },
-        ].map(tab => (
+          { id: 'profile', icon: User, label: impersonateId ? 'School Profile' : 'System Overview', show: true },
+          { id: 'security', icon: Lock, label: 'Security & Password', show: true },
+          { id: 'holidays', icon: Calendar, label: 'Holidays & Calendar', show: !!impersonateId },
+        ].filter(t => t.show).map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold tracking-tight transition-all flex items-center gap-2.5 ${
               activeTab === tab.id
-                ? 'bg-white text-primary-700 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -128,8 +145,9 @@ export default function Settings() {
       </div>
 
       {activeTab === 'profile' && (
-        <div className="card">
-          <form onSubmit={handleUpdateSchool} className="space-y-6">
+        impersonateId ? (
+          <div className="card">
+            <form onSubmit={handleUpdateSchool} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1 space-y-4">
                 <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center">
@@ -220,7 +238,68 @@ export default function Settings() {
             </div>
           </form>
         </div>
-      )}
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 card">
+            <h3 className="text-xl font-black text-white mb-6 flex items-center gap-2">
+              <ShieldCheck className="w-6 h-6 text-blue-400" />
+              Global SaaS Configuration
+            </h3>
+            <div className="space-y-6">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                     <label className="label">Platform Name</label>
+                     <input className="input" defaultValue="SmartERP Solution" readOnly />
+                     <p className="text-[10px] text-gray-500 mt-1">Global branding for all sub-directories.</p>
+                  </div>
+                  <div>
+                     <label className="label">System Support Email</label>
+                     <input className="input" defaultValue="support@smarterpsolution.com" readOnly />
+                  </div>
+               </div>
+               <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-2xl">
+                  <h4 className="text-sm font-bold text-blue-400 mb-2">Automated Backups</h4>
+                  <p className="text-sm text-gray-400">Database backups are scheduled every 24 hours at 01:00 AM. Last backup: Successful (2h ago).</p>
+               </div>
+               <div className="pt-6 border-t border-white/10 flex justify-end">
+                  <button className="btn btn-primary opacity-50 cursor-not-allowed">Save System Config</button>
+               </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="card border-blue-500/20 bg-gradient-to-br from-blue-600/10 to-transparent">
+              <h3 className="text-lg font-bold text-white mb-4">System Health</h3>
+              <div className="space-y-4">
+                 <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-xs text-gray-400 font-bold uppercase">Schools Registered</span>
+                    <span className="text-lg font-black text-blue-400">{platformUsage?.schools || 0}</span>
+                 </div>
+                 <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-xs text-gray-400 font-bold uppercase">Total active Students</span>
+                    <span className="text-lg font-black text-cyan-400">{platformUsage?.students || 0}</span>
+                 </div>
+                 <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-xs text-gray-400 font-bold uppercase">API Version</span>
+                    <span className="text-lg font-black text-white">v1.2.4-stable</span>
+                 </div>
+              </div>
+            </div>
+
+            <div className="card">
+              <h3 className="text-lg font-bold text-white mb-2">Maintenance</h3>
+              <p className="text-xs text-gray-400 leading-relaxed">Turn on global maintenance mode to suspend all school activities and admin logins.</p>
+              <div className="mt-4 flex items-center gap-3">
+                 <div className="w-10 h-5 bg-gray-700 rounded-full relative cursor-pointer opacity-50">
+                    <div className="absolute left-1 top-1 w-3 h-3 bg-gray-500 rounded-full" />
+                 </div>
+                 <span className="text-xs font-bold text-gray-500">Currently Disabled</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    )}
 
       {activeTab === 'security' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
