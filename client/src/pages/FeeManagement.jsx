@@ -124,8 +124,8 @@ export default function FeeManagement() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <IndianRupee className="w-6 h-6 text-primary-600" aria-hidden="true" />
+        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+          <IndianRupee className="w-6 h-6 text-[#0A84FF]" aria-hidden="true" />
           Fee Management
         </h2>
         <p className="text-gray-600 mt-1">Manage fee collection, concessions, and reports</p>
@@ -140,7 +140,7 @@ export default function FeeManagement() {
             aria-selected={activeTab === tab}
             onClick={() => handleTabChange(tab)}
             className={`px-6 py-2 rounded-lg text-sm font-bold transition-all capitalize ${
-              activeTab === tab ? 'bg-white text-primary-700 shadow-sm' : 'text-gray-500 hover:text-gray-900'
+              activeTab === tab ? 'bg-white text-[#409CFF] ' : 'text-gray-500 hover:text-white'
             }`}
           >
             {tab === 'collect' ? 'Collect Fee' : tab}
@@ -152,7 +152,7 @@ export default function FeeManagement() {
       {activeTab === 'collect' && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Search Student</h3>
+            <h3 className="text-lg font-bold text-white mb-4">Search Student</h3>
             <div className="flex gap-3">
               <div className="flex-1">
                 <input
@@ -188,34 +188,34 @@ export default function FeeManagement() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Student Info */}
               <div className="card border-l-4 border-l-primary-500">
-                <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-primary-500"></div> Student Details
+                <h4 className="font-bold text-white mb-4 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-[#0A84FF]/150"></div> Student Details
                 </h4>
                 <div className="space-y-4">
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Name</p>
-                    <p className="font-bold text-gray-900">{feeStatus.student?.profile?.firstName} {feeStatus.student?.profile?.lastName}</p>
+                    <p className="font-bold text-white">{feeStatus.student?.profile?.firstName} {feeStatus.student?.profile?.lastName}</p>
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Class</p>
-                    <p className="font-bold text-gray-900">{feeStatus.student?.class?.name} - {feeStatus.student?.section?.name}</p>
+                    <p className="font-bold text-white">{feeStatus.student?.class?.name} - {feeStatus.student?.section?.name}</p>
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Student ID</p>
-                    <p className="font-mono text-sm font-bold text-primary-700">{feeStatus.student?.studentId}</p>
+                    <p className="font-mono text-sm font-bold text-[#409CFF]">{feeStatus.student?.studentId}</p>
                   </div>
                 </div>
               </div>
 
               {/* Fee Summary */}
               <div className="card border-l-4 border-l-green-500">
-                <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <h4 className="font-bold text-white mb-4 flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-green-500"></div> Fee Summary
                 </h4>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-gray-600 font-medium">Total Due</span>
-                    <span className="font-bold text-gray-900" data-testid="fee-amount">{formatINR(feeStatus.summary?.totalDue || 0)}</span>
+                    <span className="font-bold text-white" data-testid="fee-amount">{formatINR(feeStatus.summary?.totalDue || 0)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600 font-medium">Total Paid</span>
@@ -232,7 +232,7 @@ export default function FeeManagement() {
                   <div className="pt-2 border-t">
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-gray-700">Payment Progress</span>
-                      <span className="font-bold text-primary-600">{feeStatus.summary?.paymentPercentage}%</span>
+                      <span className="font-bold text-[#0A84FF]">{feeStatus.summary?.paymentPercentage}%</span>
                     </div>
                     <div className="mt-2 w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
                       <div
@@ -246,7 +246,7 @@ export default function FeeManagement() {
 
               {/* Payment Form */}
               <div className="card border-l-4 border-l-purple-500">
-                <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <h4 className="font-bold text-white mb-4 flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-purple-500"></div> Record Payment
                 </h4>
                 <form onSubmit={handlePayment} className="space-y-4">
@@ -306,7 +306,7 @@ export default function FeeManagement() {
                   <button 
                     type="submit" 
                     disabled={processing}
-                    className="w-full btn btn-success flex items-center justify-center gap-2 shadow-lg shadow-green-100"
+                    className="w-full btn btn-success flex items-center justify-center gap-2  shadow-green-100"
                   >
                     {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <IndianRupee className="w-4 h-4" />} 
                     Record Payment
@@ -319,21 +319,21 @@ export default function FeeManagement() {
           {/* Payment History */}
           {!loading && feeStatus?.payments && (
             <div className="card">
-              <h4 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <h4 className="font-bold text-white mb-6 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-gray-400" aria-hidden="true" /> Payment History
               </h4>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-100">
+                  <thead className="bg-gray-50 border-b border-[rgba(84,84,88,0.36)]">
                     <tr>
-                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Receipt</th>
-                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Installment</th>
-                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Date</th>
-                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Total</th>
-                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Paid</th>
-                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Balance</th>
-                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-widest">Status</th>
-                      <th className="px-4 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-widest">Action</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 ">Receipt</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 ">Installment</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 ">Date</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 ">Total</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 ">Paid</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 ">Balance</th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-500 ">Status</th>
+                      <th className="px-4 py-4 text-center text-xs font-bold text-gray-500 ">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -345,10 +345,10 @@ export default function FeeManagement() {
                       </tr>
                     ) : feeStatus.payments.map((payment) => (
                       <tr key={payment.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-4 py-4 text-sm font-mono font-bold text-primary-700">{payment.receiptNumber}</td>
+                        <td className="px-4 py-4 text-sm font-mono font-bold text-[#409CFF]">{payment.receiptNumber}</td>
                         <td className="px-4 py-4 text-sm font-bold text-gray-700">Q{payment.installmentNumber}</td>
                         <td className="px-4 py-4 text-sm font-medium text-gray-600">{new Date(payment.createdAt).toLocaleDateString('en-IN')}</td>
-                        <td className="px-4 py-4 text-sm font-bold text-gray-900">{formatINR(payment.totalAmount)}</td>
+                        <td className="px-4 py-4 text-sm font-bold text-white">{formatINR(payment.totalAmount)}</td>
                         <td className="px-4 py-4 text-sm font-bold text-green-700">{formatINR(payment.paidAmount)}</td>
                         <td className="px-4 py-4 text-sm font-bold text-red-700">{formatINR(payment.balanceAmount)}</td>
                         <td className="px-4 py-4">
@@ -367,7 +367,7 @@ export default function FeeManagement() {
                               const token = useAuthStore.getState().token;
                               window.open(`/api/v1/pdf/receipt/${payment.id}?token=${token}`, '_blank');
                             }}
-                            className="p-2 rounded-lg bg-gray-100 hover:bg-primary-50 text-gray-600 hover:text-primary-600 transition-all active:scale-95"
+                            className="p-2 rounded-lg bg-gray-100 hover:bg-[#0A84FF]/15 text-gray-600 hover:text-[#0A84FF] transition-all active:scale-95"
                             title="Print Receipt"
                           >
                             <Printer className="w-4 h-4" />
@@ -387,24 +387,24 @@ export default function FeeManagement() {
       {activeTab === 'structure' && (
         <div className="card">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-xl font-bold text-gray-900">Fee Structure Management</h3>
+            <h3 className="text-xl font-bold text-white">Fee Structure Management</h3>
             <button 
               aria-label="Create new fee structure"
               onClick={openCreateModal} 
-              className="btn btn-primary flex items-center gap-2 shadow-lg shadow-primary-100"
+              className="btn btn-primary flex items-center gap-2  "
             >
               <Plus className="w-4 h-4" /> Create Structure
             </button>
           </div>
-          <div className="bg-gradient-to-br from-primary-50 to-white border border-primary-100 rounded-2xl p-6 shadow-sm">
+          <div className="bg-gradient-to-br from-primary-50 to-white border border-primary-100 rounded-2xl p-6 ">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                <div>
                   <h4 className="text-lg font-bold text-primary-900">Class 5 Fee Structure</h4>
-                  <p className="text-primary-700 font-medium">Academic Session 2025-2026</p>
+                  <p className="text-[#409CFF] font-medium">Academic Session 2025-2026</p>
                </div>
                <div className="bg-white px-4 py-2 rounded-xl border border-primary-100">
                   <span className="text-xs font-bold text-primary-500 uppercase block tracking-wider">Total Package</span>
-                  <span className="text-2xl font-black text-primary-900" data-testid="fee-amount">{formatINR(31000)}</span>
+                  <span className="text-2xl font-bold text-primary-900" data-testid="fee-amount">{formatINR(31000)}</span>
                </div>
             </div>
             
@@ -421,15 +421,15 @@ export default function FeeManagement() {
               ].map((head) => (
                 <div key={head.name} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-white hover:border-primary-200 transition-all">
                   <p className="text-xs font-bold text-gray-500 uppercase mb-1">{head.name}</p>
-                  <p className="font-bold text-gray-900 text-lg" data-testid="fee-amount">{formatINR(head.amount)}</p>
+                  <p className="font-bold text-white text-lg" data-testid="fee-amount">{formatINR(head.amount)}</p>
                 </div>
               ))}
             </div>
             
             <div className="mt-6 pt-5 border-t border-primary-100 flex flex-wrap gap-4 text-sm font-bold text-primary-800">
-              <span className="bg-primary-100 px-3 py-1 rounded-full">Installments: Quarterly</span>
-              <span className="bg-primary-100 px-3 py-1 rounded-full">Late Fine: ₹5/day</span>
-              <span className="bg-primary-100 px-3 py-1 rounded-full">Due Window: 1st-15th</span>
+              <span className="bg-[#0A84FF]/15 px-3 py-1 rounded-full">Installments: Quarterly</span>
+              <span className="bg-[#0A84FF]/15 px-3 py-1 rounded-full">Late Fine: ₹5/day</span>
+              <span className="bg-[#0A84FF]/15 px-3 py-1 rounded-full">Due Window: 1st-15th</span>
             </div>
           </div>
         </div>
@@ -439,7 +439,7 @@ export default function FeeManagement() {
       {activeTab === 'defaulters' && (
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Fee Defaulters List</h3>
+            <h3 className="text-lg font-bold text-white">Fee Defaulters List</h3>
             <button 
               aria-label="Export defaulters report"
               className="btn btn-secondary flex items-center gap-2"
@@ -460,23 +460,23 @@ export default function FeeManagement() {
       {/* Reports Tab */}
       {activeTab === 'reports' && (
         <div className="card">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Real-time Collection Insights</h3>
+          <h3 className="text-lg font-bold text-white mb-6">Real-time Collection Insights</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg shadow-green-100 text-white">
-              <p className="text-sm font-bold text-green-100 uppercase tracking-widest mb-1">Today's Collection</p>
-              <p className="text-3xl font-black">₹0</p>
+            <div className="p-6 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl  shadow-green-100 text-white">
+              <p className="text-sm font-bold text-green-100  mb-1">Today's Collection</p>
+              <p className="text-3xl font-bold">₹0</p>
               <div className="mt-4 flex items-center gap-2 text-xs font-bold text-green-100">
                  <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div> Live Updates
               </div>
             </div>
-            <div className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg shadow-blue-100 text-white">
-              <p className="text-sm font-bold text-blue-100 uppercase tracking-widest mb-1">Monthly Peak</p>
-              <p className="text-3xl font-black">₹0</p>
+            <div className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl  shadow-blue-100 text-white">
+              <p className="text-sm font-bold text-blue-100  mb-1">Monthly Peak</p>
+              <p className="text-3xl font-bold">₹0</p>
               <p className="mt-4 text-xs font-bold text-blue-100">Across all classes</p>
             </div>
-            <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg shadow-purple-100 text-white">
-              <p className="text-sm font-bold text-purple-100 uppercase tracking-widest mb-1">Expected Revenue</p>
-              <p className="text-3xl font-black">₹0</p>
+            <div className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl  shadow-purple-100 text-white">
+              <p className="text-sm font-bold text-purple-100  mb-1">Expected Revenue</p>
+              <p className="text-3xl font-bold">₹0</p>
               <p className="mt-4 text-xs font-bold text-purple-100 font-mono">EY 2025-26 Target</p>
             </div>
           </div>
@@ -486,9 +486,9 @@ export default function FeeManagement() {
       {/* Create Structure Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 font-sans">
-            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50">
-              <h3 className="text-lg font-bold text-gray-900">Configure New Structure</h3>
+          <div className="bg-[#1c1c1e] rounded-2xl  w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 font-sans">
+            <div className="px-6 py-5 border-b border-[rgba(84,84,88,0.36)] flex items-center justify-between bg-gray-50">
+              <h3 className="text-lg font-bold text-white">Configure New Structure</h3>
               <button 
                 aria-label="Close modal"
                 onClick={() => setIsCreateModalOpen(false)} 
@@ -553,7 +553,7 @@ export default function FeeManagement() {
                 <button 
                   type="submit" 
                   disabled={processing}
-                  className="w-full btn btn-primary flex justify-center items-center gap-2 py-3 font-bold shadow-lg shadow-primary-200"
+                  className="w-full btn btn-primary flex justify-center items-center gap-2 py-3 font-bold  shadow-primary-200"
                 >
                   {processing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5"/>} 
                   Generate Structure

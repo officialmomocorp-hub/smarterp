@@ -206,7 +206,7 @@ export default function ExamEnhanced() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Examination Management (Enhanced)</h2>
+        <h2 className="text-2xl font-bold text-white">Examination Management (Enhanced)</h2>
         <p className="text-gray-500 mt-1">Verification workflow, hall tickets, seating, analytics & more</p>
       </div>
 
@@ -239,7 +239,7 @@ export default function ExamEnhanced() {
               if (tab.id === 'analytics') handleFetchAnalytics();
             }}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-              activeTab === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              activeTab === tab.id ? 'bg-white text-white shadow-sm' : 'text-gray-600 hover:text-white'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -251,7 +251,7 @@ export default function ExamEnhanced() {
       {/* Marks Entry Tab */}
       {activeTab === 'marks-entry' && (
         <div className="card">
-           <h3 className="text-lg font-semibold mb-4 text-gray-900">1. Marks Entry - Level 1 (Teacher Draft)</h3>
+           <h3 className="text-lg font-semibold mb-4 text-white">1. Marks Entry - Level 1 (Teacher Draft)</h3>
            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div className="md:col-span-2">
                  <label className="label">Select Subject</label>
@@ -286,11 +286,11 @@ export default function ExamEnhanced() {
                     <tbody className="divide-y divide-gray-100 bg-white">
                        {entryStudents.map((student, idx) => (
                           <tr key={student.id} className="hover:bg-blue-50/30 transition-colors">
-                             <td className="px-6 py-4 text-sm font-bold text-gray-900 border-r">{student.profile.firstName} {student.profile.lastName}</td>
+                             <td className="px-6 py-4 text-sm font-bold text-white border-r">{student.profile.firstName} {student.profile.lastName}</td>
                              <td className="px-6 py-4 text-sm text-gray-500 border-r font-mono">{student.rollNumber}</td>
                              <td className="px-6 py-4 text-center flex justify-center border-r">
                                 <input 
-                                  type="number" className="input py-2 w-28 text-center text-lg font-bold border-2 border-gray-100 focus:border-primary-500 shadow-sm" 
+                                  type="number" className="input py-2 w-28 text-center text-lg font-bold border-2 border-[rgba(84,84,88,0.36)] focus:border-primary-500 shadow-sm" 
                                   placeholder="0.0"
                                   value={student.obtainedMarks} 
                                   onChange={(e) => {
@@ -307,7 +307,7 @@ export default function ExamEnhanced() {
                  </table>
                  <div className="flex justify-end p-6 bg-gray-50 border-t items-center gap-4">
                     <p className="text-xs text-gray-500 italic">Unsaved changes will be lost after reloading.</p>
-                    <button onClick={handleBulkSaveMarks} className="btn btn-primary px-8 py-3 rounded-lg shadow-lg shadow-primary-500/20 active:scale-95 transition-transform flex items-center gap-2">
+                    <button onClick={handleBulkSaveMarks} className="btn btn-primary px-8 py-3 rounded-lg  shadow-primary-500/20 active:scale-95 transition-transform flex items-center gap-2">
                        <Save className="w-5 h-5" /> Save All as Draft
                     </button>
                  </div>
@@ -320,7 +320,7 @@ export default function ExamEnhanced() {
       {activeTab === 'verification' && (
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">3-Level Verification Workflow</h3>
+            <h3 className="text-lg font-semibold text-white">3-Level Verification Workflow</h3>
             <button onClick={fetchPendingVerifications} className="btn btn-secondary text-sm">
               <Search className="w-4 h-4 mr-1" /> Refresh
             </button>
@@ -336,7 +336,7 @@ export default function ExamEnhanced() {
             </div>
             <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-sm">2</div>
+                <div className="w-8 h-8 rounded-full bg-[#FF9F0A] flex items-center justify-center text-white font-bold text-sm">2</div>
                 <h4 className="font-medium text-amber-900">HOD/Coordinator</h4>
               </div>
               <p className="text-sm text-amber-700">Review marks → Approve or Send Back with reason</p>
@@ -431,7 +431,7 @@ export default function ExamEnhanced() {
       {activeTab === 'hall-tickets' && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Hall Ticket Generation</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Hall Ticket Generation</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
                 <h4 className="font-medium text-blue-900 mb-2">Bulk Generate</h4>
@@ -488,7 +488,7 @@ export default function ExamEnhanced() {
       {activeTab === 'seating' && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Seating Arrangement Generator</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Seating Arrangement Generator</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
                 <h4 className="font-medium text-purple-900 mb-2">Auto-Generate</h4>
@@ -520,7 +520,7 @@ export default function ExamEnhanced() {
       {activeTab === 'answer-books' && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Answer Book Tracking</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Answer Book Tracking</h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="p-4 bg-blue-50 rounded-lg text-center">
                 <QrCode className="w-8 h-8 mx-auto text-blue-600 mb-2" />
@@ -557,7 +557,7 @@ export default function ExamEnhanced() {
       {activeTab === 'compartment' && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Compartment / Back Exam Management</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Compartment / Back Exam Management</h3>
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
               <h4 className="font-medium text-amber-900 mb-2">Compartment Rules</h4>
               <ul className="text-sm text-amber-700 space-y-1">
@@ -579,7 +579,7 @@ export default function ExamEnhanced() {
             {/* Compartment Student List */}
             {verificationData?.compartmentStudents && (
                <div className="mt-8 border-t pt-6">
-                  <h4 className="font-bold text-gray-900 mb-4">Eligible Students (Fail in 1 Subject)</h4>
+                  <h4 className="font-bold text-white mb-4">Eligible Students (Fail in 1 Subject)</h4>
                   <div className="overflow-x-auto">
                      <table className="w-full">
                         <thead className="bg-gray-50 uppercase text-xs">
@@ -591,7 +591,7 @@ export default function ExamEnhanced() {
                                  <td className="px-4 py-3 text-sm font-medium">{s.student.profile.firstName} {s.student.profile.lastName}</td>
                                  <td className="px-4 py-3 text-sm text-red-600 font-bold">{s.failedSubjects.join(', ')}</td>
                                  <td className="px-4 py-3 text-sm">{s.percentage}%</td>
-                                 <td className="px-4 py-3"><button className="btn btn-ghost text-xs text-primary-600">Register</button></td>
+                                 <td className="px-4 py-3"><button className="btn btn-ghost text-xs text-[#0A84FF]">Register</button></td>
                               </tr>
                            ))}
                         </tbody>
@@ -622,14 +622,14 @@ export default function ExamEnhanced() {
                   <p className="text-2xl font-bold text-red-600">{verificationData.summary?.failCount || 0}</p>
                 </div>
                 <div className="card">
-                  <p className="text-sm text-amber-500">Pass %</p>
+                  <p className="text-sm text-[#FF9F0A]">Pass %</p>
                   <p className="text-2xl font-bold text-amber-600">{verificationData.summary?.passPercentage || 0}%</p>
                 </div>
               </div>
 
               {verificationData.top10 && verificationData.top10.length > 0 && (
                 <div className="card">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Top 10 Students</h3>
+                  <h3 className="text-lg font-semibold text-white mb-4">Top 10 Students</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-gray-50">
@@ -665,7 +665,7 @@ export default function ExamEnhanced() {
                               </span>
                             </td>
                             <td className="px-4 py-3">
-                               <button onClick={() => handlePrintReportCard(student.student?.id)} className="btn btn-ghost p-1 text-primary-600" title="Print Report Card">
+                               <button onClick={() => handlePrintReportCard(student.student?.id)} className="btn btn-ghost p-1 text-[#0A84FF]" title="Print Report Card">
                                   <Printer className="w-4 h-4" />
                                </button>
                             </td>
@@ -679,7 +679,7 @@ export default function ExamEnhanced() {
 
               {verificationData.subjectAverages && verificationData.subjectAverages.length > 0 && (
                 <div className="card">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Subject-wise Performance</h3>
+                  <h3 className="text-lg font-semibold text-white mb-4">Subject-wise Performance</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-gray-50">

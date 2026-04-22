@@ -108,7 +108,7 @@ export default function Examinations() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Examination & Marks</h2>
+          <h2 className="text-2xl font-bold text-white">Examination & Marks</h2>
           <p className="text-gray-500 mt-1">Manage exam schedules, grading, and result publication</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn btn-primary flex items-center gap-2">
@@ -145,7 +145,7 @@ export default function Examinations() {
 
       <div className="card">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Exam Schedule - 2025-26</h3>
+          <h3 className="text-lg font-semibold text-white">Exam Schedule - 2025-26</h3>
           <div className="flex items-center gap-2">
             <Search className="w-4 h-4 text-gray-400" />
             <select 
@@ -179,7 +179,7 @@ export default function Examinations() {
               <tbody className="divide-y divide-gray-200">
                 {exams.map((exam) => (
                   <tr key={exam.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-bold text-primary-700">{exam.name}</td>
+                    <td className="px-4 py-3 text-sm font-bold text-[#409CFF]">{exam.name}</td>
                     <td className="px-4 py-3 text-sm">{exam.class?.name || 'All'}</td>
                     <td className="px-4 py-3 text-sm">
                        {new Date(exam.startDate).toLocaleDateString('en-IN')} - {new Date(exam.endDate).toLocaleDateString('en-IN')}
@@ -217,7 +217,7 @@ export default function Examinations() {
       {/* Create Exam Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#1c1c1e] rounded-xl  w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b">
               <h3 className="text-xl font-bold">Schedule New Examination</h3>
               <button onClick={() => setShowModal(false)}><X className="w-6 h-6 text-gray-400" /></button>

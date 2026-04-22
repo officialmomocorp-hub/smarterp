@@ -1,70 +1,53 @@
 const express = require('express');
 const router = express.Router();
-const { authenticate, schoolScoped } = require('../middleware/auth');
 const prisma = require('../config/database');
+const { authenticate, authorize } = require('../middleware/auth');
 
-router.get('/super-admin', authenticate, async (req, res, next) => {
+router.use(authenticate);
+
+router.get('/super-admin', authorize('SUPER_ADMIN'), async (req, res, next) => {
   try {
-    if (req.userRole !== 'SUPER_ADMIN') {
-      return res.status(403).json({ success: false, message: 'Forbidden' });
-    }
-
-    const [totalSchools, totalStudents, totalStaff, recentSchools, inactiveSchools, allSchools] = await Promise.all([
+    const [
+      totalSchools,
+      activeSchools,
+      totalStudents,
+      totalStaff,
+      recentSchools,
+      paymentSummary
+    ] = await Promise.all([
       prisma.school.count(),
+      prisma.school.count({ where: { isActive: true } }),
       prisma.student.count(),
       prisma.staff.count(),
-      prisma.school.findMany({
-        orderBy: { createdAt: 'desc' },
+      prisma.school.findMany({ 
+        orderBy: { createdAt: 'desc' }, 
         take: 5,
         select: { id: true, name: true, city: true, createdAt: true, isActive: true }
       }),
-      prisma.school.count({ where: { isActive: false } }),
-      prisma.school.findMany({ select: { createdAt: true } })
+      prisma.feePayment.aggregate({
+        _sum: { paidAmount: true }
+      })
     ]);
-
-    // Calculate real revenue trend based on school creation dates
-    // Assume MRR of ₹15,000 per school
-    const MRR_PER_SCHOOL = 15000;
-    
-    // Initialize last 6 months
-    const months = [];
-    const revenueTrend = [];
-    const now = new Date();
-    
-    for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        months.push(d.toLocaleString('default', { month: 'short' }));
-        
-        // Count schools created on or before this month
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
-        const schoolsUpToMonth = allSchools.filter(s => new Date(s.createdAt) <= endOfMonth).length;
-        revenueTrend.push(schoolsUpToMonth * MRR_PER_SCHOOL);
-    }
 
     res.json({
       success: true,
       data: {
         totalSchools,
-        activeSchools: totalSchools - inactiveSchools,
-        unpaidSchoolsCount: inactiveSchools,
-        totalStudentsAcross: totalStudents,
-        totalStaffAcross: totalStaff,
+        activeSchools,
+        totalStudents,
+        totalStaff,
         recentSchools,
-        totalRevenue: (totalSchools - inactiveSchools) * MRR_PER_SCHOOL,
-        revenueTrend,
-        trendLabels: months
+        totalRevenue: paymentSummary._sum.paidAmount || 0,
+        unpaidSchoolsCount: 0 // To be implemented with billing module
       }
     });
   } catch (error) { next(error); }
 });
 
-router.use(authenticate, schoolScoped);
-
-
-router.get('/admin', async (req, res, next) => {
+router.get('/admin', authorize('SUPER_ADMIN', 'ADMIN'), async (req, res, next) => {
   try {
     const currentYear = await prisma.academicYear.findFirst({
-      where: { schoolId: req.schoolId, isCurrent: true },
+      where: { schoolId: req.schoolId, isCurrent: true }
     });
 
     if (!currentYear) {
@@ -93,11 +76,11 @@ router.get('/admin', async (req, res, next) => {
       (async () => {
         const students = await prisma.student.findMany({
           where: { schoolId: req.schoolId, academicYearId: currentYear.id, status: 'ACTIVE' },
-          select: { profile: { select: { gender: true } } },
+          select: { studentProfile: { select: { gender: true } } },
         });
         const genderMap = {};
         students.forEach(s => {
-          const g = s.profile?.gender || 'UNKNOWN';
+          const g = s.studentProfile?.gender || 'UNKNOWN';
           genderMap[g] = (genderMap[g] || 0) + 1;
         });
         return Object.entries(genderMap).map(([gender, count]) => ({ profile: { gender }, _count: count }));
@@ -171,7 +154,7 @@ router.get('/admin', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.get('/teacher', async (req, res, next) => {
+router.get('/teacher', authorize('TEACHER'), async (req, res, next) => {
   try {
     const today = new Date().getDay();
     const [myClasses, pendingMarks, myAttendance] = await Promise.all([
@@ -214,7 +197,7 @@ router.get('/teacher', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.get('/parent', async (req, res, next) => {
+router.get('/parent', authorize('PARENT'), async (req, res, next) => {
   try {
     const parent = await prisma.parent.findFirst({
       where: { userId: req.userId },
@@ -223,7 +206,7 @@ router.get('/parent', async (req, res, next) => {
           include: {
             student: {
               include: {
-                profile: true,
+                studentProfile: true,
                 class: true,
                 section: true,
                 feePayments: { orderBy: { createdAt: 'desc' }, take: 5 },
@@ -277,12 +260,12 @@ router.get('/parent', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-router.get('/student', async (req, res, next) => {
+router.get('/student', authorize('STUDENT'), async (req, res, next) => {
   try {
     const student = await prisma.student.findFirst({
       where: { userId: req.userId },
       include: {
-        profile: true,
+        studentProfile: true,
         class: true,
         section: true,
       }
@@ -293,7 +276,7 @@ router.get('/student', async (req, res, next) => {
     }
 
     const today = new Date().getDay();
-    const [myTimetable, myAttendance, recentHomework] = await Promise.all([
+    const [myTimetable, myAttendance, recentHomework, feePayments, notices] = await Promise.all([
       prisma.timetable.findMany({
         where: { 
           classId: student.classId, 
@@ -317,6 +300,15 @@ router.get('/student', async (req, res, next) => {
         orderBy: { createdAt: 'desc' },
         take: 5,
         include: { subject: true }
+      }),
+      prisma.feePayment.findMany({
+        where: { studentId: student.id },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.notice.findMany({
+        where: { schoolId: student.schoolId, isActive: true },
+        orderBy: { createdAt: 'desc' },
+        take: 5
       })
     ]);
 
@@ -324,10 +316,14 @@ router.get('/student', async (req, res, next) => {
     const presentDays = myAttendance.filter(a => a.status === 'PRESENT' || a.status === 'LATE').length;
     const attendancePercentage = totalDays > 0 ? ((presentDays / totalDays) * 100).toFixed(2) : 0;
 
+    const totalFees = feePayments.reduce((sum, p) => sum + parseFloat(p.totalAmount), 0);
+    const paidFees = feePayments.reduce((sum, p) => sum + parseFloat(p.paidAmount), 0);
+    const feeBalance = totalFees - paidFees;
+
     res.json({
       success: true,
       data: {
-        profile: student.profile,
+        profile: student.studentProfile || { firstName: 'Student', lastName: '' },
         class: student.class,
         section: student.section,
         timetable: myTimetable,
@@ -336,7 +332,13 @@ router.get('/student', async (req, res, next) => {
           presentDays,
           attendancePercentage
         },
-        homework: recentHomework
+        feeSummary: {
+          totalFees,
+          paidFees,
+          feeBalance
+        },
+        homework: recentHomework,
+        notices
       }
     });
   } catch (error) { next(error); }

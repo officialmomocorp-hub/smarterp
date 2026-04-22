@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useAuthStore } from '../store';
+import { useAuthStore, useAppStore } from '../store';
 
 export const API_BASE = '/api/v1';
 const api = axios.create({
@@ -9,8 +9,8 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const state = useAuthStore.getState();
-  const impersonateId = state.impersonateId;
+  // Access store state dynamically inside the interceptor
+  const impersonateId = useAuthStore.getState().impersonateId;
   
   if (impersonateId) {
     config.headers['X-School-Id'] = impersonateId;
@@ -22,8 +22,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      useAuthStore.getState().logout();
+      // Access store dynamically inside the error handler
+      const logout = useAuthStore.getState().logout;
+      logout();
       window.location.href = '/login';
+    }
+    if (error.response?.status === 503) {
+      const setMaintenance = useAppStore.getState().setMaintenance;
+      setMaintenance(true);
     }
     return Promise.reject(error);
   }
@@ -95,9 +101,15 @@ export const examAPI = {
 
 export const dashboardAPI = {
   getAdmin: () => api.get('/dashboard/admin'),
+  getSuperAdmin: () => api.get('/dashboard/super-admin'),
   getTeacher: () => api.get('/dashboard/teacher'),
   getParent: () => api.get('/dashboard/parent'),
   getStudent: () => api.get('/dashboard/student'),
+};
+
+export const platformAPI = {
+  getSettings: () => api.get('/platform/settings'),
+  updateSettings: (data) => api.put('/platform/settings', data),
 };
 
 export const staffAPI = {
@@ -136,9 +148,10 @@ export const timetableAPI = {
 
 export const libraryAPI = {
   getBooks: (params) => api.get('/library/books', { params }),
+  getStats: () => api.get('/library/stats'),
   addBook: (data) => api.post('/library/books', data),
   issueBook: (data) => api.post('/library/issue', data),
-  returnBook: (data) => api.post('/library/return', data),
+  returnBook: (id) => api.post(`/library/return/${id}`),
 };
 
 export const transportAPI = {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Smarterp: The next-generation Indian School ERP. A world-class SaaS platform for comprehensive school automation including Admissions, Fees, Examinations, and Reporting." />
+    <meta name="description" content="SmartERP: The next-generation Indian School ERP. A world-class SaaS platform for comprehensive school automation including Admissions, Fees, Examinations, and Reporting." />
     <!-- Open Graph / Social Media -->
     <meta property="og:title" content="SmartERP - World Class Indian School ERP Solution" />
     <meta property="og:description" content="Automate your institution with the smartest ERP built for modern education. Trusted by leading schools globally." />
@@ -35,8 +35,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
-  <body>
+  <body style="background: #000;">
     <div id="root"></div>
+    <script>
+      console.log("INLINE DEBUG: HTML parsed successfully.");
+      window.onload = () => console.log("INLINE DEBUG: Window loaded.");
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

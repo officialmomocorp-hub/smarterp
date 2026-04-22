@@ -40,7 +40,7 @@ export default function Notices() {
       URGENT: 'bg-red-100 text-red-800',
       HIGH: 'bg-orange-100 text-orange-800',
       MEDIUM: 'bg-blue-100 text-blue-800',
-      LOW: 'bg-gray-100 text-gray-800',
+      LOW: 'bg-gray-100 text-white',
     };
     return badges[priority] || badges.LOW;
   };
@@ -77,7 +77,7 @@ export default function Notices() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Notice Board</h2>
+          <h2 className="text-2xl font-bold text-white">Notice Board</h2>
           <p className="text-gray-500 mt-1">Digital notice board for school announcements</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn btn-primary flex items-center gap-2">
@@ -94,7 +94,7 @@ export default function Notices() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="font-semibold text-gray-900">{notice.title}</h3>
+                  <h3 className="font-semibold text-white">{notice.title}</h3>
                   <span className={`badge ${getPriorityBadge(notice.priority)}`}>
                     {notice.priority}
                   </span>
@@ -113,9 +113,9 @@ export default function Notices() {
       {/* New Notice Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+          <div className="bg-[#1c1c1e] rounded-lg  w-full max-w-md overflow-hidden">
             <div className="px-6 py-4 border-b flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Create New Notice</h3>
+              <h3 className="text-lg font-semibold text-white">Create New Notice</h3>
               <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-500"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">

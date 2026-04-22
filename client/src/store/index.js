@@ -21,6 +21,8 @@ export const useAuthStore = create(
 export const useAppStore = create((set) => ({
   sidebarOpen: true,
   currentLanguage: 'en',
+  isUnderMaintenance: false,
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
   setLanguage: (lang) => set({ currentLanguage: lang }),
+  setMaintenance: (status) => set({ isUnderMaintenance: status }),
 }));

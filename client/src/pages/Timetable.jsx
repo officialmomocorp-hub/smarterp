@@ -120,7 +120,7 @@ export default function Timetable() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Timetable Management</h2>
+          <h2 className="text-2xl font-bold text-white">Timetable Management</h2>
           <p className="text-gray-500 mt-1">Create and manage class timetables</p>
         </div>
         <div className="flex gap-3">
@@ -178,7 +178,7 @@ export default function Timetable() {
                       onClick={() => handleSlotClick(dayIndex, day, periodIndex)}
                     >
                       {entry ? (
-                        <div className={`rounded-lg p-2 border ${subjectColors[entry.subject] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+                        <div className={`rounded-lg p-2 border ${subjectColors[entry.subject] || 'bg-gray-100 text-white border-[rgba(84,84,88,0.36)]'}`}>
                           <p className="text-xs font-medium truncate">{entry.subject}</p>
                           <p className="text-xs opacity-75 truncate">{entry.teacher}</p>
                         </div>
@@ -198,18 +198,18 @@ export default function Timetable() {
 
       {/* Teacher Workload Summary */}
       <div className="card">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Teacher Workload Summary</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">Teacher Workload Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {staff.slice(0, 8).map(teacher => {
             const teacherName = `${teacher.user?.profile?.firstName || 'Staff'} ${teacher.user?.profile?.lastName || ''}`;
             const count = Object.values(timetable).flat().filter(e => e.teacherId === teacher.id).length;
             return (
               <div key={teacher.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-                  <UserIcon className="w-5 h-5 text-primary-600" />
+                <div className="w-10 h-10 rounded-full bg-[#0A84FF]/15 flex items-center justify-center">
+                  <UserIcon className="w-5 h-5 text-[#0A84FF]" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{teacherName}</p>
+                  <p className="text-sm font-medium text-white">{teacherName}</p>
                   <p className="text-xs text-gray-500">{count} periods/week</p>
                 </div>
               </div>
@@ -221,9 +221,9 @@ export default function Timetable() {
       {/* Add/Edit Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="bg-[#1c1c1e] rounded-2xl w-full max-w-md">
+            <div className="px-6 py-4 border-b border-[rgba(84,84,88,0.36)] flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-white">
                 {timetable[selectedSlot?.key] ? 'Edit' : 'Add'} Entry
               </h3>
               <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
@@ -267,10 +267,10 @@ export default function Timetable() {
       {/* Edit Timings Modal */}
       {showTimeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-primary-600" /> Edit Bell Timings
+          <div className="bg-[#1c1c1e] rounded-2xl w-full max-w-lg  overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-[rgba(84,84,88,0.36)] flex items-center justify-between sticky top-0 bg-white">
+              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                <Clock className="w-5 h-5 text-[#0A84FF]" /> Edit Bell Timings
               </h3>
               <button onClick={() => setShowTimeModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>

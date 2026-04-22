@@ -1,3 +1,4 @@
+import 'chart.js/auto';
 import React, { useState, useEffect } from 'react';
 import { FileText, Download, Printer, Users, AlertTriangle, TrendingDown, Send, Calendar, CheckCircle, XCircle, Clock, TrendingUp } from 'lucide-react';
 import { Line, Pie, Bar } from 'react-chartjs-2';
@@ -84,7 +85,7 @@ export default function Reports() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Reports & Compliance</h2>
+        <h2 className="text-2xl font-bold text-white">Reports & Compliance</h2>
         <p className="text-gray-500 mt-1">UDISE+ export, attendance warnings, PDF generation</p>
       </div>
 
@@ -94,7 +95,7 @@ export default function Reports() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 cursor-pointer z-10 relative ${
-              activeTab === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+              activeTab === tab.id ? 'bg-[#1c1c1e] text-white shadow-sm' : 'text-gray-600 hover:text-white hover:bg-[#2c2c2e]'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -107,29 +108,29 @@ export default function Reports() {
       {activeTab === 'analytics' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="card bg-gradient-to-br from-blue-600 to-indigo-700 text-white border-none shadow-xl shadow-blue-500/20">
+            <div className="card bg-gradient-to-br from-blue-600 to-indigo-700 text-white border-none  shadow-blue-500/20">
                <div className="flex justify-between items-start mb-4">
-                  <div className="p-2 bg-white/10 rounded-lg"><TrendingUp className="w-6 h-6 text-white" /></div>
-                  <span className="text-xs font-bold bg-white/20 px-2 py-1 rounded">+12% vs last month</span>
+                  <div className="p-2 bg-[#2c2c2e] rounded-lg"><TrendingUp className="w-6 h-6 text-white" /></div>
+                  <span className="text-xs font-bold bg-[#1c1c1e]/20 px-2 py-1 rounded">+12% vs last month</span>
                </div>
                <p className="text-blue-100 text-sm font-medium">Monthly Gross Revenue</p>
-               <p className="text-3xl font-black mt-1">₹8,45,200</p>
+               <p className="text-3xl font-bold mt-1">₹8,45,200</p>
             </div>
-            <div className="card bg-white border-slate-100 shadow-sm">
+            <div className="card bg-[#1c1c1e] border-slate-100 shadow-sm">
                <div className="flex justify-between items-start mb-4">
                   <div className="p-2 bg-green-50 rounded-lg"><Users className="w-6 h-6 text-green-600" /></div>
                   <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">Target 95%</span>
                </div>
                <p className="text-slate-500 text-sm font-medium">Admission Conversion Rate</p>
-               <p className="text-3xl font-black text-slate-900 mt-1">87.4%</p>
+               <p className="text-3xl font-bold text-slate-900 mt-1">87.4%</p>
             </div>
-            <div className="card bg-white border-slate-100 shadow-sm">
+            <div className="card bg-[#1c1c1e] border-slate-100 shadow-sm">
                <div className="flex justify-between items-start mb-4">
                   <div className="p-2 bg-amber-50 rounded-lg"><Clock className="w-6 h-6 text-amber-600" /></div>
                   <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">24 Students</span>
                </div>
                <p className="text-slate-500 text-sm font-medium">Pending Fee Defaulters</p>
-               <p className="text-3xl font-black text-slate-900 mt-1">₹1,12,000</p>
+               <p className="text-3xl font-bold text-slate-900 mt-1">₹1,12,000</p>
             </div>
           </div>
 
@@ -183,7 +184,7 @@ export default function Reports() {
       {activeTab === 'udise' && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">UDISE+ Data Export</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">UDISE+ Data Export</h3>
             <p className="text-gray-500 mb-6">Export enrollment, teacher, and infrastructure data in UDISE+ format for government submission</p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -235,7 +236,7 @@ export default function Reports() {
       {activeTab === 'attendance' && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Attendance Warning (Below 75%)</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Attendance Warning (Below 75%)</h3>
             <p className="text-gray-500 mb-4">CBSE Rule: Students below 75% attendance cannot appear for board exams</p>
 
             <div className="flex gap-4 mb-6">
@@ -301,7 +302,7 @@ export default function Reports() {
       {activeTab === 'pdf' && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">PDF Document Generator</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">PDF Document Generator</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
                 <FileText className="w-8 h-8 text-blue-600 mb-3" />

@@ -22,6 +22,54 @@ router.get('/books', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+router.get('/stats', async (req, res, next) => {
+  try {
+    const schoolId = req.schoolId;
+    if (!schoolId) return res.status(400).json({ success: false, message: 'School ID missing' });
+
+    const where = { schoolId };
+    
+    const [totalAgg, issuedCount, availableAgg, overdueCount] = await Promise.all([
+      prisma.libraryBook.aggregate({
+        where,
+        _sum: { totalCopies: true }
+      }),
+      prisma.bookIssue.count({
+        where: { ...where, status: 'Issued' }
+      }),
+      prisma.libraryBook.aggregate({
+        where,
+        _sum: { availableCopies: true }
+      }),
+      prisma.bookIssue.count({
+        where: {
+          ...where,
+          status: 'Issued',
+          dueDate: { lt: new Date() }
+        }
+      })
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        total: totalAgg?._sum?.totalCopies || 0,
+        issued: issuedCount || 0,
+        available: availableAgg?._sum?.availableCopies || 0,
+        overdue: overdueCount || 0,
+        // Keep new names for future-proofing
+        totalBooks: totalAgg?._sum?.totalCopies || 0,
+        issuedBooks: issuedCount || 0,
+        availableBooks: availableAgg?._sum?.availableCopies || 0,
+        overdueCount: overdueCount || 0
+      }
+    });
+  } catch (error) { 
+    console.error('Library Stats Error:', error);
+    next(error); 
+  }
+});
+
 router.post('/books', authorize('SUPER_ADMIN', 'ADMIN', 'TEACHER'), async (req, res, next) => {
   try {
     const book = await prisma.libraryBook.create({

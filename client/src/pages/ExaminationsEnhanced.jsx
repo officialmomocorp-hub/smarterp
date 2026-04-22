@@ -76,7 +76,7 @@ export default function ExaminationsEnhanced() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Advanced Examinations</h2>
+          <h2 className="text-2xl font-bold text-white">Advanced Examinations</h2>
           <p className="text-gray-500 mt-1">Manage marks entry, verification and analytical reporting</p>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function ExaminationsEnhanced() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'bg-white text-primary-700 shadow-sm'
+                ? 'bg-white text-[#409CFF] shadow-sm'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >

@@ -164,7 +164,7 @@ export default function Students() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Student Management</h2>
+          <h2 className="text-2xl font-bold text-white">Student Management</h2>
           <p className="text-gray-500 mt-1">{pagination.total || 0} students enrolled</p>
         </div>
         <div className="flex gap-2">
@@ -232,14 +232,14 @@ export default function Students() {
                 students.map((student) => (
                   <tr key={student.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm">{student.rollNumber}</td>
-                    <td className="px-4 py-3 text-sm font-mono text-primary-600">{student.studentId}</td>
+                    <td className="px-4 py-3 text-sm font-mono text-[#0A84FF]">{student.studentId}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-medium">
+                        <div className="w-8 h-8 rounded-full bg-[#0A84FF]/15 flex items-center justify-center text-[#409CFF] text-sm font-medium">
                           {student.profile?.firstName?.charAt(0)}{student.profile?.lastName?.charAt(0)}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{student.profile?.firstName} {student.profile?.lastName}</p>
+                          <p className="text-sm font-medium text-white">{student.profile?.firstName} {student.profile?.lastName}</p>
                           <p className="text-xs text-gray-500">{student.profile?.gender}</p>
                         </div>
                       </div>
@@ -300,7 +300,7 @@ export default function Students() {
           </table>
         </div>
         {pagination.pages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-[rgba(84,84,88,0.36)]">
             <p className="text-sm text-gray-500">Page {pagination.page} of {pagination.pages} ({pagination.total} total)</p>
             <div className="flex gap-2">
               <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="btn btn-secondary text-sm flex items-center gap-1">
@@ -326,13 +326,13 @@ export default function Students() {
 
       {showImportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+          <div className="bg-[#1c1c1e] rounded-xl  max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-gray-900">Import Students</h3>
+              <h3 className="text-xl font-bold text-white">Import Students</h3>
               <button onClick={() => setShowImportModal(false)} className="text-gray-400 hover:text-gray-500">✕</button>
             </div>
             <form onSubmit={handleImport} className="space-y-4">
-              <div className="p-8 border-2 border-dashed border-gray-200 rounded-xl text-center">
+              <div className="p-8 border-2 border-dashed border-[rgba(84,84,88,0.36)] rounded-xl text-center">
                 <FileUp className="w-10 h-10 text-gray-400 mx-auto mb-4" />
                 <p className="text-sm text-gray-500 mb-4">Click to select or drag and drop your Excel/CSV file here</p>
                 <input name="file" type="file" accept=".xlsx, .xls, .csv" required className="text-xs text-gray-500 block w-full" />

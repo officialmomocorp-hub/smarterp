@@ -34,8 +34,8 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+    <div className="min-h-screen flex items-center justify-center bg-[#0B1121]">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500"></div>
     </div>
   );
 }
@@ -49,7 +49,14 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <BrowserRouter>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" toastOptions={{
+        style: {
+          background: 'rgba(15, 23, 42, 0.9)',
+          color: '#fff',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }
+      }} />
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route path="/" element={<Home />} />

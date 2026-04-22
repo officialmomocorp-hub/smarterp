@@ -93,17 +93,17 @@ export default function ManageSchools() {
           </h2>
           <p className="text-gray-400 mt-1">Super Admin Dashboard: Oversee school status and access</p>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn btn-primary bg-blue-600 hover:bg-blue-500 border border-blue-500/50 flex items-center gap-2 shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+        <button onClick={() => setShowModal(true)} className="btn btn-primary bg-blue-600 hover:bg-blue-500 border border-blue-500/50 flex items-center gap-2 ">
           <Plus className="w-4 h-4" /> Add New School
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {schools.map(school => (
-          <div key={school.id} className={`card hover:shadow-lg transition-all relative border-t-4 ${school.isActive ? 'border-emerald-500' : 'border-rose-500'}`}>
+          <div key={school.id} className={`card hover: transition-all relative border-t-4 ${school.isActive ? 'border-[#30D158]' : 'border-[#FF453A]'}`}>
             <div className="flex items-start justify-between mb-4">
-              <div className={`p-3 rounded-lg ${school.isActive ? 'bg-emerald-500/10' : 'bg-rose-500/10'}`}>
-                <Building2 className={`w-6 h-6 ${school.isActive ? 'text-emerald-400' : 'text-rose-400'}`} />
+              <div className={`p-3 rounded-lg ${school.isActive ? 'bg-[#30D158]/10' : 'bg-[#FF453A]/10'}`}>
+                <Building2 className={`w-6 h-6 ${school.isActive ? 'text-[#30D158]' : 'text-rose-400'}`} />
               </div>
               <div className="flex gap-2">
                 <span className={`badge ${school.isActive ? 'badge-green' : 'badge-red'}`}>
@@ -120,7 +120,7 @@ export default function ManageSchools() {
                   className={`p-1.5 rounded-lg transition-colors ${
                     school.isActive 
                     ? 'text-gray-600 cursor-not-allowed grayscale' 
-                    : 'text-gray-400 hover:text-rose-400 hover:bg-rose-500/10'
+                    : 'text-gray-400 hover:text-rose-400 hover:bg-[#FF453A]/10'
                   }`}
                   title={school.isActive ? "Deactivate school before deleting" : "Delete School"}
                 >
@@ -136,7 +136,7 @@ export default function ManageSchools() {
               <div className="flex justify-between"><span>Code:</span> <span className="font-medium text-white">{school.code}</span></div>
               <div className="flex justify-between"><span>Admin:</span> <span className="font-medium text-white truncate ml-4" title={school.users?.[0]?.email}>{school.users?.[0]?.email || 'N/A'}</span></div>
               <div className="flex justify-between"><span>Phone:</span> <span className="font-medium text-white">{school.phone}</span></div>
-              <div className="flex justify-between pt-2 border-t border-white/10 mt-2 text-[10px] uppercase tracking-tighter text-gray-500 font-bold">
+              <div className="flex justify-between pt-2 border-t border-[#38383a] mt-2 text-[10px] er text-gray-500 font-bold">
                  <span>Registered On</span>
                  <span>{new Date(school.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
               </div>
@@ -145,7 +145,7 @@ export default function ManageSchools() {
             <div className="grid grid-cols-2 gap-3">
               <button 
                   onClick={() => setResetModalSchool(school)}
-                  className="py-2 px-3 border border-white/10 text-gray-300 rounded-lg text-xs font-bold hover:bg-white/5 hover:text-white transition-colors"
+                  className="py-2 px-3 border border-[#38383a] text-gray-300 rounded-lg text-xs font-bold hover:bg-[#1c1c1e] hover:text-white transition-colors"
               >
                 Password
               </button>
@@ -153,8 +153,8 @@ export default function ManageSchools() {
                   onClick={() => handleToggleStatus(school)}
                   className={`py-2 px-3 flex items-center justify-center gap-2 rounded-lg text-xs font-bold transition-colors ${
                     school.isActive 
-                    ? 'border border-rose-500/30 text-rose-400 hover:bg-rose-500/10' 
-                    : 'border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
+                    ? 'border border-[#FF453A]/30 text-rose-400 hover:bg-[#FF453A]/10' 
+                    : 'border border-[#30D158]/30 text-[#30D158] hover:bg-[#30D158]/10'
                   }`}
               >
                 {school.isActive ? <PowerOff className="w-3 h-3" /> : <Power className="w-3 h-3" />}
@@ -167,8 +167,8 @@ export default function ManageSchools() {
 
       {/* Reset Password Modal */}
       {resetModalSchool && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-          <div className="bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+          <div className="bg-[#0f172a] border border-[#38383a] rounded-2xl  max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
             <h3 className="text-xl font-bold text-white mb-2">Reset Admin Password</h3>
             <p className="text-sm text-gray-400 mb-6">Changing password for <strong className="text-white">{resetModalSchool.name}</strong> admin account.</p>
             <form onSubmit={handleResetPassword}>
@@ -189,11 +189,11 @@ export default function ManageSchools() {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmSchool && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-          <div className="bg-[#0f172a] border border-rose-500/20 rounded-2xl shadow-2xl max-w-md w-full p-8 animate-in zoom-in-95 duration-200 text-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full filter blur-2xl"></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+          <div className="bg-[#0f172a] border border-[#FF453A]/20 rounded-2xl  max-w-md w-full p-8 animate-in zoom-in-95 duration-200 text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF453A]/10 rounded-full filter blur-2xl"></div>
             
-            <div className="relative w-20 h-20 bg-rose-500/10 border border-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
+            <div className="relative w-20 h-20 bg-[#FF453A]/10 border border-[#FF453A]/20 rounded-full flex items-center justify-center mx-auto mb-6 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
               <ShieldAlert className="w-10 h-10" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-2 relative">Delete School?</h3>
@@ -204,7 +204,7 @@ export default function ManageSchools() {
               <button 
                 onClick={handleDeleteSchool} 
                 disabled={loading}
-                className="w-full py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.4)] transition-colors disabled:opacity-50"
+                className="w-full py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-[#FF453A] shadow-[0_0_15px_rgba(244,63,94,0.4)] transition-colors disabled:opacity-50"
               >
                 {loading ? 'Deleting...' : 'Yes, Delete Permanently'}
               </button>
@@ -222,8 +222,8 @@ export default function ManageSchools() {
 
       {/* Add School Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-          <div className="bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto overflow-x-hidden p-8 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
+          <div className="bg-[#0f172a] border border-[#38383a] rounded-2xl  max-w-2xl w-full max-h-[90vh] overflow-y-auto overflow-x-hidden p-8 animate-in slide-in-from-bottom-4 duration-300">
             <div className="flex justify-between items-center mb-8">
               <h3 className="text-2xl font-bold text-white">Add New School</h3>
               <button onClick={() => setShowModal(false)} className="p-2 text-gray-400 hover:text-white rounded-lg transition-colors">✕</button>
@@ -231,7 +231,7 @@ export default function ManageSchools() {
 
             <form onSubmit={handleSubmit} className="space-y-2">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                <div className="md:col-span-2"><h4 className="text-xs font-black text-blue-400 uppercase tracking-widest mb-2">School Information</h4><hr className="mb-4 border-white/10" /></div>
+                <div className="md:col-span-2"><h4 className="text-xs font-bold text-blue-400  mb-2">School Information</h4><hr className="mb-4 border-[#38383a]" /></div>
                 <div>
                   <label className="label">School Name</label>
                   <input type="text" className="input" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
@@ -269,7 +269,7 @@ export default function ManageSchools() {
                   <input type="text" className="input" required value={formData.udiseCode} onChange={e => setFormData({...formData, udiseCode: e.target.value})} />
                 </div>
 
-                <div className="md:col-span-2 mt-8"><h4 className="text-xs font-black text-rose-400 uppercase tracking-widest mb-2">Initial Admin Account</h4><hr className="mb-4 border-white/10" /></div>
+                <div className="md:col-span-2 mt-8"><h4 className="text-xs font-bold text-rose-400  mb-2">Initial Admin Account</h4><hr className="mb-4 border-[#38383a]" /></div>
                 <div>
                   <label className="label">Admin Email</label>
                   <input type="email" className="input" required value={formData.adminEmail} onChange={e => setFormData({...formData, adminEmail: e.target.value})} />

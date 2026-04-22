@@ -48,7 +48,7 @@ export default function AuditLogs() {
       case 'UPDATE': return 'text-blue-700 bg-blue-50 border-blue-200';
       case 'DELETE': return 'text-red-700 bg-red-50 border-red-200';
       case 'LOGIN': return 'text-indigo-700 bg-indigo-50 border-indigo-200';
-      default: return 'text-gray-700 bg-gray-50 border-gray-200';
+      default: return 'text-gray-700 bg-[#2c2c2e] border-[rgba(84,84,88,0.36)]';
     }
   };
 
@@ -56,26 +56,26 @@ export default function AuditLogs() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Shield className="w-8 h-8 text-primary-600" />
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Shield className="w-8 h-8 text-[#0A84FF]" />
             Security & Audit Logs
           </h2>
           <p className="text-gray-500 mt-1">Track administrative actions, system changes, and access history.</p>
         </div>
-        <div className="bg-primary-50 text-primary-700 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+        <div className="bg-[#0A84FF]/15 text-[#409CFF] px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
            <Activity className="w-4 h-4 animate-pulse" />
            Live System Monitoring Active
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 bg-[#1c1c1e] p-6 rounded-xl shadow-sm border border-[rgba(84,84,88,0.36)]">
         <div className="space-y-1">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Resource</label>
+          <label className="text-xs font-bold text-gray-400 uppercase ">Resource</label>
           <select 
             name="resource" 
             value={filters.resource} 
             onChange={handleFilterChange}
-            className="input w-full bg-gray-50 border-transparent focus:bg-white"
+            className="input w-full bg-[#2c2c2e] border-transparent focus:bg-white"
           >
             <option value="">All Resources</option>
             <option value="STUDENT">Students</option>
@@ -86,12 +86,12 @@ export default function AuditLogs() {
           </select>
         </div>
         <div className="space-y-1">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Action</label>
+          <label className="text-xs font-bold text-gray-400 uppercase ">Action</label>
           <select 
             name="action" 
             value={filters.action} 
             onChange={handleFilterChange}
-            className="input w-full bg-gray-50 border-transparent focus:bg-white"
+            className="input w-full bg-[#2c2c2e] border-transparent focus:bg-white"
           >
             <option value="">All Actions</option>
             <option value="CREATE">Create</option>
@@ -101,14 +101,14 @@ export default function AuditLogs() {
           </select>
         </div>
         <div className="md:col-span-2 space-y-1">
-           <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Date Range</label>
+           <label className="text-xs font-bold text-gray-400 uppercase ">Date Range</label>
            <div className="flex gap-2">
               <input 
                 type="date" 
                 name="startDate" 
                 value={filters.startDate} 
                 onChange={handleFilterChange}
-                className="input w-full bg-gray-50 border-transparent focus:bg-white"
+                className="input w-full bg-[#2c2c2e] border-transparent focus:bg-white"
               />
               <span className="self-center text-gray-300">to</span>
               <input 
@@ -116,7 +116,7 @@ export default function AuditLogs() {
                 name="endDate" 
                 value={filters.endDate} 
                 onChange={handleFilterChange}
-                className="input w-full bg-gray-50 border-transparent focus:bg-white"
+                className="input w-full bg-[#2c2c2e] border-transparent focus:bg-white"
               />
            </div>
         </div>
@@ -130,11 +130,11 @@ export default function AuditLogs() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-[#1c1c1e] rounded-xl shadow-sm border border-[rgba(84,84,88,0.36)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
+              <tr className="bg-[#2c2c2e] border-b border-[rgba(84,84,88,0.36)]">
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Timestamp</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Performer</th>
                 <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Action</th>
@@ -147,7 +147,7 @@ export default function AuditLogs() {
               {loading ? (
                 Array(5).fill(0).map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    <td colSpan="6" className="px-6 py-4 h-16 bg-gray-50/50"></td>
+                    <td colSpan="6" className="px-6 py-4 h-16 bg-[#2c2c2e]/50"></td>
                   </tr>
                 ))
               ) : logs.length === 0 ? (
@@ -158,23 +158,23 @@ export default function AuditLogs() {
                 </tr>
               ) : (
                 logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-50/80 transition-colors">
+                  <tr key={log.id} className="hover:bg-[#2c2c2e]/80 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">
+                      <div className="text-sm font-semibold text-white">
                         {format(new Date(log.createdAt), 'MMM dd, HH:mm:ss')}
                       </div>
                       <div className="text-[10px] text-gray-400 font-mono">{log.id.slice(0, 8)}...</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold text-xs">
+                        <div className="w-8 h-8 rounded-full bg-[#0A84FF]/15 text-[#409CFF] flex items-center justify-center font-bold text-xs">
                           {log.user?.profile?.firstName?.[0] || 'S'}
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-gray-900">
+                          <div className="text-sm font-bold text-white">
                             {log.user?.profile ? `${log.user.profile.firstName} ${log.user.profile.lastName}` : 'System Agent'}
                           </div>
-                          <div className="text-[10px] text-gray-400 uppercase tracking-tighter">
+                          <div className="text-[10px] text-gray-400 er">
                             {log.user?.role || 'SYSTEM'}
                           </div>
                         </div>
@@ -209,9 +209,9 @@ export default function AuditLogs() {
         </div>
 
         {pagination.pages > 1 && (
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+          <div className="px-6 py-4 bg-[#2c2c2e] border-t border-[rgba(84,84,88,0.36)] flex items-center justify-between">
             <div className="text-sm text-gray-500 font-medium">
-              Page <span className="text-gray-900 font-bold">{pagination.page}</span> of <span className="text-gray-900 font-bold">{pagination.pages}</span>
+              Page <span className="text-white font-bold">{pagination.page}</span> of <span className="text-white font-bold">{pagination.pages}</span>
               <span className="ml-4 font-normal">({pagination.total} records total)</span>
             </div>
             <div className="flex gap-2">

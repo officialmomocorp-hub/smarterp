@@ -28,6 +28,13 @@ const authenticate = async (req, res, next) => {
       throw new AppError('User not found or inactive', 401);
     }
 
+    // --- GLOBAL MAINTENANCE CHECK ---
+    const globalSettings = await prisma.globalSetting.findUnique({ where: { id: 'default' } });
+    if (globalSettings?.maintenanceMode && user.role !== 'SUPER_ADMIN') {
+      throw new AppError('Platform is currently under maintenance. Please try again later.', 503);
+    }
+    // ---------------------------------
+
     const expectedVersion = decoded.version !== undefined ? decoded.version : decoded.tokenVersion;
     if (expectedVersion !== undefined && user.tokenVersion !== expectedVersion) {
        throw new AppError('Session expired due to security update. Please log in again.', 401);

@@ -86,8 +86,8 @@ export default function Subscriptions() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <CreditCard className="w-7 h-7 text-primary-600" />
+          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+            <CreditCard className="w-7 h-7 text-[#0A84FF]" />
             Subscriptions & Billing
           </h2>
           <p className="text-gray-500 mt-1">Manage school plans, invoices, and SaaS revenue.</p>
@@ -97,7 +97,7 @@ export default function Subscriptions() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, idx) => (
-          <div key={idx} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow relative overflow-hidden group">
+          <div key={idx} className="bg-[#1c1c1e] rounded-xl border border-[rgba(84,84,88,0.36)] shadow-sm p-6 hover:shadow-md transition-shadow relative overflow-hidden group">
             <div className={`absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 rounded-full ${stat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500 ease-in-out blur-2xl`}></div>
             <div className="flex justify-between items-start mb-4 relative">
               <div className={`p-3 rounded-xl ${stat.color}`}>
@@ -110,7 +110,7 @@ export default function Subscriptions() {
               )}
             </div>
             <div className="relative">
-              <h3 className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</h3>
+              <h3 className="text-3xl font-bold text-white mb-1">{stat.value}</h3>
               <p className="text-sm font-medium text-gray-500">{stat.title}</p>
             </div>
           </div>
@@ -118,9 +118,9 @@ export default function Subscriptions() {
       </div>
 
       {/* Main Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-900">Registered Schools</h3>
+      <div className="bg-[#1c1c1e] rounded-xl shadow-sm border border-[rgba(84,84,88,0.36)] overflow-hidden">
+        <div className="p-6 border-b border-[rgba(84,84,88,0.36)] bg-gray-50 flex justify-between items-center">
+            <h3 className="text-lg font-bold text-white">Registered Schools</h3>
             <div className="relative">
                 <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input type="text" placeholder="Search schools..." className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-64" />
@@ -129,7 +129,7 @@ export default function Subscriptions() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white border-b border-gray-100 text-xs uppercase tracking-wider text-gray-500">
+              <tr className="bg-[#1c1c1e] text-white border-b border-[rgba(84,84,88,0.36)] text-xs uppercase tracking-wider text-gray-500">
                 <th className="p-4 font-semibold">School Details</th>
                 <th className="p-4 font-semibold">Current Plan</th>
                 <th className="p-4 font-semibold">Monthly Rate</th>
@@ -144,13 +144,13 @@ export default function Subscriptions() {
               ) : schools.map((school) => (
                 <tr key={school.id} className="hover:bg-gray-50 transition-colors">
                   <td className="p-4">
-                    <div className="font-bold text-gray-900">{school.name}</div>
+                    <div className="font-bold text-white">{school.name}</div>
                     <div className="text-sm text-gray-500">Code: {school.code}</div>
                   </td>
                   <td className="p-4">
-                    <span className="font-medium text-gray-800">{school.plan}</span>
+                    <span className="font-medium text-white">{school.plan}</span>
                   </td>
-                  <td className="p-4 font-medium text-gray-900">
+                  <td className="p-4 font-medium text-white">
                     ₹{school.price?.toLocaleString('en-IN')}
                   </td>
                   <td className="p-4">
@@ -160,10 +160,10 @@ export default function Subscriptions() {
                     {school.expiryDate}
                   </td>
                   <td className="p-4 text-right">
-                    <button className="px-4 py-1.5 text-sm font-medium text-primary-700 bg-primary-100 hover:bg-primary-200 rounded-lg transition-colors">
+                    <button className="px-4 py-1.5 text-sm font-medium text-[#409CFF] bg-[#0A84FF]/15 hover:bg-primary-200 rounded-lg transition-colors">
                       Renew
                     </button>
-                    <button className="ml-2 px-4 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors">
+                    <button className="ml-2 px-4 py-1.5 text-sm font-medium text-gray-600 bg-[#1c1c1e] text-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors">
                       Edit
                     </button>
                   </td>

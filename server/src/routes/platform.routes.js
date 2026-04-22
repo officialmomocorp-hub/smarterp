@@ -19,14 +19,13 @@ router.get('/reports/school-list', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-// 2. Revenue Report (Mock/Simplified for SaaS owner)
+// 2. Revenue Report
 router.get('/reports/revenue', async (req, res, next) => {
   try {
     const rev = await prisma.feePayment.aggregate({
       where: { status: 'PAID' },
       _sum: { paidAmount: true }
     });
-    // This is aggregated across ALL schools for global revenue overview
     res.json({ 
       success: true, 
       data: {
@@ -56,6 +55,34 @@ router.get('/reports/usage', async (req, res, next) => {
         totalUsers: stats[3]
       }
     });
+  } catch (error) { next(error); }
+});
+
+// 4. Platform Settings
+router.get('/settings', async (req, res, next) => {
+  try {
+    let settings = await prisma.globalSetting.findUnique({
+      where: { id: 'default' }
+    });
+    
+    if (!settings) {
+      settings = await prisma.globalSetting.create({
+        data: { id: 'default' }
+      });
+    }
+    
+    res.json({ success: true, data: settings });
+  } catch (error) { next(error); }
+});
+
+router.patch('/settings', async (req, res, next) => {
+  try {
+    const settings = await prisma.globalSetting.upsert({
+      where: { id: 'default' },
+      update: req.body,
+      create: { ...req.body, id: 'default' }
+    });
+    res.json({ success: true, data: settings });
   } catch (error) { next(error); }
 });
 

@@ -92,8 +92,8 @@ export default function Academics() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <School className="w-6 h-6 text-gray-900" />
+        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+          <School className="w-6 h-6 text-white" />
           Academic Management
         </h2>
         <p className="text-gray-500 mt-1">Manage academic years, classes, sections, and subjects.</p>
@@ -110,7 +110,7 @@ export default function Academics() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'bg-white text-primary-700 shadow-sm'
+                ? 'bg-[#1c1c1e] text-[#409CFF] shadow-sm'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -155,7 +155,7 @@ export default function Academics() {
                 {academicYears.map(year => (
                   <div key={year.id} className="p-4 border rounded-lg flex justify-between items-center bg-gray-50">
                     <div>
-                      <p className="font-bold text-gray-900">{year.name}</p>
+                      <p className="font-bold text-white">{year.name}</p>
                       <p className="text-sm text-gray-500">
                         {new Date(year.startDate).toLocaleDateString()} - {new Date(year.endDate).toLocaleDateString()}
                       </p>
@@ -225,13 +225,13 @@ export default function Academics() {
                 {classes.map(cls => (
                   <div key={cls.id} className="p-4 border rounded-lg bg-gray-50">
                     <div className="flex justify-between items-center mb-3">
-                      <p className="font-bold text-gray-900 text-lg">{cls.displayName}</p>
+                      <p className="font-bold text-white text-lg">{cls.displayName}</p>
                       <button 
                         onClick={() => {
                           setSectionForm({...sectionForm, classId: cls.id});
                           sectionFormRef.current?.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                        className="text-[#0A84FF] hover:text-[#409CFF] text-sm font-medium"
                       >
                         + Add Section
                       </button>
@@ -239,7 +239,7 @@ export default function Academics() {
                     <div className="flex gap-2 flex-wrap">
                       {(cls.sections || []).length > 0 ? (
                         cls.sections.map(sec => (
-                          <span key={sec.id} className="badge bg-white shadow-sm border border-gray-200 py-2 px-4 text-base">
+                          <span key={sec.id} className="badge bg-[#1c1c1e] shadow-sm border border-[rgba(84,84,88,0.36)] py-2 px-4 text-base">
                             Section {sec.name}
                           </span>
                         ))
@@ -307,7 +307,7 @@ export default function Academics() {
                     <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {(cls.subjects || []).length > 0 ? (
                         cls.subjects.map(sub => (
-                          <div key={sub.id} className="p-3 bg-white border rounded shadow-sm">
+                          <div key={sub.id} className="p-3 bg-[#1c1c1e] border rounded shadow-sm">
                             <p className="font-semibold text-sm">{sub.name}</p>
                             <p className="text-xs text-gray-500">{sub.code || 'No Code'}</p>
                           </div>

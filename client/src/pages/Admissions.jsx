@@ -124,7 +124,7 @@ export default function Admissions() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Admission Management</h2>
+          <h2 className="text-2xl font-bold text-white">Admission Management</h2>
           <p className="text-gray-600 mt-1">Manage online admissions for academic year 2025-26</p>
         </div>
         <button 
@@ -208,7 +208,7 @@ export default function Admissions() {
         <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100">
+              <thead className="bg-gray-50 border-b border-[rgba(84,84,88,0.36)]">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">App ID</th>
                   <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Student Name</th>
@@ -229,13 +229,13 @@ export default function Admissions() {
                   </tr>
                 ) : admissions.map((adm) => (
                   <tr key={adm.id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-4 py-3 text-sm font-mono font-bold text-primary-700">{adm.admissionNumber}</td>
+                    <td className="px-4 py-3 text-sm font-mono font-bold text-[#409CFF]">{adm.admissionNumber}</td>
                     <td className="px-4 py-3">
-                      <p className="text-sm font-bold text-gray-900">{adm.applicantName}</p>
+                      <p className="text-sm font-bold text-white">{adm.applicantName}</p>
                       <p className="text-xs font-medium text-gray-600">{new Date(adm.dateOfBirth).toLocaleDateString('en-IN')}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="text-sm font-medium text-gray-900">{adm.fatherName}</p>
+                      <p className="text-sm font-medium text-white">{adm.fatherName}</p>
                       <p className="text-xs font-medium text-gray-600">{adm.fatherPhone}</p>
                     </td>
                     <td className="px-4 py-3 text-sm font-medium text-gray-700">{adm.classApplied}</td>
@@ -287,7 +287,7 @@ export default function Admissions() {
                                 toast.error(e.response?.data?.message || 'Conversion failed');
                               }
                             }} 
-                            className="bg-primary-600 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md hover:bg-primary-700 transition-all active:scale-95 flex items-center gap-1"
+                            className="bg-[#0A84FF] text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md hover:bg-primary-700 transition-all active:scale-95 flex items-center gap-1"
                           >
                             <UserPlus className="w-3 h-3" /> Enroll Now
                           </button>
@@ -305,16 +305,16 @@ export default function Admissions() {
       {/* Admission Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-              <h3 className="text-lg font-semibold text-gray-900">New Admission Application</h3>
+          <div className="bg-[#1c1c1e] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-[rgba(84,84,88,0.36)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
+              <h3 className="text-lg font-semibold text-white">New Admission Application</h3>
               <button onClick={() => setShowForm(false)} className="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               {/* Student Details */}
               <div>
-                <h4 className="text-md font-medium text-gray-900 mb-4 border-b pb-2">Applicant Details</h4>
+                <h4 className="text-md font-medium text-white mb-4 border-b pb-2">Applicant Details</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="label">Full Name *</label>
@@ -369,7 +369,7 @@ export default function Admissions() {
 
               {/* Previous School */}
               <div>
-                <h4 className="text-md font-medium text-gray-900 mb-4 border-b pb-2">Previous School Details (if applicable)</h4>
+                <h4 className="text-md font-medium text-white mb-4 border-b pb-2">Previous School Details (if applicable)</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="label">Previous School Name</label>
@@ -392,7 +392,7 @@ export default function Admissions() {
 
               {/* Parent Details */}
               <div>
-                <h4 className="text-md font-medium text-gray-900 mb-4 border-b pb-2">Parent/Guardian Details</h4>
+                <h4 className="text-md font-medium text-white mb-4 border-b pb-2">Parent/Guardian Details</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="label">Father's Name *</label>
@@ -427,7 +427,7 @@ export default function Admissions() {
 
               {/* Address */}
               <div>
-                <h4 className="text-md font-medium text-gray-900 mb-4 border-b pb-2">Address</h4>
+                <h4 className="text-md font-medium text-white mb-4 border-b pb-2">Address</h4>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="md:col-span-2">
                     <label className="label">Address *</label>
@@ -452,7 +452,7 @@ export default function Admissions() {
 
               {/* Contact */}
               <div>
-                <h4 className="text-md font-medium text-gray-900 mb-4 border-b pb-2">Contact Information</h4>
+                <h4 className="text-md font-medium text-white mb-4 border-b pb-2">Contact Information</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="label">Phone *</label>
@@ -467,7 +467,7 @@ export default function Admissions() {
 
               {/* Document Upload */}
               <div>
-                <h4 className="text-md font-medium text-gray-900 mb-4 border-b pb-2">Document Upload</h4>
+                <h4 className="text-md font-medium text-white mb-4 border-b pb-2">Document Upload</h4>
                 <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                   <Upload className="w-10 h-10 mx-auto text-gray-400 mb-3" />
                   <p className="text-sm text-gray-600 font-medium">Upload Required Documents</p>

@@ -1591,3 +1591,11 @@ model WhatsAppMessage {
   @@index([messageType])
   @@index([schoolId, status])
 }
+
+model GlobalSetting {
+  id              String   @id @default("default")
+  maintenanceMode Boolean  @default(false)
+  platformName    String   @default("SmartERP")
+  supportEmail    String   @default("support@smarterp.in")
+  updatedAt       DateTime @updatedAt
+}

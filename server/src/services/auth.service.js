@@ -5,8 +5,7 @@ const prisma = new PrismaClient();
 
 class AuthService {
   async login(emailOrPhone, password) {
-    console.log('--- Login Attempt ---');
-    console.log('Input:', emailOrPhone);
+    console.log('--- Login Attempt ---', emailOrPhone);
 
     const user = await prisma.user.findFirst({
       where: {
@@ -40,14 +39,13 @@ class AuthService {
         userId: user.id,
         role: user.role, 
         schoolId: user.schoolId,
-        tokenVersion: user.tokenVersion || 0,
-        version: user.tokenVersion || 0 
+        tokenVersion: user.tokenVersion || 0 
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    console.log('Result: Login Success for', user.email);
+    console.log('Result: Login Success');
     const { password: _, ...sanitized } = user;
     return { user: sanitized, token };
   }

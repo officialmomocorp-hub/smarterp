@@ -83,7 +83,7 @@ export default function Staff() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Staff Management</h2>
+          <h2 className="text-2xl font-bold text-white">Staff Management</h2>
           <p className="text-gray-500 mt-1">Manage teaching and non-teaching staff</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn btn-primary flex items-center gap-2">
@@ -113,11 +113,11 @@ export default function Staff() {
             filtered.map(s => (
               <div key={s.id} className="card hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg">
+                  <div className="w-12 h-12 rounded-full bg-[#0A84FF]/15 flex items-center justify-center text-[#409CFF] font-bold text-lg">
                     {getInitials(s)}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{getName(s)}</p>
+                    <p className="font-medium text-white">{getName(s)}</p>
                     <p className="text-sm text-gray-500">{s.designation} - {s.department}</p>
                     <p className="text-xs text-gray-400">{s.staffId} | {s.qualification}</p>
                   </div>
@@ -157,7 +157,7 @@ export default function Staff() {
                            document.body.removeChild(linkElem);
                          } catch (e) { toast.error('No salary record found for this month'); }
                       }}
-                      className="p-2 bg-primary-50 rounded-lg text-primary-600 hover:bg-primary-100" 
+                      className="p-2 bg-[#0A84FF]/15 rounded-lg text-[#0A84FF] hover:bg-[#0A84FF]/15" 
                       title="Download Last Salary Slip"
                     >
                        <Download className="w-4 h-4" />
@@ -173,9 +173,9 @@ export default function Staff() {
       {/* Add Staff Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden">
+          <div className="bg-[#1c1c1e] rounded-lg  w-full max-w-lg overflow-hidden">
             <div className="px-6 py-4 border-b flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Add New Staff Member</h3>
+              <h3 className="text-lg font-semibold text-white">Add New Staff Member</h3>
               <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-500"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">

@@ -16,9 +16,9 @@ import {
 
 const Home = () => {
   return (
-    <div className="min-h-screen" style={{ background: '#0B1121' }}>
+    <div className="min-h-screen" style={{ background: '#000' }}>
       {/* ── Navbar ── */}
-      <nav className="fixed top-0 w-full z-50" style={{ background: 'rgba(11,17,33,0.8)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <nav className="fixed top-0 w-full z-50" style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer group">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #2563eb, #3b82f6)', boxShadow: '0 0 20px rgba(37,99,235,0.4)' }}>
@@ -72,7 +72,7 @@ const Home = () => {
             </div>
           </div>
           <div className="relative">
-            <div className="absolute -inset-10 rounded-full blur-3xl" style={{ background: 'rgba(56,189,248,0.08)' }}></div>
+            <div className="absolute -inset-10 rounded-full blur-none" style={{ background: 'rgba(56,189,248,0.08)' }}></div>
             <div className="relative p-3 rounded-[2rem] overflow-hidden" style={{ background: 'rgba(30,41,59,0.5)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(16px)', boxShadow: '0 25px 60px rgba(0,0,0,0.5)' }}>
               <img src="/hero-mockup.png" alt="Dashboard" className="rounded-[1.5rem] w-full" />
             </div>

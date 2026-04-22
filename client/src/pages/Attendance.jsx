@@ -103,7 +103,7 @@ export default function Attendance() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Attendance Management</h2>
+        <h2 className="text-2xl font-bold text-white">Attendance Management</h2>
         <p className="text-gray-500 mt-1">Mark and track student attendance</p>
       </div>
 
@@ -119,7 +119,7 @@ export default function Attendance() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-6 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
               activeTab === tab.id
-                ? 'bg-white text-primary-700 shadow-sm'
+                ? 'bg-white text-[#409CFF] shadow-sm'
                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -199,7 +199,7 @@ export default function Attendance() {
                           <td className="px-4 py-3 text-sm">{student.rollNumber || index + 1}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 text-sm font-medium">
+                              <div className="w-8 h-8 rounded-full bg-[#0A84FF]/15 flex items-center justify-center text-[#409CFF] text-sm font-medium">
                                 {getInitials(student)}
                               </div>
                               <span className="text-sm font-medium">{getStudentName(student)}</span>
@@ -231,7 +231,7 @@ export default function Attendance() {
                                 onClick={() => setAttendanceRecords({ ...attendanceRecords, [student.id]: { ...attendanceRecords[student.id], status: 'LATE' } })}
                                 className={`p-2 rounded-lg transition-colors ${
                                   attendanceRecords[student.id]?.status === 'LATE'
-                                    ? 'bg-amber-100 text-amber-700 ring-2 ring-amber-500'
+                                    ? 'bg-amber-100 text-amber-700 ring-2 ring-[#FF9F0A]'
                                     : 'bg-gray-100 text-gray-400 hover:bg-amber-50'
                                 }`}
                               >
@@ -276,7 +276,7 @@ export default function Attendance() {
 
       {activeTab === 'report' && (
         <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Attendance Report</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Monthly Attendance Report</h3>
           <div className="flex gap-4 mb-6">
             <select className="input w-48">
               <option>Class 5</option>
@@ -304,7 +304,7 @@ export default function Attendance() {
 
       {activeTab === 'alerts' && (
         <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Low Attendance Alerts (&lt;75%)</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Low Attendance Alerts (&lt;75%)</h3>
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
             <div>
@@ -320,7 +320,7 @@ export default function Attendance() {
 
       {activeTab === 'leaves' && (
         <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Leave Applications</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Leave Applications</h3>
           <div className="text-center py-12 text-gray-500">
             <p>No leave applications found</p>
           </div>

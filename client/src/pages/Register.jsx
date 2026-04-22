@@ -73,7 +73,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] overflow-y-auto">
-      <div className="max-w-5xl w-full grid md:grid-cols-5 bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100 my-8">
+      <div className="max-w-5xl w-full grid md:grid-cols-5 bg-[#1c1c1e] rounded-[2.5rem]  overflow-hidden border border-slate-100 my-8">
         
         {/* Left Side: Plan Info (2 cols) */}
         <div className="md:col-span-2 bg-slate-900 p-12 text-white flex flex-col justify-between relative overflow-hidden">
@@ -100,7 +100,7 @@ const Register = () => {
                 { title: 'Feature Suite', desc: 'Academics, Finance & Transport.' }
               ].map((item, idx) => (
                 <div key={idx} className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-blue-400 shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#2c2c2e] flex items-center justify-center text-blue-400 shrink-0">
                     <CheckCircle2 size={20} />
                   </div>
                   <div>
@@ -112,13 +112,13 @@ const Register = () => {
             </div>
           </div>
 
-          <div className="pt-10 border-t border-white/10 relative z-10 mt-12">
+          <div className="pt-10 border-t border-[#38383a] relative z-10 mt-12">
             <div className="flex items-baseline gap-1">
               <span className="text-sm text-slate-400">Starting at</span>
-              <span className="text-3xl font-black">{"\u20B9"}{planInfo.price}</span>
+              <span className="text-3xl font-bold">{"\u20B9"}{planInfo.price}</span>
               <span className="text-sm text-slate-500">/mo</span>
             </div>
-            <p className="text-[10px] text-slate-500 mt-2 uppercase tracking-widest font-bold">Billing starts after 14-day trial</p>
+            <p className="text-[10px] text-slate-500 mt-2  font-bold">Billing starts after 14-day trial</p>
           </div>
         </div>
 
@@ -133,7 +133,7 @@ const Register = () => {
             {/* School Identity */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">School Name</label>
+                <label className="text-[10px] font-bold text-slate-500  ml-1">School Name</label>
                 <div className="relative">
                   <School className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                   <input
@@ -147,7 +147,7 @@ const Register = () => {
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">UDISE Code</label>
+                <label className="text-[10px] font-bold text-slate-500  ml-1">UDISE Code</label>
                 <div className="relative">
                   <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                   <input
@@ -164,7 +164,7 @@ const Register = () => {
 
             {/* Address Details */}
             <div className="space-y-1">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Address</label>
+              <label className="text-[10px] font-bold text-slate-500  ml-1">Address</label>
               <div className="relative">
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                 <input
@@ -180,7 +180,7 @@ const Register = () => {
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">City</label>
+                <label className="text-[10px] font-bold text-slate-500  ml-1">City</label>
                 <input
                   type="text"
                   name="city"
@@ -191,7 +191,7 @@ const Register = () => {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">State</label>
+                <label className="text-[10px] font-bold text-slate-500  ml-1">State</label>
                 <input
                   type="text"
                   name="state"
@@ -202,7 +202,7 @@ const Register = () => {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Pincode</label>
+                <label className="text-[10px] font-bold text-slate-500  ml-1">Pincode</label>
                 <input
                   type="text"
                   name="pincode"
@@ -217,7 +217,7 @@ const Register = () => {
             {/* Admin Details */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Admin Name</label>
+                <label className="text-[10px] font-bold text-slate-500  ml-1">Admin Name</label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                   <input
@@ -231,7 +231,7 @@ const Register = () => {
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Phone</label>
+                <label className="text-[10px] font-bold text-slate-500  ml-1">Phone</label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                   <input
@@ -249,7 +249,7 @@ const Register = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Admin Email</label>
+                <label className="text-[10px] font-bold text-slate-500  ml-1">Admin Email</label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                   <input
@@ -263,7 +263,7 @@ const Register = () => {
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Admin Password</label>
+                <label className="text-[10px] font-bold text-slate-500  ml-1">Admin Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                   <input
@@ -281,7 +281,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group mt-4"
+              className="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all  shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group mt-4"
             >
               {loading ? <Loader2 className="animate-spin" /> : <>Complete Registration <ArrowRight className="group-hover:translate-x-1 transition-transform" /> </>}
             </button>
